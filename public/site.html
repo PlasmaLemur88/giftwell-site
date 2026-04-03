@@ -852,52 +852,21 @@ input[type="range"]::-webkit-slider-thumb {
 
       <!-- Step 3: Result + Apply -->
       <div class="calc-step" data-step="3">
-        <div class="result-hero">
-          <div class="result-label">Your estimated annual corporate gifting revenue</div>
+        <div class="result-hero" style="padding:4px 0 16px">
+          <div class="result-label">Estimated annual corporate gifting revenue</div>
           <div class="result-num" id="calc-result-num">$0</div>
           <div class="result-range" id="calc-result-range"></div>
         </div>
-        <div class="result-stats">
-          <div class="result-stat"><div class="result-stat-num" id="rs-orders">0</div><div class="result-stat-label">orders / year</div></div>
-          <div class="result-stat"><div class="result-stat-num" id="rs-recip">0</div><div class="result-stat-label">avg recipients</div></div>
-          <div class="result-stat"><div class="result-stat-num" id="rs-subs">0</div><div class="result-stat-label">new subscribers</div></div>
+        <div class="apply-section" style="margin-top:8px">
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input type="email" id="calc-email" placeholder="Work email" style="flex:1">
+            <input type="text" id="calc-store" placeholder="yourstore.myshopify.com" style="flex:1">
+          </div>
+          <a href="#" class="btn btn-dark" style="width:100%;text-align:center;display:block" onclick="event.preventDefault();submitApp()">Apply now</a>
         </div>
-        <div class="result-divider"></div>
-        <div class="apply-section">
-          <div class="calc-q" style="margin-bottom:12px">Apply to be a Giftwell merchant</div>
-          <label>Your name</label>
-          <input type="text" id="calc-name" placeholder="Jane Smith">
-          <label>Work email</label>
-          <input type="email" id="calc-email" placeholder="jane@yourbrand.com">
-          <label>Shopify store URL</label>
-          <input type="text" id="calc-store" placeholder="yourbrand.myshopify.com">
-          <details class="qualify-extras">
-            <summary>Help us qualify your fit (optional)</summary>
-            <div class="qualify-q">
-              <p>Monthly Google Ads spend?</p>
-              <div class="qualify-pills" data-field="ads">
-                <div class="qpill" data-val="0">None</div>
-                <div class="qpill" data-val="2000">&lt;$2K</div>
-                <div class="qpill" data-val="5000">$2-10K</div>
-                <div class="qpill" data-val="15000">$10-25K</div>
-                <div class="qpill" data-val="40000">$25K+</div>
-              </div>
-            </div>
-            <div class="qualify-q">
-              <p>Would you invest 10% of ad spend in corporate gifting if ROI was 5-8x?</p>
-              <div class="qualify-pills" data-field="willing">
-                <div class="qpill" data-val="yes">Yes</div>
-                <div class="qpill" data-val="maybe">Maybe</div>
-                <div class="qpill" data-val="later">Not yet</div>
-              </div>
-            </div>
-          </details>
-        </div>
-        <a href="#" class="btn btn-dark" style="width:100%;text-align:center;display:block;margin-top:20px" onclick="event.preventDefault();submitApp()">Apply now</a>
         <div id="calc-submitted" class="submitted-msg" style="display:none">
           <div class="submitted-check">&#10003;</div>
-          <div class="calc-q">Application received</div>
-          <div class="calc-hint" style="margin-bottom:0">We'll review your store and reach out within 24 hours.</div>
+          <div class="calc-q">We'll reach out within 24 hours</div>
         </div>
       </div>
 
@@ -1006,34 +975,19 @@ function calcResult() {
   requestAnimationFrame(animateNum);
 
   document.getElementById('calc-result-range').textContent = '$' + low.toLocaleString() + ' - $' + high.toLocaleString() + ' estimated range';
-  document.getElementById('rs-orders').textContent = ordersPerYear.toLocaleString();
-  document.getElementById('rs-recip').textContent = avgRecipients;
-  document.getElementById('rs-subs').textContent = newSubs.toLocaleString();
+  // Stats removed from UI for simplicity
 
   calcGo(3);
 }
 
 function submitApp() {
-  const name = document.getElementById('calc-name').value;
   const email = document.getElementById('calc-email').value;
   const store = document.getElementById('calc-store').value;
   if (!email) { document.getElementById('calc-email').style.borderColor = '#ef4444'; document.getElementById('calc-email').focus(); return; }
 
-  // Collect optional qualify data
-  const adsEl = document.querySelector('.qualify-pills[data-field="ads"] .qpill.selected');
-  const willingEl = document.querySelector('.qualify-pills[data-field="willing"] .qpill.selected');
+  console.log('Application:', { ...calcData, email, store });
 
-  const payload = {
-    ...calcData,
-    name, email, store,
-    adSpend: adsEl ? adsEl.dataset.val : 'skipped',
-    willingToInvest: willingEl ? willingEl.dataset.val : 'skipped'
-  };
-  console.log('Application:', payload);
-
-  // Hide form, show confirmation
   document.querySelector('.apply-section').style.display = 'none';
-  document.querySelector('.calc-step[data-step="3"] > a').style.display = 'none';
   document.getElementById('calc-submitted').style.display = 'block';
 }
 
