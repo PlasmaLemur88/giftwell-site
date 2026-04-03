@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giftwell | Corporate Gifting Made Easy</title>
+<link rel="icon" type="image/png" href="g-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nothing+You+Could+Do&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: #171717; background: #fff;
+  overflow-x: hidden; -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ BUTTONS — Partiful exact style ═══ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 4px; font-weight: 400; font-size: 12px;
+  padding: 0 24px; height: 48px; text-decoration: none;
+  transition: opacity .15s; cursor: pointer; border: none;
+  font-family: inherit;
+}
+.btn:hover { opacity: .85; }
+.btn-dark { background: #000; color: #fff; }
+.btn-white { background: #fff; color: #000; }
+
+/* ═══ G LOGO — pixel G images ═══ */
+.g-logo { width: 44px; height: 44px; position: relative; flex-shrink: 0; }
+.g-logo img { width: 100%; height: 100%; object-fit: contain; position: absolute; inset: 0; transition: opacity .3s; }
+.g-logo .logo-sticky { opacity: 0; }
+nav.sticky .g-logo .logo-default { opacity: 0; }
+nav.sticky .g-logo .logo-sticky { opacity: 1; }
+.g-logo-lg { width: 72px; height: 72px; }
+
+/* ═══ HEADINGS ═══ */
+h2 {
+  font-family: 'Outfit', sans-serif; font-weight: 700;
+  letter-spacing: -0.96px; line-height: 1.2;
+}
+
+/* ═══ MEDIA SLOT ═══ */
+.media-slot {
+  width: 100%; border-radius: 20px; overflow: hidden;
+  background: linear-gradient(135deg, #E8E0F8, #F0D8EE, #D8E0F8);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 8px;
+  color: rgba(0,0,0,.2); font-size: 13px; font-weight: 400;
+  border: 2px dashed rgba(0,0,0,.06); position: relative;
+}
+.media-slot::before {
+  content: '▶'; display: flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(255,255,255,.5); font-size: 16px; color: #7B2FBE;
+}
+.media-slot video, .media-slot img {
+  width: 100%; height: 100%; object-fit: cover;
+  position: absolute; inset: 0; border-radius: 20px;
+}
+.media-slot:has(video), .media-slot:has(img) { color: transparent; }
+.media-slot:has(video)::before, .media-slot:has(img)::before { display: none; }
+
+/* ═══ SPRING SCROLL REVEAL ═══ */
+.reveal {
+  opacity: 0; transform: translateY(100px);
+  transition: opacity .8s cubic-bezier(.25, .1, .25, 1),
+              transform .8s cubic-bezier(.17, .67, .3, 1.2);
+}
+.reveal.vis { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: .1s; }
+.reveal-d2 { transition-delay: .2s; }
+.reveal-d3 { transition-delay: .3s; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ═══ NAV — transparent on hero, white sticky after scroll ═══ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  transition: background .3s ease, border-color .3s ease, backdrop-filter .3s ease;
+  border-bottom: 1px solid transparent;
+}
+nav.sticky {
+  background: rgba(255,255,255,.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom-color: rgba(0,0,0,.06);
+}
+nav.sticky .nav-logo span { color: #171717; }
+nav.sticky .nav-links a { color: #525252; }
+nav.sticky .nav-links a:hover { color: #171717; }
+nav.sticky .login { color: #525252; }
+nav.sticky .btn-white { background: #171717; color: #fff; }
+.nav-inner {
+  max-width: 1200px; margin: 0 auto; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 40px; height: 72px;
+}
+.nav-logo { display: flex; align-items: center; gap: 2px; text-decoration: none; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: -.3px; color: #fff; }
+.nav-logo .g-icon { width: 34px; height: 34px; }
+.nav-links { display: flex; gap: 32px; }
+.nav-links a { font-size: 14px; font-weight: 500; text-decoration: none; color: rgba(255,255,255,.8); transition: color .15s; }
+.nav-links a:hover { color: #fff; }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.nav-right .login { font-size: 14px; font-weight: 500; text-decoration: none; color: rgba(255,255,255,.9); }
+
+/* ═══ HERO ═══ */
+.hero {
+  background: url('hero-bg.png') center/cover no-repeat;
+  padding: 0 24px; position: relative; overflow: hidden;
+  min-height: 0; padding-top: 100px; padding-bottom: 60px; display: flex; align-items: center;
+}
+.grain-svg { position: absolute; inset: 0; z-index: 1; pointer-events: none; width: 100%; height: 100%; mix-blend-mode: overlay; }
+.hero-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to right, rgba(0,0,0,.5) 0%, rgba(0,0,0,.3) 30%, rgba(0,0,0,.1) 50%, transparent 60%); }
+.hero-inner {
+  max-width: 1200px; margin: 0 auto; position: relative; z-index: 2;
+  display: flex; align-items: center; gap: 0;
+  padding: 0 40px; width: 100%;
+}
+.hero-text-col { width: 360px; flex-shrink: 0; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 16px; border-radius: 999px;
+  background: rgba(255,255,255,.12); backdrop-filter: blur(8px);
+  color: rgba(255,255,255,.85); font-size: 13px; font-weight: 400;
+  margin-bottom: 16px; border: 1px solid rgba(255,255,255,.1);
+}
+.hero-badge .stars { color: #FBBF24; letter-spacing: 1px; }
+h1 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800; font-size: clamp(32px, 3.5vw, 48px);
+  line-height: 1.05; letter-spacing: -1.5px; color: #fff; margin-bottom: 14px;
+  text-shadow: 0 2px 30px rgba(0,0,0,.3), 0 1px 4px rgba(0,0,0,.15);
+}
+.hero-sub { color: rgba(255,255,255,.8); font-size: 14px; line-height: 1.5; max-width: 380px; margin-bottom: 20px; text-shadow: 0 1px 10px rgba(0,0,0,.2); }
+.hero-media { flex: 1; display: flex; justify-content: flex-end; align-items: center; position: relative; }
+.hero-media .media-slot {
+  width: 460px; aspect-ratio: 16/10;
+  box-shadow: 0 20px 60px -10px rgba(0,0,0,.2);
+  border: 1px solid rgba(255,255,255,.15);
+  background: #fff;
+  color: rgba(0,0,0,.25);
+  border-radius: 16px;
+  position: relative; z-index: 3;
+}
+.hero-media .media-slot::before { color: rgba(0,0,0,.2); background: rgba(0,0,0,.05); }
+.gem {
+  position: absolute; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,255,255,.6), rgba(180,140,255,.4), rgba(255,180,220,.4));
+  animation: float 6s ease-in-out infinite;
+}
+.gem-1 { width: 24px; height: 24px; top: -10px; right: 60px; }
+.gem-2 { width: 18px; height: 18px; bottom: 40px; right: -8px; animation-delay: 1.5s; }
+.gem-3 { width: 30px; height: 30px; bottom: -12px; left: 80px; animation-delay: 3s; }
+.gem-4 { width: 14px; height: 14px; top: 40px; left: -6px; animation-delay: 4.2s; }
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-8px) rotate(5deg); }
+  66% { transform: translateY(4px) rotate(-3deg); }
+}
+
+/* ═══ MARQUEE ═══ */
+.marquee-wrap { overflow: hidden; padding: 40px 0; background: linear-gradient(180deg, #F0E8FF, #fff); }
+.marquee-track { display: flex; gap: 48px; width: max-content; animation: marquee 30s linear infinite; }
+.marquee-track span { white-space: nowrap; font-size: 15px; color: #b0b0b0; font-weight: 400; font-style: italic; }
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+/* ═══ SHOWCASE (tabs) ═══ */
+.showcase { background: linear-gradient(180deg, #fff, #F8F2FF 40%, #FFF2F8 70%, #F2F6FF); padding: 100px 24px; }
+.section-center { text-align: center; max-width: 700px; margin: 0 auto; }
+.section-center p { color: #737373; font-size: 18px; font-weight: 500; line-height: 1.4; letter-spacing: -0.36px; margin-top: 8px; }
+.tab-row { display: flex; justify-content: center; gap: 12px; margin: 32px 0 40px; flex-wrap: wrap; }
+.tab-pill {
+  padding: 10px 20px; border-radius: 960px; font-size: 12px; font-weight: 400; cursor: pointer;
+  border: none; background: rgba(0,0,0,.05); color: #171717;
+  display: flex; align-items: center; gap: 6px; transition: background .15s; height: 44px;
+}
+.tab-pill.active { background: rgba(0,0,0,.1); }
+.tab-pill:hover:not(.active) { background: rgba(0,0,0,.07); }
+.showcase-media { max-width: 900px; margin: 0 auto; }
+.showcase-media .media-slot { aspect-ratio: 16/9; border-radius: 24px; }
+
+/* ═══ FEATURE ROWS ═══
+   No hard borders. Backgrounds bleed into each other via gradients.
+   Alternating text/media. ═══ */
+.feature-row { padding: 100px 24px; }
+.fr-1 { background: linear-gradient(180deg, #F2F6FF 0%, #fff 30%, #FFF8FA 100%); }
+.fr-2 { background: linear-gradient(180deg, #FFF8FA 0%, #FAFAFF 50%, #F8FAFF 100%); }
+.fr-3 { background: linear-gradient(180deg, #F8FAFF 0%, #fff 40%, #FFFAF8 100%); }
+.fr-4 { background: linear-gradient(180deg, #FFFAF8 0%, #FAF8FF 50%, #F8FFFA 100%); }
+.fr-5 { background: linear-gradient(180deg, #F8FFFA 0%, #fff 40%, #FFF8FC 100%); }
+.fr-6 { background: linear-gradient(180deg, #FFF8FC 0%, #F8F8FF 50%, #fff 100%); }
+.feature-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+}
+.feature-inner.reverse .feature-text { order: 2; }
+.feature-inner.reverse .feature-media { order: 1; }
+.feature-text h2 { font-size: 24px; color: #171717; margin-bottom: 12px; }
+.feature-text p { color: #737373; font-size: 18px; font-weight: 500; line-height: 1.4; letter-spacing: -0.36px; margin-bottom: 24px; }
+.feature-media .media-slot { aspect-ratio: 4/3; }
+
+/* ═══ 3 CARDS ═══ */
+.cards-section { padding: 80px 24px; background: linear-gradient(180deg, #fff 0%, #F8F2FF 50%, #FFF5F8 100%); }
+.cards-section .section-center { margin-bottom: 48px; }
+.cards-grid {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+.fcard { background: #fff; border-radius: 20px; overflow: hidden; }
+.fcard-img { height: 220px; overflow: hidden; }
+.fcard-img .media-slot { height: 100%; border-radius: 0; border: none; aspect-ratio: auto; }
+.fcard-img .media-slot.s-purple { background: linear-gradient(135deg, #2D1B69, #4A2D8F); color: rgba(255,255,255,.2); }
+.fcard-img .media-slot.s-purple::before { color: #fff; background: rgba(255,255,255,.1); }
+.fcard-img .media-slot.s-warm { background: linear-gradient(135deg, #8B3A1A, #C04830); color: rgba(255,255,255,.2); }
+.fcard-img .media-slot.s-warm::before { color: #fff; background: rgba(255,255,255,.1); }
+.fcard-img .media-slot.s-teal { background: linear-gradient(135deg, #1A5C6B, #20808F); color: rgba(255,255,255,.2); }
+.fcard-img .media-slot.s-teal::before { color: #fff; background: rgba(255,255,255,.1); }
+.fcard-body { padding: 24px; }
+.fcard-body h3 {
+  font-family: 'Outfit', sans-serif; font-weight: 700;
+  font-size: 18px; letter-spacing: -.5px; margin-bottom: 8px;
+}
+.fcard-body p { font-size: 16px; font-weight: 500; color: #737373; line-height: 1.4; letter-spacing: -0.3px; margin-bottom: 16px; }
+.fcard-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 14px; font-weight: 500; color: #525252;
+  text-decoration: none; padding: 10px 0; border-top: 1px solid #f0f0f0; width: 100%;
+  transition: color .15s;
+}
+.fcard-link:hover { color: #000; }
+
+/* ═══ REVIEWS — Partiful layout: text left, cards right ═══ */
+.reviews { padding: 100px 24px; background: #fff; }
+.reviews-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; align-items: start;
+}
+.reviews-text { position: sticky; top: 120px; }
+.reviews-text .badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 999px; border: 1px solid #e5e5e5;
+  font-size: 13px; color: #737373; margin-bottom: 20px;
+}
+.reviews-text h2 { font-size: 36px; margin-bottom: 12px; }
+.reviews-text p { color: #737373; font-size: 18px; font-weight: 500; line-height: 1.4; letter-spacing: -0.36px; margin-bottom: 24px; }
+.reviews-grid { columns: 2; column-gap: 12px; }
+.review-card {
+  background: #fff; border: 1px solid #f0f0f0; border-radius: 12px; padding: 20px;
+  margin-bottom: 12px; break-inside: avoid;
+}
+.review-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px; }
+.review-card h4 { font-weight: 700; font-size: 14px; }
+.review-date { font-size: 11px; color: #a3a3a3; }
+.review-stars { color: #F59E0B; font-size: 11px; margin-bottom: 4px; }
+.review-author { font-size: 11px; color: #a3a3a3; text-align: right; }
+.review-card p { font-size: 13px; color: #525252; line-height: 1.5; margin-top: 8px; }
+
+/* ═══ CTA BANNER — Partiful style: soft lavender, not dark gradient ═══ */
+.cta-banner {
+  background: linear-gradient(180deg, #fff 0%, #F5F0FF 30%, #F0E8FF 60%, #F8F0FF 100%);
+  padding: 120px 24px; text-align: center;
+}
+.cta-banner h2 { font-size: 36px; color: #171717; margin-bottom: 12px; }
+.cta-banner p { color: #737373; font-size: 18px; font-weight: 500; letter-spacing: -0.36px; margin-bottom: 40px; }
+.shopify-badge {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: #000; color: #fff; border-radius: 8px;
+  padding: 12px 24px; text-decoration: none; transition: opacity .15s;
+}
+.shopify-badge:hover { opacity: .85; }
+.shopify-badge svg { flex-shrink: 0; }
+.shopify-badge-text { text-align: left; }
+.shopify-badge-text .small { font-size: 9px; text-transform: uppercase; letter-spacing: .5px; opacity: .7; }
+.shopify-badge-text .big { font-size: 16px; font-weight: 600; }
+
+/* ═══ FOOTER — light bg like Partiful ═══ */
+footer { background: #fafafa; color: #737373; padding: 60px 24px 40px; border-top: 1px solid #f0f0f0; }
+.footer-inner { max-width: 1100px; margin: 0 auto; }
+.footer-top { display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 60px; margin-bottom: 40px; align-items: start; }
+.footer-logo-col { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.footer-logo-col img { width: 72px; height: 72px; filter: contrast(1.3); }
+.footer-col h5 { color: #171717; font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+.footer-col a { display: block; color: #737373; font-size: 14px; text-decoration: none; margin-bottom: 10px; transition: color .15s; }
+.footer-col a:hover { color: #171717; }
+.social-icons { display: flex; gap: 16px; margin-top: 16px; }
+.social-icons a { color: #525252; transition: color .15s; }
+.social-icons a:hover { color: #171717; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+  /* Nav */
+  .nav-links { display: none; }
+  .nav-inner { padding: 0 20px; height: 60px; }
+  .nav-logo span { font-size: 18px; }
+  .g-logo { width: 36px; height: 36px; }
+
+  /* Hero */
+  .hero { min-height: auto; padding: 0; }
+  .hero-inner { flex-direction: column; text-align: center; padding: 100px 20px 60px; gap: 32px; }
+  .hero-text-col { width: 100%; }
+  h1 { font-size: 38px; line-height: 1; letter-spacing: -1.5px; }
+  .hero-sub { margin: 0 auto 20px; font-size: 14px; }
+  .hero-text-col div[style] { justify-content: center !important; }
+  .hero-badge { font-size: 12px; padding: 6px 14px; margin-bottom: 20px; }
+  .hero-media { width: 100%; justify-content: center; }
+  .hero-media .media-slot { width: 100%; max-width: 400px; }
+  .gem { display: none; }
+
+  /* Marquee */
+  .marquee-track { font-size: 14px; }
+
+  /* Showcase */
+  .showcase-pills { gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .showcase-pill { font-size: 11px; padding: 8px 14px; height: 38px; }
+
+  /* Feature rows */
+  .feature-row { padding: 60px 20px; }
+  .feature-inner { grid-template-columns: 1fr; text-align: center; gap: 32px; }
+  .feature-inner.reverse .feature-text, .feature-inner.reverse .feature-media { order: unset; }
+  .feature-inner h2 { font-size: 26px; letter-spacing: -.5px; }
+  .feature-inner p { font-size: 16px; max-width: 100%; }
+
+  /* Cards */
+  .cards-section { padding: 60px 20px; }
+  .cards-grid { grid-template-columns: 1fr; gap: 24px; }
+
+  /* Origin story */
+  .reviews + section, section:has(+ .reviews) { padding: 60px 20px !important; }
+
+  /* Reviews */
+  .reviews { padding: 60px 20px; }
+  .reviews-inner { flex-direction: column; gap: 40px; }
+  .reviews-text { text-align: center; }
+  .section-center h2, .reviews-text h2 { font-size: 30px !important; letter-spacing: -1px !important; }
+  .reviews-grid { columns: 1; }
+
+  /* CTA */
+  .cta-banner { padding: 60px 20px; }
+  .cta-banner h2 { font-size: 30px; letter-spacing: -1px; }
+
+  /* Footer */
+  .footer-inner { padding: 40px 20px; }
+  .footer-top { grid-template-columns: 1fr; gap: 32px; }
+  .footer-logo-col img { width: 48px; height: 48px; }
+  .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV — fixed, transparent, no scroll state change -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="g-logo"><img src="g-white-bold.png" alt="G" class="logo-default"><img src="g-black-bold.png" alt="G" class="logo-sticky"></div>
+      <span>giftwell</span>
+    </a>
+    <div class="nav-links">
+      <a href="#">How It Works</a>
+      <a href="#">Why Giftwell</a>
+      <a href="#">Pricing</a>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="login">Login</a>
+      <a href="#" class="btn btn-white" onclick="event.preventDefault();document.getElementById('calc-modal').classList.add('active')">Unlock new revenue</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-scrim"></div>
+  <svg class="grain-svg" style="opacity:.18;mix-blend-mode:overlay">
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch"/></filter>
+    <rect width="100%" height="100%" filter="url(#grain)"/>
+  </svg>
+  <div class="hero-inner">
+    <div class="hero-text-col">
+      <div class="hero-badge"><span class="stars">★★★★★</span> 100+ Shopify merchants</div>
+      <h1>Your next $1M channel is corporate gifting</h1>
+      <p class="hero-sub">Sales teams, HR, event planners, team leads. They're all buying gifts in your category right now. Giftwell makes your store the easiest place to order and turns every recipient into a subscriber.</p>
+      <a href="#" class="btn btn-white" onclick="event.preventDefault();document.getElementById('calc-modal').classList.add('active')">Unlock new revenue</a>
+      <div style="margin-top:24px;display:flex;align-items:center;gap:8px;opacity:.6">
+        <span style="font-size:11px;color:rgba(255,255,255,.7);letter-spacing:.5px">Built for</span>
+        <img src="shopify-logo.png" alt="Shopify" style="height:20px;filter:brightness(0) invert(1);opacity:.85">
+        <span style="font-size:11px;color:rgba(255,255,255,.6)">merchants</span>
+      </div>
+    </div>
+    <div class="hero-media">
+      <div class="media-slot">Hero product video</div>
+      <div class="gem gem-1"></div><div class="gem gem-2"></div><div class="gem gem-3"></div><div class="gem gem-4"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>"The gifting app we've been waiting for"</span><span>"Partiful for corporate gifts"</span><span>"DTC brands' secret weapon"</span><span>"Corporate gifting, reimagined"</span><span>"Finally, B2B revenue that doesn't suck"</span><span>"Installed in October, $47K by November"</span><span>"The gifting app we've been waiting for"</span><span>"Partiful for corporate gifts"</span><span>"DTC brands' secret weapon"</span><span>"Corporate gifting, reimagined"</span><span>"Finally, B2B revenue that doesn't suck"</span><span>"Installed in October, $47K by November"</span>
+  </div>
+</div>
+
+<!-- SHOWCASE (tabs) -->
+<section class="showcase">
+  <div class="section-center reveal">
+    <h2 style="font-size:36px">The easiest corporate gifting checkout on the internet</h2>
+    <p>100% free to install. We only make money when you do. Customize the perfect gift experience.</p>
+  </div>
+  <div class="tab-row">
+    <div class="tab-pill active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="17" r="2"/><circle cx="9" cy="18" r="3"/><path d="M3 2l4 9.5L14 18"/></svg> Branded</div>
+    <div class="tab-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a4 4 0 014 4c0 2-2 3-2 5h-4c0-2-2-3-2-5a4 4 0 014-4z"/><line x1="10" y1="14" x2="14" y2="14"/><line x1="10" y1="17" x2="14" y2="17"/><path d="M10 20h4"/></svg> AI Parsing</div>
+    <div class="tab-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Unwrapping</div>
+    <div class="tab-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg> Tracking</div>
+  </div>
+  <div class="showcase-media reveal reveal-d2">
+    <div class="media-slot">Feature demo</div>
+  </div>
+</section>
+
+<!-- FEATURE: Paste any list -->
+<div class="feature-row fr-1">
+  <div class="feature-inner">
+    <div class="feature-text reveal">
+      <h2>Give us anything. We'll figure it out.</h2>
+      <p>Emails. Addresses. Names. A mix of all three. Doesn't matter. Drop whatever you have. AI parses, auto-completes, and builds the order. No CSV. No spreadsheet. No lost sales.</p>
+      <a href="#" class="btn btn-dark" onclick="event.preventDefault();document.getElementById('calc-modal').classList.add('active')">Unlock new revenue</a>
+    </div>
+    <div class="feature-media reveal reveal-d2">
+      <div class="media-slot">Media slot</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURE: Branded unwrapping -->
+<div class="feature-row fr-2">
+  <div class="feature-inner reverse">
+    <div class="feature-text reveal">
+      <h2>The gifter looks like a hero. Not like they bulk-ordered.</h2>
+      <p>Every recipient gets a branded, animated unwrapping experience with a personal message. Your logo, your colors, your vibe. The gifter gets credit for being thoughtful. The recipient remembers your brand. Other platforms send a tracking number.</p>
+      <a href="#" class="btn btn-dark" onclick="event.preventDefault();document.getElementById('calc-modal').classList.add('active')">Unlock new revenue</a>
+    </div>
+    <div class="feature-media reveal reveal-d2">
+      <div class="media-slot">Media slot</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURE: 4 clicks -->
+<div class="feature-row fr-3">
+  <div class="feature-inner">
+    <div class="feature-text reveal">
+      <h2>One order. 200 gifts. Done.</h2>
+      <p>Corporate buyers don't have time. Everything is pre-populated. Gift selected, message written, theme applied. They click through, customize if they want, and checkout in one shot. That's 200 gifts, not 200 separate orders.</p>
+      <a href="#" class="btn btn-dark" onclick="event.preventDefault();document.getElementById('calc-modal').classList.add('active')">Unlock new revenue</a>
+    </div>
+    <div class="feature-media reveal reveal-d2">
+      <div class="media-slot">Media slot</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURE: Concierge -->
+<div class="feature-row fr-4">
+  <div class="feature-inner reverse">
+    <div class="feature-text reveal">
+      <h2>Every gift tracked. Every claim visible. Zero guesswork.</h2>
+      <p>Did it arrive? Did they open it? Who hasn't claimed yet? The gifter sees everything in real time. No follow-up emails. No "did you get it?" texts. Full transparency. That's exactly what makes them order again.</p>
+      <a href="#" class="btn btn-dark" onclick="event.preventDefault();document.getElementById('calc-modal').classList.add('active')">Unlock new revenue</a>
+    </div>
+    <div class="feature-media reveal reveal-d2">
+      <div class="media-slot">Media slot</div>
+    </div>
+  </div>
+</div>
+
+<!-- 3 CARDS -->
+<section class="cards-section">
+  <div class="section-center reveal"><h2 style="font-size:36px">This isn't a Shopify app. It's a revenue channel.</h2></div>
+  <div class="cards-grid">
+    <div class="fcard reveal">
+      <div class="fcard-img"><div class="media-slot s-purple">Media slot</div></div>
+      <div class="fcard-body"><h3>One order, 200 gifts</h3><p>Drop emails, addresses, names. Whatever you have. AI builds the order. No spreadsheet. No friction. No lost sales.</p><a href="#" class="fcard-link">See how ↗</a></div>
+    </div>
+    <div class="fcard reveal reveal-d1">
+      <div class="fcard-img"><div class="media-slot s-warm">Media slot</div></div>
+      <div class="fcard-body"><h3>Make the gifter look cool</h3><p>Branded unwrapping. Personal message. Their logo, their colors. The gifter looks thoughtful. Not like they bulk-ordered from a catalog.</p><a href="#" class="fcard-link">See the experience ↗</a></div>
+    </div>
+    <div class="fcard reveal reveal-d2">
+      <div class="fcard-img"><div class="media-slot s-teal">Media slot</div></div>
+      <div class="fcard-body"><h3>200 new subscribers per order</h3><p>Every recipient opts into your marketing from the gift experience. One corporate order fills your funnel with people who've already held your product.</p><a href="#" class="fcard-link">See the flywheel ↗</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE: Your brand -->
+<div class="feature-row fr-5">
+  <div class="feature-inner">
+    <div class="feature-text reveal">
+      <h2>One corporate order. 200 new subscribers.</h2>
+      <p>Every gift recipient can opt into your marketing right from the unwrapping experience. One order of 200 gifts = 200 people who've already held your product and are now in your funnel. This isn't a one-off sale. It's an acquisition channel.</p>
+      <a href="#" class="btn btn-dark" onclick="event.preventDefault();document.getElementById('calc-modal').classList.add('active')">Unlock new revenue</a>
+    </div>
+    <div class="feature-media reveal reveal-d2">
+      <div class="media-slot">Media slot</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURE: We bring buyers -->
+<div class="feature-row fr-6">
+  <div class="feature-inner reverse">
+    <div class="feature-text reveal">
+      <h2>You keep every dollar. We charge the buyer 10%.</h2>
+      <p>Other platforms take 20-40% of your revenue. We don't touch your margins. The buyer pays a 10% experience fee because they're getting branded unwrapping, AI-powered ordering, and full tracking. They're happy to pay it. You keep 100% of your product revenue.</p>
+      <a href="#" class="btn btn-dark" onclick="event.preventDefault();document.getElementById('calc-modal').classList.add('active')">Unlock new revenue</a>
+    </div>
+    <div class="feature-media reveal reveal-d2">
+      <div class="media-slot">Media slot</div>
+    </div>
+  </div>
+</div>
+
+<!-- WHY US — origin story -->
+<section style="padding:100px 24px;background:#fff;">
+  <div style="max-width:700px;margin:0 auto;text-align:center;" class="reveal">
+    <h2 style="font-size:36px;font-weight:700;margin-bottom:24px;">We didn't build this in a garage. We built it in our own store.</h2>
+    <p style="font-size:18px;font-weight:500;line-height:1.6;color:#525252;margin-bottom:16px;">We were Shopify merchants who hit $3M in corporate gifting in a single year using our own custom tools. We know every small detail that makes order flows convert. Every friction point that kills a sale. Every follow-up that turns a one-time buyer into a quarterly reorder.</p>
+    <p style="font-size:18px;font-weight:500;line-height:1.6;color:#525252;">We built Giftwell because we wanted to give every merchant the same unfair advantage.</p>
+  </div>
+</section>
+
+<!-- REVIEWS — Partiful layout: text left, staggered cards right -->
+<section class="reviews">
+  <div class="reviews-inner">
+    <div class="reviews-text reveal">
+      <div class="badge">★★★★★ 5.0 · Shopify App Store</div>
+      <h2>Real reviews, from real merchants</h2>
+      <p>Don't just take our word for it. See what our merchants say.</p>
+      <a href="#" class="btn btn-dark" onclick="event.preventDefault();document.getElementById('calc-modal').classList.add('active')">Unlock new revenue</a>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card reveal">
+        <div class="review-header"><h4>$47K in our first month</h4><span class="review-date">Dec 2025</span></div>
+        <div class="review-stars">★★★★★</div><span class="review-author">Wellness brand · Shopify Plus</span>
+        <p>We installed in October and did $47K in corporate orders by November. One buyer ordered 300 candle sets in a single checkout. That never would've happened without Giftwell.</p>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-header"><h4>Clients screenshot the unwrapping and send it to us</h4><span class="review-date">Nov 2025</span></div>
+        <div class="review-stars">★★★★★</div><span class="review-author">DTC skincare brand · NYC</span>
+        <p>The gifting experience is what sets us apart. Our corporate buyers say their recipients love the unwrapping. It makes them look thoughtful, not like they did a bulk order.</p>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-header"><h4>Corporate is now bigger than DTC for us</h4><span class="review-date">Jan 2026</span></div>
+        <div class="review-stars">★★★★★</div><span class="review-author">Specialty food brand · LA</span>
+        <p>We did $3M in corporate gifting last year. It's now our biggest channel. The convenience for buyers is what drives repeat orders. They just paste a list and it's done.</p>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-header"><h4>Zero margin hit was the dealbreaker</h4><span class="review-date">Oct 2025</span></div>
+        <div class="review-stars">★★★★★</div><span class="review-author">Home goods brand · Shopify</span>
+        <p>Every other platform wanted 20-30% of our revenue. Giftwell charges the buyer, not us. That alone made the decision easy.</p>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-header"><h4>200 new email subscribers from one order</h4><span class="review-date">Dec 2025</span></div>
+        <div class="review-stars">★★★★★</div><span class="review-author">Coffee brand · Shopify Plus</span>
+        <p>A corporate buyer sent 200 gifts. 180 of those recipients opted into our marketing. Three months later, 40 of them have reordered. That's not gifting. That's acquisition.</p>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-header"><h4>Our corporate buyers keep coming back</h4><span class="review-date">Jan 2026</span></div>
+        <div class="review-stars">★★★★★</div><span class="review-author">Premium snack brand · Austin</span>
+        <p>The tracking dashboard is what does it. Buyers can see exactly who claimed, who hasn't. They feel in control. That's why they reorder every quarter.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA — soft lavender bg, Shopify badge -->
+<section class="cta-banner">
+  <div class="reveal" style="margin-bottom:24px"><div class="g-logo g-logo-lg" style="margin:0 auto"><img src="g-gradient.png" alt="G"></div></div>
+  <h2 class="reveal">Your next $1M channel starts here</h2>
+  <p class="reveal reveal-d1">Free to install. Zero margin hit. Corporate gifting revenue from day one.</p>
+  <a href="#" class="btn btn-dark reveal reveal-d2" onclick="event.preventDefault();document.getElementById('calc-modal').classList.add('active')">Unlock new revenue</a>
+</section>
+
+<!-- FOOTER — light bg like Partiful -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo-col">
+        <img src="g-black-bold.png" alt="Giftwell">
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <a href="#">How It Works</a><a href="#">Pricing</a><a href="#">Playbook</a><a href="#">Changelog</a>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="#">About</a><a href="#">Blog</a><a href="#">Careers</a><a href="#">Terms</a><a href="#">Privacy</a>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <a href="#">Contact</a><a href="#">Help Center</a>
+        <div class="social-icons">
+          <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+          <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.87a8.16 8.16 0 004.77 1.52V7a4.85 4.85 0 01-1.01-.31z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Nav: transparent on hero, white sticky after scroll
+const navEl = document.querySelector('nav');
+window.addEventListener('scroll', () => {
+  navEl.classList.toggle('sticky', window.scrollY > 80);
+}, { passive: true });
+
+// Spring-like scroll reveal (IntersectionObserver)
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+// Delay to let page render, then observe
+setTimeout(() => {
+  document.querySelectorAll('.reveal').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight) el.classList.add('vis');
+    else observer.observe(el);
+  });
+}, 50);
+
+// Tab pills
+document.querySelectorAll('.tab-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.tab-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+  });
+});
+</script>
+
+<!-- REVENUE CALCULATOR MODAL -->
+<style>
+.calc-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,.5); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .25s;
+}
+.calc-overlay.active { opacity: 1; pointer-events: all; }
+.calc-modal {
+  background: #fff; border-radius: 20px; width: 90%; max-width: 520px;
+  padding: 0; position: relative; box-shadow: 0 32px 80px rgba(0,0,0,.25);
+  overflow: hidden;
+}
+.calc-header {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed, #a855f7);
+  padding: 28px 32px 20px; color: #fff;
+}
+.calc-header-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -.5px; }
+.calc-header-sub { font-size: 13px; opacity: .8; margin-top: 4px; }
+.calc-progress-bar { height: 3px; background: rgba(255,255,255,.2); border-radius: 2px; margin-top: 16px; }
+.calc-progress-fill { height: 100%; background: #fff; border-radius: 2px; transition: width .4s cubic-bezier(.4,0,.2,1); }
+.calc-close {
+  position: absolute; top: 16px; right: 16px; width: 28px; height: 28px;
+  border: none; background: rgba(255,255,255,.2); border-radius: 50%; cursor: pointer;
+  font-size: 14px; color: #fff; display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.calc-close:hover { background: rgba(255,255,255,.3); }
+.calc-body { padding: 28px 32px 32px; }
+.calc-step { display: none; animation: calcFadeIn .3s ease; }
+.calc-step.active { display: block; }
+@keyframes calcFadeIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+.calc-q { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -.3px; margin-bottom: 4px; color: #171717; }
+.calc-hint { font-size: 13px; color: #a3a3a3; margin-bottom: 20px; }
+.cat-search {
+  width: 100%; padding: 10px 14px 10px 36px; border: 1.5px solid #e5e5e5; border-radius: 10px;
+  font-size: 14px; font-weight: 500; outline: none; font-family: 'DM Sans', sans-serif;
+  margin-bottom: 12px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a3a3a3' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 10-1.397 1.398h-.001l3.85 3.85a1 1 0 001.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 110-10 5 5 0 010 10z'/%3E%3C/svg%3E") 12px center no-repeat;
+}
+.cat-search:focus { border-color: #7c3aed; }
+.cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 320px; overflow-y: auto; }
+.cat-card {
+  padding: 12px; border: 1.5px solid #f0f0f0; border-radius: 12px; cursor: pointer;
+  transition: all .15s; display: flex; align-items: center; gap: 10px;
+}
+.cat-card:hover { border-color: #c4b5fd; background: #faf5ff; }
+.cat-card.selected { border-color: #7c3aed; background: #f5f0ff; }
+.cat-card.hidden { display: none; }
+.cat-icon { font-size: 22px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 8px; flex-shrink: 0; }
+.cat-card.selected .cat-icon { background: #ede9fe; }
+.cat-info { min-width: 0; }
+.cat-name { font-size: 13px; font-weight: 600; color: #171717; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cat-tag { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 99px; display: inline-block; margin-top: 2px; }
+.ct-high { background: #dcfce7; color: #166534; }
+.ct-med { background: #fef9c3; color: #854d0e; }
+.ct-low { background: #fde8e8; color: #991b1b; }
+
+/* Step 2: AOV + Revenue on same screen */
+.dual-inputs { display: flex; flex-direction: column; gap: 16px; }
+.input-group label { font-size: 12px; font-weight: 600; color: #525252; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: .5px; }
+.slider-wrap { position: relative; }
+.slider-val { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 32px; color: #7c3aed; letter-spacing: -1px; margin-bottom: 8px; }
+input[type="range"] {
+  -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px;
+  background: linear-gradient(to right, #7c3aed var(--pct, 50%), #e5e5e5 var(--pct, 50%));
+  outline: none; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
+  background: #7c3aed; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(124,58,237,.3); cursor: pointer;
+}
+.rev-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.rev-pill {
+  padding: 10px 16px; border: 1.5px solid #e5e5e5; border-radius: 10px;
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; flex: 1; text-align: center; min-width: 100px;
+}
+.rev-pill:hover { border-color: #c4b5fd; background: #faf5ff; }
+.rev-pill.selected { border-color: #7c3aed; background: #f5f0ff; color: #7c3aed; }
+.calc-nav { display: flex; gap: 10px; margin-top: 24px; }
+.calc-nav .btn { flex: 1; text-align: center; }
+.calc-back { background: #f5f5f5 !important; color: #171717 !important; }
+.calc-back:hover { background: #e5e5e5 !important; }
+
+/* Step 3: Result */
+.result-hero { text-align: center; padding: 8px 0 20px; }
+.result-label { font-size: 13px; color: #a3a3a3; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.result-num {
+  font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 52px;
+  letter-spacing: -2px; background: linear-gradient(135deg, #4f46e5, #7c3aed, #a855f7);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 8px 0 4px;
+}
+.result-range { font-size: 13px; color: #737373; }
+.result-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 20px 0; }
+.result-stat { background: #faf5ff; border-radius: 12px; padding: 14px; text-align: center; }
+.result-stat-num { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 20px; color: #7c3aed; }
+.result-stat-label { font-size: 11px; color: #737373; margin-top: 2px; }
+.result-divider { height: 1px; background: #f0f0f0; margin: 20px 0; }
+.apply-section label { font-size: 12px; font-weight: 600; color: #525252; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: .5px; }
+.apply-section input {
+  width: 100%; padding: 12px 14px; border: 1.5px solid #e5e5e5; border-radius: 10px;
+  font-size: 14px; font-weight: 500; outline: none; font-family: 'DM Sans', sans-serif;
+  margin-bottom: 10px;
+}
+.apply-section input:focus { border-color: #7c3aed; }
+.qualify-extras { margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+.qualify-extras summary { font-size: 13px; color: #7c3aed; font-weight: 600; cursor: pointer; margin-bottom: 12px; }
+.qualify-q { margin-bottom: 12px; }
+.qualify-q p { font-size: 13px; font-weight: 500; color: #525252; margin-bottom: 6px; }
+.qualify-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.qpill {
+  padding: 6px 12px; border: 1px solid #e5e5e5; border-radius: 8px; font-size: 12px;
+  font-weight: 500; cursor: pointer; transition: all .15s;
+}
+.qpill:hover { border-color: #c4b5fd; }
+.qpill.selected { border-color: #7c3aed; background: #f5f0ff; color: #7c3aed; }
+.submitted-msg { text-align: center; padding: 32px 0; }
+.submitted-check {
+  width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #fff; font-size: 24px;
+}
+@media (max-width: 768px) {
+  .calc-modal { width: 95%; max-height: 90vh; overflow-y: auto; }
+  .calc-header { padding: 20px 20px 16px; }
+  .calc-body { padding: 20px; }
+  .cat-grid { grid-template-columns: 1fr; }
+  .result-num { font-size: 40px; }
+  .result-stats { grid-template-columns: 1fr; }
+  .rev-pills { flex-direction: column; }
+}
+</style>
+
+<div class="calc-overlay" id="calc-modal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="calc-modal">
+    <button class="calc-close" onclick="this.closest('.calc-overlay').classList.remove('active')">x</button>
+    <div class="calc-header">
+      <div class="calc-header-title">Unlock your corporate gifting revenue</div>
+      <div class="calc-header-sub">3 quick questions. Get your personalized estimate.</div>
+      <div class="calc-progress-bar"><div class="calc-progress-fill" id="calc-prog" style="width:33%"></div></div>
+    </div>
+    <div class="calc-body">
+
+      <!-- Step 1: Category -->
+      <div class="calc-step active" data-step="1">
+        <div class="calc-q">What do you sell?</div>
+        <div class="calc-hint">Select your category or search below.</div>
+        <input type="text" class="cat-search" placeholder="Search categories..." oninput="filterCats(this.value)">
+        <div class="cat-grid" id="calc-cats">
+          <div class="cat-card" data-val="Alcohol / Spirits" data-gift="high" data-mult=".6">
+            <div class="cat-icon">&#127863;</div><div class="cat-info"><div class="cat-name">Alcohol / Spirits</div><span class="cat-tag ct-high">High demand</span></div>
+          </div>
+          <div class="cat-card" data-val="Candy / Chocolate" data-gift="high" data-mult=".55">
+            <div class="cat-icon">&#127852;</div><div class="cat-info"><div class="cat-name">Candy / Chocolate</div><span class="cat-tag ct-high">High demand</span></div>
+          </div>
+          <div class="cat-card" data-val="Specialty Food" data-gift="high" data-mult=".5">
+            <div class="cat-icon">&#127858;</div><div class="cat-info"><div class="cat-name">Specialty Food / Snacks</div><span class="cat-tag ct-high">High demand</span></div>
+          </div>
+          <div class="cat-card" data-val="Coffee / Tea" data-gift="high" data-mult=".5">
+            <div class="cat-icon">&#9749;</div><div class="cat-info"><div class="cat-name">Coffee / Tea</div><span class="cat-tag ct-high">High demand</span></div>
+          </div>
+          <div class="cat-card" data-val="Candles" data-gift="high" data-mult=".5">
+            <div class="cat-icon">&#128367;</div><div class="cat-info"><div class="cat-name">Candles / Fragrance</div><span class="cat-tag ct-high">High demand</span></div>
+          </div>
+          <div class="cat-card" data-val="Tech Gadgets" data-gift="high" data-mult=".5">
+            <div class="cat-icon">&#128268;</div><div class="cat-info"><div class="cat-name">Tech Gadgets (&lt;$100)</div><span class="cat-tag ct-high">High demand</span></div>
+          </div>
+          <div class="cat-card" data-val="Home Goods" data-gift="med" data-mult=".25">
+            <div class="cat-icon">&#127968;</div><div class="cat-info"><div class="cat-name">Home Goods / Kitchen</div><span class="cat-tag ct-med">Medium</span></div>
+          </div>
+          <div class="cat-card" data-val="Wellness" data-gift="med" data-mult=".2">
+            <div class="cat-icon">&#128588;</div><div class="cat-info"><div class="cat-name">Wellness / Self-care</div><span class="cat-tag ct-med">Medium</span></div>
+          </div>
+          <div class="cat-card" data-val="Beauty" data-gift="low" data-mult=".1">
+            <div class="cat-icon">&#128132;</div><div class="cat-info"><div class="cat-name">Skincare / Beauty</div><span class="cat-tag ct-low">Harder to gift</span></div>
+          </div>
+          <div class="cat-card" data-val="Apparel" data-gift="low" data-mult=".1">
+            <div class="cat-icon">&#128085;</div><div class="cat-info"><div class="cat-name">Apparel / Accessories</div><span class="cat-tag ct-low">Harder to gift</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: AOV + Revenue -->
+      <div class="calc-step" data-step="2">
+        <div class="calc-q">Tell us about your business</div>
+        <div class="calc-hint">This helps us estimate your corporate gifting potential.</div>
+        <div class="dual-inputs">
+          <div class="input-group">
+            <label>Average order value</label>
+            <div class="slider-val">$<span id="aov-display">65</span></div>
+            <input type="range" id="calc-aov" min="15" max="500" value="65" step="5" oninput="updateAOV(this.value)">
+          </div>
+          <div class="input-group">
+            <label>Monthly revenue</label>
+            <div class="rev-pills" id="calc-revs">
+              <div class="rev-pill" data-val="5000">Under $10K</div>
+              <div class="rev-pill" data-val="30000">$10-50K</div>
+              <div class="rev-pill" data-val="100000">$50-250K</div>
+              <div class="rev-pill" data-val="500000">$250K-1M</div>
+              <div class="rev-pill" data-val="1500000">$1M+</div>
+            </div>
+          </div>
+        </div>
+        <div class="calc-nav">
+          <a href="#" class="btn calc-back" onclick="event.preventDefault();calcGo(1)">Back</a>
+          <a href="#" class="btn btn-dark" id="step2-next" onclick="event.preventDefault();calcResult()" style="opacity:.4;pointer-events:none">See my estimate</a>
+        </div>
+      </div>
+
+      <!-- Step 3: Result + Apply -->
+      <div class="calc-step" data-step="3">
+        <div class="result-hero">
+          <div class="result-label">Your estimated annual corporate gifting revenue</div>
+          <div class="result-num" id="calc-result-num">$0</div>
+          <div class="result-range" id="calc-result-range"></div>
+        </div>
+        <div class="result-stats">
+          <div class="result-stat"><div class="result-stat-num" id="rs-orders">0</div><div class="result-stat-label">orders / year</div></div>
+          <div class="result-stat"><div class="result-stat-num" id="rs-recip">0</div><div class="result-stat-label">avg recipients</div></div>
+          <div class="result-stat"><div class="result-stat-num" id="rs-subs">0</div><div class="result-stat-label">new subscribers</div></div>
+        </div>
+        <div class="result-divider"></div>
+        <div class="apply-section">
+          <div class="calc-q" style="margin-bottom:12px">Apply to be a Giftwell merchant</div>
+          <label>Your name</label>
+          <input type="text" id="calc-name" placeholder="Jane Smith">
+          <label>Work email</label>
+          <input type="email" id="calc-email" placeholder="jane@yourbrand.com">
+          <label>Shopify store URL</label>
+          <input type="text" id="calc-store" placeholder="yourbrand.myshopify.com">
+          <details class="qualify-extras">
+            <summary>Help us qualify your fit (optional)</summary>
+            <div class="qualify-q">
+              <p>Monthly Google Ads spend?</p>
+              <div class="qualify-pills" data-field="ads">
+                <div class="qpill" data-val="0">None</div>
+                <div class="qpill" data-val="2000">&lt;$2K</div>
+                <div class="qpill" data-val="5000">$2-10K</div>
+                <div class="qpill" data-val="15000">$10-25K</div>
+                <div class="qpill" data-val="40000">$25K+</div>
+              </div>
+            </div>
+            <div class="qualify-q">
+              <p>Would you invest 10% of ad spend in corporate gifting if ROI was 5-8x?</p>
+              <div class="qualify-pills" data-field="willing">
+                <div class="qpill" data-val="yes">Yes</div>
+                <div class="qpill" data-val="maybe">Maybe</div>
+                <div class="qpill" data-val="later">Not yet</div>
+              </div>
+            </div>
+          </details>
+        </div>
+        <a href="#" class="btn btn-dark" style="width:100%;text-align:center;display:block;margin-top:20px" onclick="event.preventDefault();submitApp()">Apply now</a>
+        <div id="calc-submitted" class="submitted-msg" style="display:none">
+          <div class="submitted-check">&#10003;</div>
+          <div class="calc-q">Application received</div>
+          <div class="calc-hint" style="margin-bottom:0">We'll review your store and reach out within 24 hours.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+let calcData = { cat: '', mult: 0, gift: '', aov: 65, rev: 0 };
+
+// Category search filter
+function filterCats(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('.cat-card').forEach(c => {
+    c.classList.toggle('hidden', !c.dataset.val.toLowerCase().includes(q));
+  });
+}
+
+// Category selection
+document.querySelectorAll('.cat-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    calcData.cat = card.dataset.val;
+    calcData.mult = parseFloat(card.dataset.mult);
+    calcData.gift = card.dataset.gift;
+    setTimeout(() => calcGo(2), 250);
+  });
+});
+
+// AOV slider
+function updateAOV(val) {
+  calcData.aov = parseInt(val);
+  document.getElementById('aov-display').textContent = val;
+  const pct = ((val - 15) / (500 - 15)) * 100;
+  document.getElementById('calc-aov').style.setProperty('--pct', pct + '%');
+}
+
+// Revenue pills
+document.querySelectorAll('.rev-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.rev-pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+    calcData.rev = parseInt(pill.dataset.val);
+    const btn = document.getElementById('step2-next');
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'all';
+  });
+});
+
+// Qualify pills (optional)
+document.querySelectorAll('.qpill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    const group = pill.closest('.qualify-pills');
+    group.querySelectorAll('.qpill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+  });
+});
+
+function calcGo(step) {
+  document.querySelectorAll('.calc-step').forEach(s => s.classList.remove('active'));
+  document.querySelector(`.calc-step[data-step="${step}"]`).classList.add('active');
+  // Update progress bar
+  const pct = Math.round((step / 3) * 100);
+  document.getElementById('calc-prog').style.width = pct + '%';
+}
+
+function calcResult() {
+  calcData.aov = parseInt(document.getElementById('calc-aov').value) || 65;
+
+  // Realistic math: annual corporate rev = monthly rev * category multiplier * 12
+  // High gift categories: 40-60% of DTC revenue achievable from corporate
+  // Medium: 15-25%
+  // Low: 5-10%
+  let monthlyRev = calcData.rev;
+  let annualRev = Math.round(monthlyRev * calcData.mult * 12);
+
+  // Cap at realistic ranges
+  let maxCap = { high: monthlyRev * 12 * 0.8, med: monthlyRev * 12 * 0.3, low: monthlyRev * 12 * 0.15 };
+  annualRev = Math.min(annualRev, maxCap[calcData.gift] || annualRev);
+
+  // Floor at something reasonable
+  annualRev = Math.max(annualRev, calcData.aov * 50);
+
+  let avgRecipients = calcData.gift === 'high' ? 60 : calcData.gift === 'med' ? 35 : 20;
+  let ordersPerYear = Math.max(6, Math.round(annualRev / (avgRecipients * calcData.aov)));
+  let newSubs = Math.round(ordersPerYear * avgRecipients * 0.65);
+
+  let low = Math.round(annualRev * 0.7);
+  let high = Math.round(annualRev * 1.3);
+
+  // Animate the number counting up
+  const numEl = document.getElementById('calc-result-num');
+  let current = 0;
+  const target = annualRev;
+  const duration = 1200;
+  const start = performance.now();
+  function animateNum(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    current = Math.round(target * eased);
+    numEl.textContent = '$' + current.toLocaleString();
+    if (progress < 1) requestAnimationFrame(animateNum);
+  }
+  requestAnimationFrame(animateNum);
+
+  document.getElementById('calc-result-range').textContent = '$' + low.toLocaleString() + ' - $' + high.toLocaleString() + ' estimated range';
+  document.getElementById('rs-orders').textContent = ordersPerYear.toLocaleString();
+  document.getElementById('rs-recip').textContent = avgRecipients;
+  document.getElementById('rs-subs').textContent = newSubs.toLocaleString();
+
+  calcGo(3);
+}
+
+function submitApp() {
+  const name = document.getElementById('calc-name').value;
+  const email = document.getElementById('calc-email').value;
+  const store = document.getElementById('calc-store').value;
+  if (!email) { document.getElementById('calc-email').style.borderColor = '#ef4444'; document.getElementById('calc-email').focus(); return; }
+
+  // Collect optional qualify data
+  const adsEl = document.querySelector('.qualify-pills[data-field="ads"] .qpill.selected');
+  const willingEl = document.querySelector('.qualify-pills[data-field="willing"] .qpill.selected');
+
+  const payload = {
+    ...calcData,
+    name, email, store,
+    adSpend: adsEl ? adsEl.dataset.val : 'skipped',
+    willingToInvest: willingEl ? willingEl.dataset.val : 'skipped'
+  };
+  console.log('Application:', payload);
+
+  // Hide form, show confirmation
+  document.querySelector('.apply-section').style.display = 'none';
+  document.querySelector('.calc-step[data-step="3"] > a').style.display = 'none';
+  document.getElementById('calc-submitted').style.display = 'block';
+}
+
+// Init AOV slider position
+updateAOV(65);
+</script>
+</body>
+</html>
