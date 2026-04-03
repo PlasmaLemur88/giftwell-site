@@ -2,7 +2,6 @@
 
 import { StoreData } from '../lib/types';
 
-// Screen 2 is now "Gift Sets" — showing the product selection in the same dark UI
 export default function ScreenCustomize({
   store,
   onNext,
@@ -11,16 +10,14 @@ export default function ScreenCustomize({
   onNext: () => void;
 }) {
   return (
-    <div style={{ maxWidth: 800, width: '100%' }}>
-      <h3 style={{ fontSize: 16, fontWeight: 500, color: 'var(--gw-text-muted)', marginBottom: 8 }}>
-        Choose Your Set
-      </h3>
-      <p style={{ fontSize: 13, color: 'var(--gw-text-dim)', marginBottom: 24 }}>
-        Your gifters choose from {store.products.length} products in your catalog.
-        Each bundle includes your branded unwrapping experience.
+    <div className="demo-site-container">
+      <div className="demo-section-header">
+        <span className="demo-section-title">Choose Your Set — {store.products.length} Options</span>
+      </div>
+      <p style={{ fontSize: 13, color: 'var(--gw-slate-gray)', marginBottom: 24 }}>
+        Your gifters choose from your products. Each bundle includes a branded unwrapping experience.
       </p>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
         {store.products.slice(0, 6).map((product) => {
           const img = product.images[0]?.src;
           const price = product.variants[0]?.price;

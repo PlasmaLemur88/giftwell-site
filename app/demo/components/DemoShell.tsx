@@ -2,7 +2,7 @@
 
 import { DemoScreen, StoreData } from '../lib/types';
 
-const SCREENS: { id: DemoScreen; label: string; }[] = [
+const SCREENS: { id: DemoScreen; label: string }[] = [
   { id: 'gift-page', label: 'Design' },
   { id: 'customize', label: 'Gift Sets' },
   { id: 'recipients', label: 'Recipients' },
@@ -24,56 +24,70 @@ export default function DemoShell({
   const currentIndex = SCREENS.findIndex(s => s.id === currentScreen);
 
   return (
-    <div className="demo-shell">
-      {/* Top nav */}
-      <div className="demo-topnav">
-        <div className="demo-topnav-left">
-          {store.logo ? (
-            <img src={store.logo} alt={store.name} className="demo-topnav-logo" />
-          ) : (
-            <span className="demo-topnav-logo-text">{store.name}</span>
-          )}
-          <span className="demo-topnav-powered">powered by Giftwell</span>
-        </div>
-        <div className="demo-topnav-right">
-          <span className="demo-topnav-step">Step {currentIndex + 1} of {SCREENS.length}</span>
-          <span className="demo-topnav-caption">
-            {currentScreen === 'gift-page' && 'This is what your gifters see'}
-            {currentScreen === 'customize' && 'Choose from your real products'}
-            {currentScreen === 'recipients' && 'Add recipients in seconds'}
-            {currentScreen === 'dashboard' && 'Track everything in real time'}
-            {currentScreen === 'cta' && 'Ready to launch?'}
-          </span>
-          <span className="demo-topnav-saved">Progress Saved</span>
-          <button className="demo-btn-cart">View Cart</button>
-        </div>
-      </div>
+    <div className="demo-page">
+      {/* Fixed background layer */}
+      <div className="demo-bg-layer" />
 
-      {/* Main content */}
-      <div className="demo-body">
-        {children}
-      </div>
+      {/* Content layer */}
+      <div className="demo-content-layer">
+        {/* Header — matches real app */}
+        <header className="demo-header">
+          <div className="demo-header-inner">
+            <div className="demo-header-left">
+              {store.logo ? (
+                <img src={store.logo} alt={store.name} className="demo-header-logo" />
+              ) : (
+                <span className="demo-header-logo-text">{store.name}</span>
+              )}
+              <span className="demo-header-powered">
+                powered by <a href="https://giftwell.ai" target="_blank" rel="noopener">Giftwell</a>
+              </span>
+            </div>
+            <div className="demo-header-right">
+              <div className="demo-header-eye">👁</div>
+              <button className="demo-btn-view-cart">View Cart</button>
+            </div>
+          </div>
+        </header>
 
-      {/* Bottom nav */}
-      <div className="demo-bottomnav">
-        {currentIndex > 0 ? (
-          <button className="demo-nav-back" onClick={() => onNavigate(SCREENS[currentIndex - 1].id)}>
-            ← Back
-          </button>
-        ) : <div />}
-        <div className="demo-nav-dots">
-          {SCREENS.map((screen, i) => (
-            <div
-              key={screen.id}
-              className={`demo-nav-dot ${i === currentIndex ? 'active' : ''} ${i < currentIndex ? 'complete' : ''}`}
-            />
-          ))}
+        {/* Main content */}
+        <div style={{ flex: 1, paddingBottom: 60 }}>
+          {children}
         </div>
-        {currentIndex < SCREENS.length - 1 ? (
-          <button className="demo-nav-next" onClick={() => onNavigate(SCREENS[currentIndex + 1].id)}>
-            Next →
-          </button>
-        ) : <div />}
+
+        {/* Bottom step nav */}
+        <div className="demo-step-nav">
+          {currentIndex > 0 ? (
+            <button className="demo-step-back" onClick={() => onNavigate(SCREENS[currentIndex - 1].id)}>
+              ← Back
+            </button>
+          ) : <div />}
+
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <span className="demo-step-caption">
+              Step {currentIndex + 1} of {SCREENS.length} —{' '}
+              {currentScreen === 'gift-page' && 'This is what your gifters see'}
+              {currentScreen === 'customize' && 'Choose from your real products'}
+              {currentScreen === 'recipients' && 'Add recipients in seconds'}
+              {currentScreen === 'dashboard' && 'Track everything in real time'}
+              {currentScreen === 'cta' && 'Ready to launch?'}
+            </span>
+            <div className="demo-step-dots">
+              {SCREENS.map((screen, i) => (
+                <div
+                  key={screen.id}
+                  className={`demo-step-dot ${i === currentIndex ? 'active' : ''} ${i < currentIndex ? 'complete' : ''}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {currentIndex < SCREENS.length - 1 ? (
+            <button className="demo-step-next" onClick={() => onNavigate(SCREENS[currentIndex + 1].id)}>
+              Next →
+            </button>
+          ) : <div />}
+        </div>
       </div>
     </div>
   );

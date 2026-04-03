@@ -43,6 +43,8 @@ export default function ScreenRecipients({
   const [visibleRows, setVisibleRows] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  void store;
+
   const handleParse = () => {
     if (phase !== 'paste') return;
     setPhase('typing');
@@ -75,77 +77,72 @@ export default function ScreenRecipients({
     }
   }, [displayedText, phase]);
 
-  // Suppress unused var warning
-  void store;
-
   return (
-    <div className="screen-recipients-dark">
-      <div className="recipients-dark-header">
-        <h2>Add Recipients</h2>
-        {phase === 'done' && (
-          <span className="recipients-count-dark">{PARSED_ROWS.length} recipients added in 2.3 seconds</span>
+    <div className="demo-site-container">
+      <div className="screen-recipients-dark">
+        <div className="recipients-dark-header">
+          <h2>Add Recipients</h2>
+          {phase === 'done' && (
+            <span className="recipients-count-dark">{PARSED_ROWS.length} recipients added in 2.3 seconds</span>
+          )}
+        </div>
+
+        <div className="recipients-input-dark">
+          <h4>Paste anything — we&apos;ll figure it out</h4>
+          <p>Names, emails, addresses, phone numbers... any format, any order.</p>
+          <textarea
+            ref={textareaRef}
+            className="recipients-textarea-dark"
+            value={phase === 'paste' ? '' : displayedText}
+            placeholder={'Paste a messy list of names, emails, addresses...\n\nOr click "Demo it" to see the magic'}
+            readOnly={phase !== 'paste'}
+          />
+          {phase === 'paste' && (
+            <button className="recipients-demo-btn" onClick={handleParse}>Demo it</button>
+          )}
+          {phase === 'typing' && (
+            <div className="recipients-status-dark">
+              <span className="typing-indicator" /> Pasting recipient data...
+            </div>
+          )}
+          {phase === 'parsing' && (
+            <div className="recipients-status-dark" style={{ color: 'var(--gw-vibrant-lime)' }}>
+              <span className="parse-spinner" /> AI is parsing...
+            </div>
+          )}
+        </div>
+
+        {(phase === 'parsing' || phase === 'done') && (
+          <div className="recipients-table-dark">
+            <table>
+              <thead>
+                <tr>
+                  <th style={{ width: 40 }}></th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Address</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PARSED_ROWS.slice(0, visibleRows).map((row, i) => (
+                  <tr key={i} className="recipient-row-enter">
+                    <td><div className="recipient-check-dark">✓</div></td>
+                    <td>{row.name}</td>
+                    <td className="email-col">{row.email}</td>
+                    <td className="addr-col">{row.address}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
-      </div>
 
-      <div className="recipients-input-dark">
-        <h4>Paste anything — we&apos;ll figure it out</h4>
-        <p>Names, emails, addresses, phone numbers... any format, any order.</p>
-
-        <textarea
-          ref={textareaRef}
-          className="recipients-textarea-dark"
-          value={phase === 'paste' ? '' : displayedText}
-          placeholder={'Paste a messy list of names, emails, addresses...\n\nOr click "Demo it" to see the magic'}
-          readOnly={phase !== 'paste'}
-        />
-
-        {phase === 'paste' && (
-          <button className="recipients-demo-btn" onClick={handleParse}>
-            Demo it
+        {phase === 'done' && (
+          <button className="recipients-continue-dark" onClick={onNext}>
+            Continue to Dashboard →
           </button>
         )}
-        {phase === 'typing' && (
-          <div className="recipients-status-dark">
-            <span className="typing-indicator" /> Pasting recipient data...
-          </div>
-        )}
-        {phase === 'parsing' && (
-          <div className="recipients-status-dark" style={{ color: 'var(--gw-green)' }}>
-            <span className="parse-spinner" /> AI is parsing...
-          </div>
-        )}
       </div>
-
-      {(phase === 'parsing' || phase === 'done') && (
-        <div className="recipients-table-dark">
-          <table>
-            <thead>
-              <tr>
-                <th style={{ width: 40 }}></th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Address</th>
-              </tr>
-            </thead>
-            <tbody>
-              {PARSED_ROWS.slice(0, visibleRows).map((row, i) => (
-                <tr key={i} className="recipient-row-enter">
-                  <td><div className="recipient-check-dark">✓</div></td>
-                  <td>{row.name}</td>
-                  <td className="email-col">{row.email}</td>
-                  <td className="addr-col">{row.address}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {phase === 'done' && (
-        <button className="recipients-continue-dark" onClick={onNext}>
-          Continue to Dashboard →
-        </button>
-      )}
     </div>
   );
 }
