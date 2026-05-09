@@ -10,7 +10,6 @@ import {
   Button,
   TextField,
   Checkbox,
-  RangeSlider,
   InlineGrid,
   Icon,
   Divider,
@@ -60,11 +59,6 @@ export const FRAMES: FrameDef[] = [
   // Pricing
   { id: 'pricing-fee',     phase: 'Pricing',      title: 'How should the experience fee be handled?' },
   { id: 'pricing-volume',  phase: 'Pricing',      title: 'Offer volume discounts?' },
-  // Branding
-  { id: 'brand-identity',   phase: 'Branding',    title: 'Confirm your brand identity', helper: 'We pulled these from your Shopify theme.' },
-  { id: 'brand-colors',     phase: 'Branding',    title: 'Pick your brand colors' },
-  { id: 'brand-background', phase: 'Branding',    title: 'Choose a background' },
-  { id: 'brand-effects',    phase: 'Branding',    title: 'Add a touch of motion' },
   // Integrations
   { id: 'integrations',    phase: 'Integrations', title: 'Connect your email marketing tool' },
   // Marketing opt-in
@@ -382,152 +376,6 @@ function FramePricingVolume({ answers, onChange }: FrameProps) {
   );
 }
 
-function FrameBrandIdentity(_: FrameProps) {
-  return (
-    <InlineGrid gap="400" columns={2}>
-      <TextField label="Brand name" value="Acme Store" autoComplete="off" onChange={() => {}} />
-      <BlockStack gap="100">
-        <Text as="span" variant="bodyMd" fontWeight="medium">Logo</Text>
-        <InlineStack gap="200" blockAlign="center">
-          <Box background="bg-surface-secondary" borderRadius="200" borderWidth="025" borderColor="border" minWidth="40px" minHeight="40px" />
-          <Button>Change</Button>
-        </InlineStack>
-      </BlockStack>
-    </InlineGrid>
-  );
-}
-
-function FrameBrandColors(_: FrameProps) {
-  const primary = ['#5B6CFF', '#E04F4F', '#3FB950', '#F0883E', '#A371F7'];
-  const secondary = ['#1a1a1a', '#7B2FBE', '#1F3A5F', '#0D9488', '#A371F7'];
-  return (
-    <InlineGrid gap="500" columns={2}>
-      <BlockStack gap="200">
-        <Text as="p" tone="subdued" variant="bodySm">PRIMARY</Text>
-        <InlineStack gap="200">
-          {primary.map((c, i) => (
-            <Swatch key={c} color={c} selected={i === 0} />
-          ))}
-          <Swatch gradient />
-        </InlineStack>
-      </BlockStack>
-      <BlockStack gap="200">
-        <Text as="p" tone="subdued" variant="bodySm">SECONDARY</Text>
-        <InlineStack gap="200">
-          {secondary.map((c, i) => (
-            <Swatch key={c} color={c} selected={i === 1} />
-          ))}
-          <Swatch gradient />
-        </InlineStack>
-      </BlockStack>
-    </InlineGrid>
-  );
-}
-
-function Swatch({ color, selected, gradient }: { color?: string; selected?: boolean; gradient?: boolean }) {
-  return (
-    <button
-      type="button"
-      style={{
-        all: 'unset',
-        cursor: 'pointer',
-        width: 28,
-        height: 28,
-        borderRadius: '50%',
-        background: gradient
-          ? 'conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)'
-          : color,
-        outline: selected ? '2px solid var(--p-color-border-emphasis)' : '1px solid var(--p-color-border)',
-        outlineOffset: selected ? 2 : 0,
-        boxSizing: 'border-box',
-      }}
-    />
-  );
-}
-
-function FrameBrandBackground(_: FrameProps) {
-  const swatches = [
-    'linear-gradient(180deg, #1F3A5F, #0F1A2E)',
-    '#FFE9A0',
-    '#FFC9D5',
-    '#A8E5C5',
-    '#DCDCFF',
-    '#1a1a1a',
-  ];
-  return (
-    <BlockStack gap="400">
-      <InlineStack gap="100">
-        <Button pressed>Library</Button>
-        <Button>Upload</Button>
-        <Button>AI Generate</Button>
-      </InlineStack>
-      <InlineGrid gap="300" columns={6}>
-        {swatches.map((bg, i) => (
-          <button
-            key={i}
-            type="button"
-            style={{
-              all: 'unset',
-              cursor: 'pointer',
-              aspectRatio: '3/4',
-              borderRadius: 8,
-              background: bg,
-              outline: i === 0 ? '2px solid var(--p-color-border-emphasis)' : '1px solid var(--p-color-border)',
-              outlineOffset: i === 0 ? 2 : 0,
-            }}
-          />
-        ))}
-      </InlineGrid>
-      <InlineStack>
-        <Button variant="plain">Preview gift page</Button>
-      </InlineStack>
-    </BlockStack>
-  );
-}
-
-function FrameBrandEffects(_: FrameProps) {
-  const effects = [
-    { id: 'sparkles', label: 'Sparkles' },
-    { id: 'snow', label: 'Snow' },
-    { id: 'confetti', label: 'Confetti' },
-    { id: 'hearts', label: 'Hearts' },
-    { id: 'stars', label: 'Stars' },
-    { id: 'none', label: 'None' },
-  ];
-  return (
-    <BlockStack gap="500">
-      <InlineGrid gap="200" columns={6}>
-        {effects.map((e, i) => (
-          <button
-            key={e.id}
-            type="button"
-            style={{ all: 'unset', cursor: 'pointer', display: 'block' }}
-          >
-            <Box
-              padding="300"
-              borderRadius="200"
-              borderWidth="025"
-              borderColor={i === 0 ? 'border-emphasis' : 'border'}
-              background={i === 0 ? 'bg-surface-selected' : 'bg-surface'}
-            >
-              <BlockStack gap="100" inlineAlign="center">
-                <Box minHeight="20px" />
-                <Text as="span" variant="bodySm">{e.label}</Text>
-              </BlockStack>
-            </Box>
-          </button>
-        ))}
-      </InlineGrid>
-      <RangeSlider
-        label="Effect intensity"
-        value={60}
-        onChange={() => {}}
-        output
-      />
-    </BlockStack>
-  );
-}
-
 function FrameIntegrations(_: FrameProps) {
   const integrations = [
     { name: 'Klaviyo', desc: 'Sync recipients to Klaviyo lists', status: 'connected' },
@@ -813,10 +661,6 @@ export const Frames: Record<string, (p: FrameProps) => ReactNode> = {
   'catalog-bundle': FrameCatalogBundle,
   'pricing-fee': FramePricingFee,
   'pricing-volume': FramePricingVolume,
-  'brand-identity': FrameBrandIdentity,
-  'brand-colors': FrameBrandColors,
-  'brand-background': FrameBrandBackground,
-  'brand-effects': FrameBrandEffects,
   integrations: FrameIntegrations,
   'optin-enable': FrameOptInEnable,
   'optin-placement': FrameOptInPlacement,

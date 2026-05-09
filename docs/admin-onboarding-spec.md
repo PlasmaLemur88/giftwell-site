@@ -8,7 +8,9 @@
 
 ## TL;DR
 
-Keep every question and tile-picker from the existing 10-step Figma wizard. **Don't keep the wizard chrome.** Reframe the whole thing as a single inline announcement-card pinned at the top of the merchant home — modeled on Alia's "Introducing Prism AI" hero card.
+Keep most of the questions from the existing 10-step Figma wizard, but **one question per frame** — frames stay short (no scroll). **Don't keep the wizard chrome.** Reframe as a single inline announcement-card pinned at the top of the merchant home, modeled on Alia's "Introducing Prism AI" hero card.
+
+**Branding (logo, colors, background, effects) and email customization do NOT live in onboarding** — they live on a separate **Customize** page in the dashboard so merchants can iterate without re-running setup.
 
 Non-blocking. Dismissible. Resumable. Native to Polaris and the Shopify admin frame.
 
@@ -49,36 +51,79 @@ Non-blocking. Dismissible. Resumable. Native to Polaris and the Shopify admin fr
 ### Rules
 
 **Keep:**
-- All question content (goals / buyer status / volume / catalog approach / fee handling / branding / integrations / opt-in / etc.)
+- Question content for goals / buyer status / volume / catalog / pricing / integrations / opt-in / landing / support
+- One question per frame — Welcome's three questions become three frames, Pricing splits into Fee + Volume, etc. Frames stay viewport-short.
 - Tile-picker pattern with title + helper + optional `Most common` / `Recommended` Polaris `Badge`
 - "Skip for now" escape hatch, present from frame 1
 - Final "You're live" success state with share URL + next-step links
 
 **Kill:**
 - Dark device-frame wrapper (Shopify's chrome already wraps us)
-- Custom left-rail step sidebar (the dot indicator at top of the card replaces it)
+- Custom left-rail step sidebar (replaced by `ProgressBar` + counter "Welcome · Step 2 of 18 · 11%")
 - Stacked tinted callouts (no `Pro tip` / `growth engine` / 💰 / 💡 boxes — replace with inline subdued text where it actually adds info)
-- Live-preview pane pinned to every frame (only Branding gets a preview, opened in a Polaris `Modal` or side `Sheet` on demand)
+- Live-preview pane pinned to every frame (only Pricing keeps a side panel, since the order calculator is load-bearing for the decision)
 - Emoji in titles
 - Gradient launch button (final CTA is a normal `Button variant="primary"`)
-- Two flow variants — pick the 10-step version. Don't ship 12.
+- Two flow variants — pick one
+- **Branding frames (identity, colors, background, effects) — moved to the Customize page (see below)**
 
 ---
 
-## Frame-by-frame content (keep all of this from the Figma)
+## Frame-by-frame content (one question per frame)
 
-| # | Frame | Inputs |
-|---|-------|--------|
-| 1 | Welcome & Goals | Goals (multi-tile), Buyer status (single-tile), Monthly volume (single-tile, "Most common" badge on 50–200) |
-| 2 | Catalog | Approach picker (Full / Curated `Recommended` / Both) → if Curated/Both: bundle builder with product grid + sticky "N products selected" footer |
-| 3 | Pricing & Fees | Fee handling (Pass `Recommended for DTC` / Absorb / Split 50/50), Volume discount tiers (repeatable rows), live order preview as a right-side `Card` *only on this frame* (it's load-bearing for the decision) |
-| 4 | Branding | Brand name + logo (pre-filled from Shopify theme, editable), primary/secondary colors, background (Library / Upload / AI Generate), Effects & Particles. Live phone preview opens in a `Modal` via "Preview gift page" button |
-| 5 | Integrations | Klaviyo / Mailchimp / Omnisend rows. Connect → opens config inline below the row (don't navigate away) |
-| 6 | Recipient Marketing Opt-in | Enable toggle, where to show (Claim Form / Unwrapping Page), checkbox copy, EU double opt-in, privacy URL, post-opt-in actions (Klaviyo list / tags / welcome flow) |
-| 7 | Landing Page | Slug (`{store}.com/gift`), add to nav/footer toggles |
-| 8 | Support | Giftwell concierge enable toggle |
-| 9 | Review | Green-check summary list of what's configured. `Preview gift page` / `Send test gift` / `Preview recipient email` buttons |
-| 10 | Launch | "You're live!" state with copyable URL, `Open Gift Page` + `Go to Dashboard`, three next-step cards (Book strategy call / Ads playbook / Slack community) |
+Onboarding is **18 frames** grouped into 9 phases. Each frame is one question — short, no scrolling.
+
+| # | Phase | Frame title | Input |
+|---|-------|-------------|-------|
+| 1 | Welcome | What are you hoping to achieve? | Multi-tile (Revenue / Customers / Brand) |
+| 2 | Welcome | Do you have corporate buyers already? | Single-tile (Waiting / Some / None) |
+| 3 | Welcome | Expected monthly volume? | Single-tile, 4-col, "Most common" badge on 50–200 |
+| 4 | Catalog | How do you want gifters to choose products? | Single-tile (Full / Curated `Recommended` / Both) |
+| 5 | Catalog | Pick products for your first bundle | Search + product grid + selection footer (only if approach != Full) |
+| 6 | Pricing | How should the experience fee be handled? | Single-tile (Pass `Recommended for DTC` / Absorb) + Split 50/50 checkbox + side calculator |
+| 7 | Pricing | Offer volume discounts? | Checkbox + repeatable tier rows |
+| 8 | Integrations | Connect your email marketing tool | List of integrations (Klaviyo / Mailchimp / Omnisend / Postscript) with inline Connect/Configure |
+| 9 | Marketing | Show a marketing opt-in? | Single-tile (Yes / No) |
+| 10 | Marketing | Where should the opt-in show? | Multi-tile (Claim Form / Unwrapping Page) |
+| 11 | Marketing | What should the checkbox say? | Text field |
+| 12 | Marketing | Compliance settings | Pre-check checkbox + EU double opt-in checkbox + privacy URL |
+| 13 | Marketing | What happens when someone opts in? | 3 checkboxes (Klaviyo list / tags / welcome flow) |
+| 14 | Landing Page | Pick your gift page URL | Slug input (`acmestore.com/<slug>`) |
+| 15 | Landing Page | Where should we link to it? | 2 checkboxes (nav / footer) |
+| 16 | Support | Want Giftwell to handle support? | Single checkbox |
+| 17 | Review | Almost there — review your setup | Green-check summary list + Preview/Test buttons |
+| 18 | Launch | You're live | Copyable URL + Open Gift Page + Go to Dashboard |
+
+**Note on branding:** Brand identity, colors, background, and effects use Shopify theme defaults at launch. Merchants tune them on the **Customize** page (see below) any time after onboarding — not as part of the gating flow.
+
+---
+
+## Customize page (separate dashboard surface)
+
+Lives at `/customize` in the merchant dashboard, not in onboarding. Tabbed layout:
+
+**Tab 1 — Recipient email**
+- From settings: From name, Subject line (with `[[Sender Name]]`, `[[Company]]`, `[[Recipient Name]]` variables), Preview text
+- Content: Headline, Body text, Button text, Footer text
+- Additional emails: Reminder (7 days) / Shipped notification / Delivered notification toggles
+- Side panel: live email preview with mock sender row + branded hero + button + footer
+- "Send test email to myself" link
+
+**Tab 2 — Digital unboxing**
+- Brand identity: name (from Shopify theme), logo
+- Brand colors: primary + secondary swatch rows (with `+ custom`)
+- Background: Library / Upload / AI Generate sub-tabs, swatch grid
+- Effects & particles: 6-tile picker (Sparkles / Snow / Confetti / Hearts / Stars / None) + intensity `RangeSlider` + custom Lottie upload
+- Side panel: live phone-style preview of the unwrap experience
+
+**Page-level chrome:**
+- Polaris `Page` with title "Customize", subtitle, primary "Save" action, secondary "Preview" + "Send test gift"
+- Auto-save on blur (no save button needed in dirty state — just status indicator)
+
+**Why separate:**
+- Merchants want to iterate on look-and-feel without rerunning setup
+- Email and unboxing share the same brand inputs — co-locating them avoids duplication
+- Skipped during onboarding so the path-to-launch is shorter and less intimidating
 
 ---
 
@@ -90,392 +135,33 @@ Non-blocking. Dismissible. Resumable. Native to Polaris and the Shopify admin fr
 
 ---
 
-## Code
+## Implementation reference
 
-Polaris-based. Drop into the admin app. Built around three pieces:
+The working Polaris implementation of the onboarding card and the separate Customize page lives in this repo at:
 
-1. `OnboardingCard` — the shell with progress + frame switcher + footer
-2. `TilePicker` — the reusable single/multi-select tile component (used in 6 of 10 frames)
-3. `FrameWelcome` — one representative frame; the rest follow the same pattern
+- `app/admin-preview/page.tsx` — onboarding card shell (Page, Card, ProgressBar, BlockStack, InlineStack, Button, Banner)
+- `app/admin-preview/frames.tsx` — all 18 frames + the `TilePicker` primitive composed from Polaris `Box` + `BlockStack` + `Badge` + `Icon`
+- `app/admin-preview/customize/page.tsx` — the Customize page (Tabs: Recipient email, Digital unboxing) with side-panel previews
+- `app/admin-preview/layout.tsx` — wraps the route with `AppProvider` + imports `@shopify/polaris/build/esm/styles.css`
 
-### `OnboardingCard.tsx`
+Run locally:
 
-```tsx
-import { useState } from 'react';
-import {
-  Card,
-  Box,
-  BlockStack,
-  InlineStack,
-  Text,
-  Button,
-} from '@shopify/polaris';
-import { FrameWelcome } from './frames/FrameWelcome';
-import { FrameCatalog } from './frames/FrameCatalog';
-import { FramePricing } from './frames/FramePricing';
-import { FrameBranding } from './frames/FrameBranding';
-import { FrameIntegrations } from './frames/FrameIntegrations';
-import { FrameOptIn } from './frames/FrameOptIn';
-import { FrameLandingPage } from './frames/FrameLandingPage';
-import { FrameSupport } from './frames/FrameSupport';
-import { FrameReview } from './frames/FrameReview';
-import { FrameLaunched } from './frames/FrameLaunched';
-
-const FRAMES = [
-  { id: 'welcome',      label: 'Welcome',      title: 'Welcome to Giftwell',          subtitle: "Let's get your corporate gifting set up. Takes about 10 minutes.", Component: FrameWelcome },
-  { id: 'catalog',      label: 'Catalog',      title: 'What products can gifters choose from?', subtitle: null, Component: FrameCatalog },
-  { id: 'pricing',      label: 'Pricing',      title: 'How should pricing work?',     subtitle: 'Configure the experience fee and volume discounts', Component: FramePricing },
-  { id: 'branding',     label: 'Branding',     title: 'Customize the gift experience', subtitle: 'Your colors, your logo, your vibe',          Component: FrameBranding },
-  { id: 'integrations', label: 'Integrations', title: 'Connect your tools',           subtitle: 'Sync gift data with your email and CRM',     Component: FrameIntegrations },
-  { id: 'optin',        label: 'Marketing',    title: 'Turn gift recipients into customers', subtitle: 'Configure the marketing opt-in shown during the gift experience', Component: FrameOptIn },
-  { id: 'landing',      label: 'Landing Page', title: 'Your gift page',               subtitle: null,                                          Component: FrameLandingPage },
-  { id: 'support',      label: 'Support',      title: 'Concierge support',            subtitle: null,                                          Component: FrameSupport },
-  { id: 'review',       label: 'Review',       title: 'Almost there! Review your setup', subtitle: 'Make sure everything looks good before going live', Component: FrameReview },
-  { id: 'launched',     label: 'Launch',       title: "You're live!",                 subtitle: null,                                          Component: FrameLaunched },
-] as const;
-
-type Answers = Record<string, unknown>;
-
-export function OnboardingCard({
-  initialStep = 0,
-  initialAnswers = {},
-  onSave,
-  onSkip,
-  onComplete,
-}: {
-  initialStep?: number;
-  initialAnswers?: Answers;
-  onSave: (answers: Answers, step: number) => Promise<void>;
-  onSkip: () => void;
-  onComplete: (answers: Answers) => Promise<void>;
-}) {
-  const [step, setStep] = useState(initialStep);
-  const [answers, setAnswers] = useState<Answers>(initialAnswers);
-
-  const frame = FRAMES[step];
-  const Frame = frame.Component;
-  const isLast = step === FRAMES.length - 1;
-  const isLaunchStep = frame.id === 'review';
-
-  const patch = (next: Answers) => setAnswers((a) => ({ ...a, ...next }));
-
-  const handleContinue = async () => {
-    if (isLaunchStep) {
-      await onComplete(answers);
-      setStep(step + 1); // advance to "launched" success frame
-      return;
-    }
-    await onSave(answers, step + 1);
-    setStep(Math.min(step + 1, FRAMES.length - 1));
-  };
-
-  return (
-    <Card>
-      <BlockStack gap="500">
-        <ProgressDots total={FRAMES.length} current={step} />
-
-        <BlockStack gap="200">
-          <Text tone="subdued" variant="bodySm" as="p">
-            Step {step + 1} of {FRAMES.length} — {frame.label}
-          </Text>
-          <Text variant="headingLg" as="h2">{frame.title}</Text>
-          {frame.subtitle && <Text tone="subdued" as="p">{frame.subtitle}</Text>}
-        </BlockStack>
-
-        <Frame answers={answers} onChange={patch} />
-
-        {frame.id !== 'launched' && (
-          <InlineStack align="space-between" blockAlign="center">
-            <Button variant="plain" onClick={onSkip}>Skip setup</Button>
-            <InlineStack gap="200">
-              {step > 0 && (
-                <Button onClick={() => setStep(step - 1)}>Back</Button>
-              )}
-              <Button variant="primary" onClick={handleContinue}>
-                {isLaunchStep ? 'Launch gift page' : 'Continue'}
-              </Button>
-            </InlineStack>
-          </InlineStack>
-        )}
-      </BlockStack>
-    </Card>
-  );
-}
-
-function ProgressDots({ total, current }: { total: number; current: number }) {
-  return (
-    <InlineStack gap="100">
-      {Array.from({ length: total }).map((_, i) => (
-        <Box
-          key={i}
-          minHeight="4px"
-          width="100%"
-          borderRadius="050"
-          background={i <= current ? 'bg-fill-emphasis' : 'bg-surface-secondary'}
-        />
-      ))}
-    </InlineStack>
-  );
-}
+```
+npm install --legacy-peer-deps
+npm run dev
+# visit http://localhost:3000/admin-preview
+# and  http://localhost:3000/admin-preview/customize
 ```
 
-### `TilePicker.tsx` — the reusable building block
-
-Used by Welcome, Catalog approach, Pricing fee, Opt-in placement, etc.
-
-```tsx
-import {
-  Box,
-  InlineGrid,
-  BlockStack,
-  Text,
-  Badge,
-  Icon,
-} from '@shopify/polaris';
-import { CheckIcon } from '@shopify/polaris-icons';
-
-type TileOption = {
-  id: string;
-  title: string;
-  description?: string;
-  badge?: string;
-  badgeTone?: 'success' | 'attention' | 'info';
-};
-
-type Props =
-  | { mode: 'single'; options: TileOption[]; value: string | null; onChange: (id: string) => void; columns?: number }
-  | { mode: 'multi';  options: TileOption[]; value: string[];      onChange: (ids: string[]) => void; columns?: number };
-
-export function TilePicker(props: Props) {
-  const { mode, options, columns = options.length } = props;
-  const isSelected = (id: string) =>
-    mode === 'multi' ? props.value.includes(id) : props.value === id;
-
-  const toggle = (id: string) => {
-    if (mode === 'multi') {
-      const next = isSelected(id)
-        ? props.value.filter((v) => v !== id)
-        : [...props.value, id];
-      props.onChange(next);
-    } else {
-      props.onChange(id);
-    }
-  };
-
-  return (
-    <InlineGrid gap="300" columns={{ xs: 1, sm: 2, md: columns }}>
-      {options.map((opt) => {
-        const selected = isSelected(opt.id);
-        return (
-          <button
-            key={opt.id}
-            type="button"
-            onClick={() => toggle(opt.id)}
-            aria-pressed={selected}
-            style={{ all: 'unset', cursor: 'pointer', display: 'block', height: '100%' }}
-          >
-            <Box
-              padding="400"
-              borderRadius="200"
-              borderWidth="025"
-              borderColor={selected ? 'border-emphasis' : 'border'}
-              background={selected ? 'bg-surface-selected' : 'bg-surface'}
-              minHeight="100%"
-              position="relative"
-            >
-              <BlockStack gap="200">
-                <BlockStack gap="050">
-                  <Text variant="bodyMd" fontWeight="semibold" as="p">
-                    {opt.title}
-                  </Text>
-                  {opt.description && (
-                    <Text tone="subdued" as="p">{opt.description}</Text>
-                  )}
-                </BlockStack>
-                {opt.badge && (
-                  <Box>
-                    <Badge tone={opt.badgeTone ?? 'success'}>{opt.badge}</Badge>
-                  </Box>
-                )}
-              </BlockStack>
-
-              {selected && (
-                <Box position="absolute" insetBlockStart="200" insetInlineEnd="200">
-                  <Icon source={CheckIcon} tone="emphasis" />
-                </Box>
-              )}
-            </Box>
-          </button>
-        );
-      })}
-    </InlineGrid>
-  );
-}
-```
-
-### `FrameWelcome.tsx` — pattern for every frame
-
-```tsx
-import { BlockStack, Text } from '@shopify/polaris';
-import { TilePicker } from '../TilePicker';
-
-type Answers = {
-  goals?: string[];
-  buyerStatus?: string;
-  volume?: string;
-};
-
-export function FrameWelcome({
-  answers,
-  onChange,
-}: {
-  answers: Answers;
-  onChange: (patch: Partial<Answers>) => void;
-}) {
-  return (
-    <BlockStack gap="500">
-      <Question label="What are you hoping to achieve?" helper="Select all that apply">
-        <TilePicker
-          mode="multi"
-          value={answers.goals ?? []}
-          onChange={(goals) => onChange({ goals })}
-          options={[
-            { id: 'revenue',   title: 'Increase Revenue',   description: 'Drive high-value bulk orders from corporate buyers' },
-            { id: 'customers', title: 'Acquire Customers',  description: 'Turn gift recipients into repeat customers' },
-            { id: 'brand',     title: 'Brand Awareness',    description: 'Create memorable brand moments' },
-          ]}
-        />
-      </Question>
-
-      <Question label="Do you have corporate buyers already?">
-        <TilePicker
-          mode="single"
-          value={answers.buyerStatus ?? null}
-          onChange={(buyerStatus) => onChange({ buyerStatus })}
-          options={[
-            { id: 'waiting', title: 'Yes, waiting on me', description: 'Buyers ready to order once I set this up' },
-            { id: 'some',    title: 'Some interest',       description: 'Had inquiries but no formal process' },
-            { id: 'none',    title: 'Not yet',             description: 'Looking to capture this opportunity' },
-          ]}
-        />
-      </Question>
-
-      <Question label="Expected monthly volume?">
-        <TilePicker
-          mode="single"
-          columns={4}
-          value={answers.volume ?? null}
-          onChange={(volume) => onChange({ volume })}
-          options={[
-            { id: 'lt50',    title: '< 50 gifts',     description: 'Just getting started' },
-            { id: '50-200',  title: '50–200 gifts',   description: 'Growing demand', badge: 'Most common' },
-            { id: '200-500', title: '200–500 gifts',  description: 'Established program' },
-            { id: '500plus', title: '500+ gifts',     description: 'Enterprise scale' },
-          ]}
-        />
-      </Question>
-    </BlockStack>
-  );
-}
-
-function Question({
-  label,
-  helper,
-  children,
-}: {
-  label: string;
-  helper?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <BlockStack gap="300">
-      <BlockStack gap="100">
-        <Text variant="headingSm" as="h3">{label}</Text>
-        {helper && <Text tone="subdued" as="p">{helper}</Text>}
-      </BlockStack>
-      {children}
-    </BlockStack>
-  );
-}
-```
-
-### `ResumeSetupBanner.tsx` — dismissed state
-
-Renders at top of admin home when the merchant clicked "Skip setup".
-
-```tsx
-import { Banner, Button, InlineStack, Text } from '@shopify/polaris';
-
-export function ResumeSetupBanner({
-  percentComplete,
-  onResume,
-  onDismiss,
-}: {
-  percentComplete: number;
-  onResume: () => void;
-  onDismiss: () => void;
-}) {
-  return (
-    <Banner
-      tone="info"
-      title="Finish setting up your gift page"
-      onDismiss={onDismiss}
-    >
-      <InlineStack gap="300" blockAlign="center" align="space-between">
-        <Text as="p">
-          You're {percentComplete}% through setup. Resume to launch your gift page.
-        </Text>
-        <Button onClick={onResume}>Resume setup</Button>
-      </InlineStack>
-    </Banner>
-  );
-}
-```
-
-### Page wiring (admin home)
-
-```tsx
-import { Page, BlockStack } from '@shopify/polaris';
-import { OnboardingCard } from './OnboardingCard';
-import { ResumeSetupBanner } from './ResumeSetupBanner';
-import { Dashboard } from './Dashboard';
-
-export function AdminHome({ onboarding, dashboard, api }) {
-  // onboarding: { status: 'in_progress' | 'dismissed' | 'complete', step, answers }
-  return (
-    <Page>
-      <BlockStack gap="400">
-        {onboarding.status === 'in_progress' && (
-          <OnboardingCard
-            initialStep={onboarding.step}
-            initialAnswers={onboarding.answers}
-            onSave={api.saveOnboarding}
-            onSkip={api.dismissOnboarding}
-            onComplete={api.completeOnboarding}
-          />
-        )}
-
-        {onboarding.status === 'dismissed' && (
-          <ResumeSetupBanner
-            percentComplete={Math.round((onboarding.step / 10) * 100)}
-            onResume={api.resumeOnboarding}
-            onDismiss={api.hideResumeBanner}
-          />
-        )}
-
-        <Dashboard data={dashboard} />
-      </BlockStack>
-    </Page>
-  );
-}
-```
-
----
+These files are the source of truth for the visual + Polaris API. Copy components straight into the admin app.
 
 ## Notes / open questions for Gustavo
 
-- The Branding frame's phone preview should open in `Modal` size `large` rather than pin to the side of the card. Wire it to the same component the gifter-side claim flow renders so it's a real preview, not a static mock.
-- Pricing frame's order calculator is the one place a side panel makes sense. Do it as an `InlineGrid columns={['twoThirds', 'oneThird']}` *inside that frame only* — not a global pattern.
+- **Branding lives on the Customize page, not in onboarding.** Onboarding ships with Shopify-theme defaults; merchants tune look-and-feel post-launch.
+- Pricing frame's order calculator is the one place a side panel makes sense in onboarding. Do it as `InlineGrid columns={['twoThirds', 'oneThird']}` *inside that frame only* — not a global pattern.
+- Customize page uses side-panel previews on both tabs (email preview + phone unboxing preview) — that's where preview density belongs, not in onboarding.
 - Persist `answers` to the existing onboarding state on every `Continue`. Don't wait for completion.
 - Skip should NOT discard answers — it just hides the card. Resume picks up exactly where they left off.
 - Final "Launched" frame replaces the card; on next session, hide the card entirely and surface re-access through Settings.
+- Polaris has no first-class `Toggle` — `SettingToggle` is deprecated. Used `Checkbox` with `helpText` for binary settings, which is the current Polaris-recommended pattern.
+- TilePicker is composed from Polaris primitives (`Box` + `BlockStack` + `Badge` + `Icon`) since Polaris ships no large-tile picker. Same pattern Shopify uses internally.
