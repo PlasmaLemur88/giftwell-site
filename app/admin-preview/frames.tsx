@@ -1,6 +1,21 @@
 'use client';
 
 import { ReactNode } from 'react';
+import {
+  BlockStack,
+  InlineStack,
+  Text,
+  Box,
+  Badge,
+  Button,
+  TextField,
+  Checkbox,
+  RangeSlider,
+  InlineGrid,
+  Icon,
+  Divider,
+} from '@shopify/polaris';
+import { CheckIcon } from '@shopify/polaris-icons';
 
 export type FrameAnswers = {
   goals?: string[];
@@ -8,8 +23,10 @@ export type FrameAnswers = {
   volume?: string;
   catalogApproach?: string;
   feeHandling?: string;
+  feeSplit?: boolean;
   optInPlacements?: string[];
   enableMarketingOptIn?: boolean;
+  preCheckOptIn?: boolean;
   enableDoubleOptIn?: boolean;
   addToKlaviyo?: boolean;
   applyTags?: boolean;
@@ -25,31 +42,49 @@ type FrameProps = {
   onChange: (patch: Partial<FrameAnswers>) => void;
 };
 
-export const FRAMES = [
-  { id: 'welcome', label: 'Welcome', title: 'Welcome to Giftwell', subtitle: "Let's get your corporate gifting set up. Takes about 10 minutes." },
-  { id: 'catalog', label: 'Catalog', title: 'What products can gifters choose from?', subtitle: 'We found 847 products in your Shopify catalog.' },
-  { id: 'pricing', label: 'Pricing', title: 'How should pricing work?', subtitle: 'Configure the experience fee and volume discounts.' },
-  { id: 'branding', label: 'Branding', title: 'Customize the gift experience', subtitle: 'Your colors, your logo, your vibe.' },
-  { id: 'integrations', label: 'Integrations', title: 'Connect your tools', subtitle: 'Sync gift data with your email marketing and CRM.' },
-  { id: 'optin', label: 'Marketing', title: 'Turn gift recipients into customers', subtitle: 'Configure the marketing opt-in shown during the gift experience.' },
-  { id: 'landing', label: 'Landing Page', title: 'Your gift page', subtitle: 'Where gifters land when they want to send a gift.' },
-  { id: 'support', label: 'Support', title: 'Concierge support', subtitle: 'Let Giftwell handle support questions for your gifters.' },
-  { id: 'review', label: 'Review', title: 'Almost there — review your setup', subtitle: 'Make sure everything looks good before going live.' },
-  { id: 'launched', label: 'Launch', title: "You're live!", subtitle: null as string | null },
-] as const;
+export type FrameDef = {
+  id: string;
+  phase: string;
+  title: string;
+  helper?: string;
+};
 
-/* ─── Shared building blocks ─── */
+export const FRAMES: FrameDef[] = [
+  // Welcome
+  { id: 'goals',           phase: 'Welcome',      title: 'What are you hoping to achieve?', helper: 'Select all that apply.' },
+  { id: 'buyers',          phase: 'Welcome',      title: 'Do you have corporate buyers already?' },
+  { id: 'volume',          phase: 'Welcome',      title: 'Expected monthly volume?' },
+  // Catalog
+  { id: 'catalog-approach', phase: 'Catalog',     title: 'How do you want gifters to choose products?' },
+  { id: 'catalog-bundle',   phase: 'Catalog',     title: 'Pick products for your first bundle', helper: 'You can edit or add more bundles later.' },
+  // Pricing
+  { id: 'pricing-fee',     phase: 'Pricing',      title: 'How should the experience fee be handled?' },
+  { id: 'pricing-volume',  phase: 'Pricing',      title: 'Offer volume discounts?' },
+  // Branding
+  { id: 'brand-identity',   phase: 'Branding',    title: 'Confirm your brand identity', helper: 'We pulled these from your Shopify theme.' },
+  { id: 'brand-colors',     phase: 'Branding',    title: 'Pick your brand colors' },
+  { id: 'brand-background', phase: 'Branding',    title: 'Choose a background' },
+  { id: 'brand-effects',    phase: 'Branding',    title: 'Add a touch of motion' },
+  // Integrations
+  { id: 'integrations',    phase: 'Integrations', title: 'Connect your email marketing tool' },
+  // Marketing opt-in
+  { id: 'optin-enable',     phase: 'Marketing',   title: 'Show a marketing opt-in?', helper: 'Recipients can join your list when they claim their gift.' },
+  { id: 'optin-placement',  phase: 'Marketing',   title: 'Where should the opt-in show?' },
+  { id: 'optin-copy',       phase: 'Marketing',   title: 'What should the checkbox say?' },
+  { id: 'optin-compliance', phase: 'Marketing',   title: 'Compliance settings' },
+  { id: 'optin-actions',    phase: 'Marketing',   title: 'What happens when someone opts in?' },
+  // Landing page
+  { id: 'landing-url',       phase: 'Landing Page', title: 'Pick your gift page URL' },
+  { id: 'landing-placement', phase: 'Landing Page', title: 'Where should we link to it?' },
+  // Support
+  { id: 'support',  phase: 'Support', title: 'Want Giftwell to handle support?' },
+  // Review
+  { id: 'review',   phase: 'Review',  title: 'Almost there — review your setup' },
+  // Launch
+  { id: 'launched', phase: 'Launch',  title: "You're live" },
+];
 
-function Question({ label, helper, children }: { label: string; helper?: string; children: ReactNode }) {
-  return (
-    <div className="mb-7 last:mb-0">
-      <h3 className="text-base font-semibold mb-1">{label}</h3>
-      {helper && <p className="text-sm text-[#6d7175] mb-3">{helper}</p>}
-      {!helper && <div className="mb-3" />}
-      {children}
-    </div>
-  );
-}
+/* ─── Tile picker (composed from Polaris primitives) ─── */
 
 type Tile = {
   id: string;
@@ -84,373 +119,412 @@ function TilePicker({
     }
   };
 
-  const cols = columns ?? options.length;
-
   return (
-    <div
-      className="grid gap-3"
-      style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-    >
+    <InlineGrid gap="300" columns={columns ?? options.length}>
       {options.map((opt) => {
         const selected = isSelected(opt.id);
         return (
           <button
             key={opt.id}
+            type="button"
             onClick={() => toggle(opt.id)}
-            className={`relative text-left p-4 rounded-xl border transition-all ${
-              selected
-                ? 'border-black bg-[#fafafa] ring-1 ring-black'
-                : 'border-[#e1e3e5] bg-white hover:border-[#c9cccf]'
-            }`}
+            aria-pressed={selected}
+            style={{ all: 'unset', cursor: 'pointer', display: 'block', height: '100%' }}
           >
-            <div className="font-semibold text-sm mb-1">{opt.title}</div>
-            {opt.description && (
-              <div className="text-xs text-[#6d7175] leading-relaxed">{opt.description}</div>
-            )}
-            {opt.badge && (
-              <div className="mt-2 inline-block text-[10px] font-medium px-1.5 py-0.5 rounded bg-[#e3f1df] text-[#0a5132]">
-                {opt.badge}
-              </div>
-            )}
-            {selected && (
-              <div className="absolute top-3 right-3 w-4 h-4 rounded-full bg-black grid place-items-center">
-                <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 12 12" fill="none">
-                  <path d="M2.5 6.5L5 9L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            )}
+            <Box
+              padding="400"
+              borderRadius="200"
+              borderWidth="025"
+              borderColor={selected ? 'border-emphasis' : 'border'}
+              background={selected ? 'bg-surface-selected' : 'bg-surface'}
+              minHeight="100%"
+              position="relative"
+            >
+              <BlockStack gap="200">
+                <BlockStack gap="050">
+                  <Text as="p" variant="bodyMd" fontWeight="semibold">
+                    {opt.title}
+                  </Text>
+                  {opt.description && (
+                    <Text as="p" tone="subdued" variant="bodySm">
+                      {opt.description}
+                    </Text>
+                  )}
+                </BlockStack>
+                {opt.badge && (
+                  <Box>
+                    <Badge tone="success">{opt.badge}</Badge>
+                  </Box>
+                )}
+              </BlockStack>
+
+              {selected && (
+                <Box position="absolute" insetBlockStart="200" insetInlineEnd="200">
+                  <Icon source={CheckIcon} tone="emphasis" />
+                </Box>
+              )}
+            </Box>
           </button>
         );
       })}
-    </div>
+    </InlineGrid>
   );
 }
 
-function Toggle({ checked, onChange, label, helper }: { checked: boolean; onChange: (v: boolean) => void; label: string; helper?: string }) {
+/* ─── Frames (one question each) ─── */
+
+function FrameGoals({ answers, onChange }: FrameProps) {
   return (
-    <div className="flex items-start justify-between py-3 border-b border-[#f1f1f1] last:border-b-0">
-      <div className="flex-1 pr-4">
-        <p className="text-sm font-medium">{label}</p>
-        {helper && <p className="text-xs text-[#6d7175] mt-0.5">{helper}</p>}
-      </div>
-      <button
-        onClick={() => onChange(!checked)}
-        className={`relative w-9 h-5 rounded-full transition-colors flex-shrink-0 ${
-          checked ? 'bg-black' : 'bg-[#d2d5d8]'
-        }`}
-      >
-        <span
-          className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-            checked ? 'translate-x-4' : 'translate-x-0.5'
-          }`}
-        />
-      </button>
-    </div>
+    <TilePicker
+      mode="multi"
+      value={answers.goals}
+      onChange={(v) => onChange({ goals: v as string[] })}
+      options={[
+        { id: 'revenue', title: 'Increase Revenue', description: 'Drive high-value bulk orders from corporate buyers' },
+        { id: 'customers', title: 'Acquire Customers', description: 'Turn gift recipients into repeat customers' },
+        { id: 'brand', title: 'Brand Awareness', description: 'Create memorable brand moments' },
+      ]}
+    />
   );
 }
 
-function TextInput({ label, value, helper }: { label: string; value: string; helper?: string }) {
+function FrameBuyers({ answers, onChange }: FrameProps) {
   return (
-    <div className="mb-4 last:mb-0">
-      <label className="text-sm font-medium block mb-1.5">{label}</label>
-      <input
-        defaultValue={value}
-        className="w-full text-sm px-3 py-2 rounded-lg border border-[#e1e3e5] bg-white focus:outline-none focus:border-black"
-      />
-      {helper && <p className="text-xs text-[#6d7175] mt-1">{helper}</p>}
-    </div>
+    <TilePicker
+      mode="single"
+      value={answers.buyerStatus}
+      onChange={(v) => onChange({ buyerStatus: v as string })}
+      options={[
+        { id: 'waiting', title: 'Yes, waiting on me', description: 'Buyers ready to order once I set this up' },
+        { id: 'some', title: 'Some interest', description: 'Had inquiries but no formal process' },
+        { id: 'none', title: 'Not yet', description: 'Looking to capture this opportunity' },
+      ]}
+    />
   );
 }
 
-function Section({ title, description, children }: { title: string; description?: string; children: ReactNode }) {
+function FrameVolume({ answers, onChange }: FrameProps) {
   return (
-    <div className="border border-[#e1e3e5] rounded-xl p-5 mb-4 last:mb-0">
-      <div className="mb-4">
-        <h4 className="text-sm font-semibold">{title}</h4>
-        {description && <p className="text-xs text-[#6d7175] mt-0.5">{description}</p>}
-      </div>
-      {children}
-    </div>
+    <TilePicker
+      mode="single"
+      columns={4}
+      value={answers.volume}
+      onChange={(v) => onChange({ volume: v as string })}
+      options={[
+        { id: 'lt50', title: '< 50 gifts', description: 'Just getting started' },
+        { id: '50-200', title: '50–200 gifts', description: 'Growing demand', badge: 'Most common' },
+        { id: '200-500', title: '200–500 gifts', description: 'Established program' },
+        { id: '500plus', title: '500+ gifts', description: 'Enterprise scale' },
+      ]}
+    />
   );
 }
 
-/* ─── Frame components ─── */
-
-function FrameWelcome({ answers, onChange }: FrameProps) {
+function FrameCatalogApproach({ answers, onChange }: FrameProps) {
   return (
-    <div>
-      <Question label="What are you hoping to achieve?" helper="Select all that apply.">
-        <TilePicker
-          mode="multi"
-          value={answers.goals}
-          onChange={(v) => onChange({ goals: v as string[] })}
-          options={[
-            { id: 'revenue', title: 'Increase Revenue', description: 'Drive high-value bulk orders from corporate buyers' },
-            { id: 'customers', title: 'Acquire Customers', description: 'Turn gift recipients into repeat customers' },
-            { id: 'brand', title: 'Brand Awareness', description: 'Create memorable brand moments' },
-          ]}
-        />
-      </Question>
-
-      <Question label="Do you have corporate buyers already?">
-        <TilePicker
-          mode="single"
-          value={answers.buyerStatus}
-          onChange={(v) => onChange({ buyerStatus: v as string })}
-          options={[
-            { id: 'waiting', title: 'Yes, waiting on me', description: 'Buyers ready to order once I set this up' },
-            { id: 'some', title: 'Some interest', description: 'Had inquiries but no formal process' },
-            { id: 'none', title: 'Not yet', description: 'Looking to capture this opportunity' },
-          ]}
-        />
-      </Question>
-
-      <Question label="Expected monthly volume?">
-        <TilePicker
-          mode="single"
-          columns={4}
-          value={answers.volume}
-          onChange={(v) => onChange({ volume: v as string })}
-          options={[
-            { id: 'lt50', title: '< 50 gifts', description: 'Just getting started' },
-            { id: '50-200', title: '50–200 gifts', description: 'Growing demand', badge: 'Most common' },
-            { id: '200-500', title: '200–500 gifts', description: 'Established program' },
-            { id: '500plus', title: '500+ gifts', description: 'Enterprise scale' },
-          ]}
-        />
-      </Question>
-    </div>
+    <TilePicker
+      mode="single"
+      value={answers.catalogApproach}
+      onChange={(v) => onChange({ catalogApproach: v as string })}
+      options={[
+        { id: 'full', title: 'Full Catalog', description: 'Make all 847 products available for gifting' },
+        { id: 'curated', title: 'Curated Bundles', description: 'Create gift bundles from your products', badge: 'Recommended' },
+        { id: 'both', title: 'Both', description: 'Featured bundles + browse full catalog' },
+      ]}
+    />
   );
 }
 
-function FrameCatalog({ answers, onChange }: FrameProps) {
+function FrameCatalogBundle(_: FrameProps) {
+  const products = [
+    { name: 'Signature Candle', price: '$34.00', sel: true },
+    { name: 'Bath Salts', price: '$28.00', sel: true },
+    { name: 'Artisan Tea Set', price: '$32.00', sel: true },
+    { name: 'Cashmere Gloves', price: '$65.00', sel: false },
+    { name: 'Leather Journal', price: '$45.00', sel: false },
+    { name: 'Ceramic Mug', price: '$24.00', sel: false },
+    { name: 'Chocolate Box', price: '$38.00', sel: false },
+    { name: 'Wool Scarf', price: '$55.00', sel: false },
+  ];
   return (
-    <div>
-      <Question label="Choose your catalog approach">
-        <TilePicker
-          mode="single"
-          value={answers.catalogApproach}
-          onChange={(v) => onChange({ catalogApproach: v as string })}
-          options={[
-            { id: 'full', title: 'Full Catalog', description: 'Make all 847 products available for gifting' },
-            { id: 'curated', title: 'Curated Bundles', description: 'Create gift bundles from your products', badge: 'Recommended' },
-            { id: 'both', title: 'Both', description: 'Featured bundles + browse full catalog' },
-          ]}
-        />
-      </Question>
-
-      <Section title="Select products for your first bundle" description="Click to select, then we'll help you create a bundle">
-        <input
-          placeholder="Search products…"
-          className="w-full text-sm px-3 py-2 rounded-lg border border-[#e1e3e5] bg-white mb-4 focus:outline-none focus:border-black"
-        />
-        <div className="grid grid-cols-4 gap-3">
-          {[
-            { name: 'Signature Candle', price: '$34.00', sel: true },
-            { name: 'Bath Salts', price: '$28.00', sel: true },
-            { name: 'Artisan Tea Set', price: '$32.00', sel: true },
-            { name: 'Cashmere Gloves', price: '$65.00', sel: false },
-            { name: 'Leather Journal', price: '$45.00', sel: false },
-            { name: 'Ceramic Mug', price: '$24.00', sel: false },
-            { name: 'Chocolate Box', price: '$38.00', sel: false },
-            { name: 'Wool Scarf', price: '$55.00', sel: false },
-          ].map((p) => (
-            <div
-              key={p.name}
-              className={`relative aspect-square rounded-lg border ${
-                p.sel ? 'border-black ring-1 ring-black bg-[#fafafa]' : 'border-[#e1e3e5] bg-white'
-              } flex flex-col`}
-            >
-              <div className="flex-1 bg-[#f6f6f7] rounded-t-lg" />
-              <div className="p-2">
-                <p className="text-xs font-medium truncate">{p.name}</p>
-                <p className="text-xs text-[#6d7175]">{p.price}</p>
-              </div>
-              {p.sel && (
-                <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-black grid place-items-center">
-                  <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 12 12" fill="none">
-                    <path d="M2.5 6.5L5 9L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 flex items-center justify-between text-sm">
-          <span className="text-[#6d7175]">3 products selected · Combined retail value: $94.00</span>
-          <button className="text-xs px-3 py-1.5 rounded-lg bg-black text-white">Create Bundle →</button>
-        </div>
-      </Section>
-    </div>
-  );
-}
-
-function FramePricing({ answers, onChange }: FrameProps) {
-  return (
-    <div className="grid grid-cols-[1fr_280px] gap-6">
-      <div>
-        <Question label="Experience Fee (10%)" helper="This covers the digital unwrapping, AI parsing, and tracking.">
-          <TilePicker
-            mode="single"
-            value={answers.feeHandling}
-            onChange={(v) => onChange({ feeHandling: v as string })}
-            columns={2}
-            options={[
-              { id: 'pass', title: 'Pass to Gifter', description: '10% added at checkout. Your margin stays intact.', badge: 'Recommended for DTC' },
-              { id: 'absorb', title: 'Absorb in Margin', description: 'Cleaner pricing for buyers. 10% deducted from revenue.' },
-            ]}
-          />
-          <div className="mt-3 flex items-center gap-3 p-3 rounded-lg border border-[#e1e3e5]">
-            <input type="checkbox" className="accent-black" />
-            <div>
-              <p className="text-sm font-medium">Split 50/50</p>
-              <p className="text-xs text-[#6d7175]">5% to gifter, 5% from margin</p>
-            </div>
-          </div>
-        </Question>
-
-        <Section title="Volume Discounts" description="Incentivize larger orders with automatic discounts">
-          <Toggle
-            checked={answers.enableVolumeDiscounts ?? false}
-            onChange={(v) => onChange({ enableVolumeDiscounts: v })}
-            label="Enable volume discounts"
-            helper="Automatically apply discounts based on order size"
-          />
-          <div className="mt-3 space-y-2">
-            {[
-              ['25', '5'],
-              ['50', '10'],
-              ['100', '15'],
-            ].map(([gifts, off]) => (
-              <div key={gifts} className="flex items-center gap-2 text-sm">
-                <input defaultValue={gifts} className="w-16 px-2 py-1.5 rounded border border-[#e1e3e5]" />
-                <span className="text-[#6d7175]">+ gifts =</span>
-                <input defaultValue={off} className="w-16 px-2 py-1.5 rounded border border-[#e1e3e5]" />
-                <span className="text-[#6d7175]">% off</span>
-                <button className="text-[#6d7175] ml-1">×</button>
-              </div>
-            ))}
-            <button className="text-xs text-blue-600 mt-1">+ Add tier</button>
-          </div>
-        </Section>
-      </div>
-
-      {/* Side calculator — only shown on this frame */}
-      <div className="bg-[#1a1a1a] text-white rounded-xl p-5 h-fit sticky top-6">
-        <p className="text-xs uppercase tracking-wide text-[#a8a8a8] mb-4">Example order (50 gifts)</p>
-        <div className="space-y-2.5 text-sm">
-          <Row label="Holiday Wellness Bundle × 50" value="$4,450.00" />
-          <Row label="Volume discount (10%)" value="−$445.00" valueClass="text-emerald-400" />
-          <Row label="Subtotal" value="$4,005.00" />
-          <Row label="Experience fee (10%)" value="$400.50" />
-          <div className="pt-2.5 mt-2.5 border-t border-[#333]">
-            <div className="flex justify-between font-semibold">
-              <span>Gifter pays</span>
-              <span>$4,405.50</span>
-            </div>
-          </div>
-        </div>
-        <div className="mt-5 pt-5 border-t border-[#333]">
-          <p className="text-xs text-[#a8a8a8]">Your revenue</p>
-          <p className="text-2xl font-semibold text-emerald-400 mt-1">$4,005.00</p>
-          <p className="text-xs text-[#a8a8a8] mt-1">Margin intact — fee passed to gifter</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Row({ label, value, valueClass = '' }: { label: string; value: string; valueClass?: string }) {
-  return (
-    <div className="flex justify-between">
-      <span className="text-[#a8a8a8]">{label}</span>
-      <span className={valueClass || 'text-white'}>{value}</span>
-    </div>
-  );
-}
-
-function FrameBranding(_: FrameProps) {
-  return (
-    <div>
-      {/* Tabs */}
-      <div className="flex gap-6 border-b border-[#e1e3e5] mb-6">
-        {['Basics', 'Backgrounds', 'Effects', 'Themes'].map((t, i) => (
-          <button
-            key={t}
-            className={`pb-3 text-sm border-b-2 -mb-px ${
-              i === 0 ? 'border-black font-semibold' : 'border-transparent text-[#6d7175]'
-            }`}
+    <BlockStack gap="400">
+      <TextField label="" labelHidden placeholder="Search products…" autoComplete="off" />
+      <InlineGrid gap="300" columns={4}>
+        {products.map((p) => (
+          <Box
+            key={p.name}
+            padding="200"
+            borderRadius="200"
+            borderWidth="025"
+            borderColor={p.sel ? 'border-emphasis' : 'border'}
+            background={p.sel ? 'bg-surface-selected' : 'bg-surface'}
+            position="relative"
           >
-            {t}
+            <BlockStack gap="200">
+              <Box background="bg-surface-secondary" borderRadius="100" minHeight="80px" />
+              <BlockStack gap="050">
+                <Text as="p" variant="bodySm" fontWeight="semibold" truncate>
+                  {p.name}
+                </Text>
+                <Text as="p" tone="subdued" variant="bodySm">
+                  {p.price}
+                </Text>
+              </BlockStack>
+            </BlockStack>
+            {p.sel && (
+              <Box position="absolute" insetBlockStart="200" insetInlineEnd="200">
+                <Icon source={CheckIcon} tone="emphasis" />
+              </Box>
+            )}
+          </Box>
+        ))}
+      </InlineGrid>
+      <InlineStack align="space-between" blockAlign="center">
+        <Text as="span" tone="subdued" variant="bodySm">
+          3 selected · combined retail $94.00
+        </Text>
+      </InlineStack>
+    </BlockStack>
+  );
+}
+
+function FramePricingFee({ answers, onChange }: FrameProps) {
+  return (
+    <InlineGrid gap="500" columns={['twoThirds', 'oneThird']}>
+      <BlockStack gap="300">
+        <TilePicker
+          mode="single"
+          columns={2}
+          value={answers.feeHandling}
+          onChange={(v) => onChange({ feeHandling: v as string })}
+          options={[
+            { id: 'pass', title: 'Pass to Gifter', description: '10% added at checkout. Margin stays intact.', badge: 'Recommended for DTC' },
+            { id: 'absorb', title: 'Absorb in Margin', description: 'Cleaner pricing for buyers. 10% deducted from revenue.' },
+          ]}
+        />
+        <Box padding="300" borderRadius="200" borderWidth="025" borderColor="border">
+          <Checkbox
+            label="Split 50/50"
+            helpText="5% to gifter, 5% from margin"
+            checked={answers.feeSplit ?? false}
+            onChange={(v) => onChange({ feeSplit: v })}
+          />
+        </Box>
+      </BlockStack>
+
+      <Box padding="400" borderRadius="200" background="bg-fill-inverse">
+        <BlockStack gap="200">
+          <Text as="p" tone="text-inverse-secondary" variant="bodySm">
+            EXAMPLE · 50 GIFTS
+          </Text>
+          <BlockStack gap="100">
+            <CalcRow label="Bundle × 50" value="$4,450.00" />
+            <CalcRow label="Volume discount" value="−$445.00" tone="success" />
+            <CalcRow label="Subtotal" value="$4,005.00" />
+            <CalcRow label="Fee (10%)" value="$400.50" />
+          </BlockStack>
+          <Divider borderColor="border-inverse" />
+          <BlockStack gap="050">
+            <Text as="p" tone="text-inverse-secondary" variant="bodySm">
+              Your revenue
+            </Text>
+            <Text as="p" variant="headingLg" tone="success">
+              $4,005.00
+            </Text>
+          </BlockStack>
+        </BlockStack>
+      </Box>
+    </InlineGrid>
+  );
+}
+
+function CalcRow({ label, value, tone }: { label: string; value: string; tone?: 'success' }) {
+  return (
+    <InlineStack align="space-between">
+      <Text as="span" tone="text-inverse-secondary" variant="bodySm">{label}</Text>
+      <Text as="span" tone={tone === 'success' ? 'success' : 'text-inverse'} variant="bodySm">
+        {value}
+      </Text>
+    </InlineStack>
+  );
+}
+
+function FramePricingVolume({ answers, onChange }: FrameProps) {
+  return (
+    <BlockStack gap="400">
+      <Checkbox
+        label="Enable volume discounts"
+        helpText="Automatically apply discounts based on order size"
+        checked={answers.enableVolumeDiscounts ?? false}
+        onChange={(v) => onChange({ enableVolumeDiscounts: v })}
+      />
+      {answers.enableVolumeDiscounts && (
+        <BlockStack gap="200">
+          {[
+            ['25', '5'],
+            ['50', '10'],
+            ['100', '15'],
+          ].map(([gifts, off]) => (
+            <InlineStack key={gifts} gap="200" blockAlign="center">
+              <Box minWidth="80px"><TextField label="" labelHidden type="number" value={gifts} autoComplete="off" onChange={() => {}} /></Box>
+              <Text as="span" tone="subdued">+ gifts =</Text>
+              <Box minWidth="80px"><TextField label="" labelHidden type="number" value={off} autoComplete="off" onChange={() => {}} /></Box>
+              <Text as="span" tone="subdued">% off</Text>
+              <Button variant="plain" tone="critical">Remove</Button>
+            </InlineStack>
+          ))}
+          <InlineStack>
+            <Button variant="plain">+ Add tier</Button>
+          </InlineStack>
+        </BlockStack>
+      )}
+    </BlockStack>
+  );
+}
+
+function FrameBrandIdentity(_: FrameProps) {
+  return (
+    <InlineGrid gap="400" columns={2}>
+      <TextField label="Brand name" value="Acme Store" autoComplete="off" onChange={() => {}} />
+      <BlockStack gap="100">
+        <Text as="span" variant="bodyMd" fontWeight="medium">Logo</Text>
+        <InlineStack gap="200" blockAlign="center">
+          <Box background="bg-surface-secondary" borderRadius="200" borderWidth="025" borderColor="border" minWidth="40px" minHeight="40px" />
+          <Button>Change</Button>
+        </InlineStack>
+      </BlockStack>
+    </InlineGrid>
+  );
+}
+
+function FrameBrandColors(_: FrameProps) {
+  const primary = ['#5B6CFF', '#E04F4F', '#3FB950', '#F0883E', '#A371F7'];
+  const secondary = ['#1a1a1a', '#7B2FBE', '#1F3A5F', '#0D9488', '#A371F7'];
+  return (
+    <InlineGrid gap="500" columns={2}>
+      <BlockStack gap="200">
+        <Text as="p" tone="subdued" variant="bodySm">PRIMARY</Text>
+        <InlineStack gap="200">
+          {primary.map((c, i) => (
+            <Swatch key={c} color={c} selected={i === 0} />
+          ))}
+          <Swatch gradient />
+        </InlineStack>
+      </BlockStack>
+      <BlockStack gap="200">
+        <Text as="p" tone="subdued" variant="bodySm">SECONDARY</Text>
+        <InlineStack gap="200">
+          {secondary.map((c, i) => (
+            <Swatch key={c} color={c} selected={i === 1} />
+          ))}
+          <Swatch gradient />
+        </InlineStack>
+      </BlockStack>
+    </InlineGrid>
+  );
+}
+
+function Swatch({ color, selected, gradient }: { color?: string; selected?: boolean; gradient?: boolean }) {
+  return (
+    <button
+      type="button"
+      style={{
+        all: 'unset',
+        cursor: 'pointer',
+        width: 28,
+        height: 28,
+        borderRadius: '50%',
+        background: gradient
+          ? 'conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)'
+          : color,
+        outline: selected ? '2px solid var(--p-color-border-emphasis)' : '1px solid var(--p-color-border)',
+        outlineOffset: selected ? 2 : 0,
+        boxSizing: 'border-box',
+      }}
+    />
+  );
+}
+
+function FrameBrandBackground(_: FrameProps) {
+  const swatches = [
+    'linear-gradient(180deg, #1F3A5F, #0F1A2E)',
+    '#FFE9A0',
+    '#FFC9D5',
+    '#A8E5C5',
+    '#DCDCFF',
+    '#1a1a1a',
+  ];
+  return (
+    <BlockStack gap="400">
+      <InlineStack gap="100">
+        <Button pressed>Library</Button>
+        <Button>Upload</Button>
+        <Button>AI Generate</Button>
+      </InlineStack>
+      <InlineGrid gap="300" columns={6}>
+        {swatches.map((bg, i) => (
+          <button
+            key={i}
+            type="button"
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              aspectRatio: '3/4',
+              borderRadius: 8,
+              background: bg,
+              outline: i === 0 ? '2px solid var(--p-color-border-emphasis)' : '1px solid var(--p-color-border)',
+              outlineOffset: i === 0 ? 2 : 0,
+            }}
+          />
+        ))}
+      </InlineGrid>
+      <InlineStack>
+        <Button variant="plain">Preview gift page</Button>
+      </InlineStack>
+    </BlockStack>
+  );
+}
+
+function FrameBrandEffects(_: FrameProps) {
+  const effects = [
+    { id: 'sparkles', label: 'Sparkles' },
+    { id: 'snow', label: 'Snow' },
+    { id: 'confetti', label: 'Confetti' },
+    { id: 'hearts', label: 'Hearts' },
+    { id: 'stars', label: 'Stars' },
+    { id: 'none', label: 'None' },
+  ];
+  return (
+    <BlockStack gap="500">
+      <InlineGrid gap="200" columns={6}>
+        {effects.map((e, i) => (
+          <button
+            key={e.id}
+            type="button"
+            style={{ all: 'unset', cursor: 'pointer', display: 'block' }}
+          >
+            <Box
+              padding="300"
+              borderRadius="200"
+              borderWidth="025"
+              borderColor={i === 0 ? 'border-emphasis' : 'border'}
+              background={i === 0 ? 'bg-surface-selected' : 'bg-surface'}
+            >
+              <BlockStack gap="100" inlineAlign="center">
+                <Box minHeight="20px" />
+                <Text as="span" variant="bodySm">{e.label}</Text>
+              </BlockStack>
+            </Box>
           </button>
         ))}
-      </div>
-
-      <Section title="Brand Identity" description="We pulled these from your Shopify theme — adjust as needed.">
-        <div className="grid grid-cols-2 gap-4">
-          <TextInput label="Brand Name" value="Acme Store" />
-          <div>
-            <label className="text-sm font-medium block mb-1.5">Logo</label>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[#f6f6f7] border border-[#e1e3e5]" />
-              <button className="text-xs px-3 py-1.5 rounded-lg border border-[#e1e3e5]">Change</button>
-            </div>
-          </div>
-        </div>
-      </Section>
-
-      <Section title="Brand Colors">
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <p className="text-xs text-[#6d7175] mb-2">Primary</p>
-            <div className="flex gap-2">
-              {['#5B6CFF', '#E04F4F', '#3FB950', '#F0883E', '#A371F7', 'gradient'].map((c, i) => (
-                <div
-                  key={i}
-                  className={`w-7 h-7 rounded-full border ${i === 0 ? 'ring-2 ring-offset-1 ring-black' : 'border-[#e1e3e5]'}`}
-                  style={{ background: c === 'gradient' ? 'conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)' : c }}
-                />
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="text-xs text-[#6d7175] mb-2">Secondary</p>
-            <div className="flex gap-2">
-              {['#1a1a1a', '#7B2FBE', '#1F3A5F', '#0D9488', '#A371F7', 'gradient'].map((c, i) => (
-                <div
-                  key={i}
-                  className={`w-7 h-7 rounded-full border ${i === 1 ? 'ring-2 ring-offset-1 ring-black' : 'border-[#e1e3e5]'}`}
-                  style={{ background: c === 'gradient' ? 'conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)' : c }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </Section>
-
-      <Section title="Background" description="Choose from our library, upload your own, or generate with AI.">
-        <div className="flex gap-1 p-1 bg-[#f6f6f7] rounded-lg w-fit mb-3">
-          {['Library', 'Upload', 'AI Generate'].map((t, i) => (
-            <button
-              key={t}
-              className={`text-xs px-3 py-1.5 rounded ${i === 0 ? 'bg-white shadow-sm' : 'text-[#6d7175]'}`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-        <div className="grid grid-cols-6 gap-3">
-          {['linear-gradient(180deg, #1F3A5F, #0F1A2E)', '#FFE9A0', '#FFC9D5', '#A8E5C5', '#DCDCFF', '#1a1a1a'].map((bg, i) => (
-            <div
-              key={i}
-              className={`aspect-[3/4] rounded-lg ${i === 0 ? 'ring-2 ring-black' : 'border border-[#e1e3e5]'}`}
-              style={{ background: bg }}
-            />
-          ))}
-        </div>
-        <button className="mt-3 text-xs text-blue-600">Preview gift page →</button>
-      </Section>
-    </div>
+      </InlineGrid>
+      <RangeSlider
+        label="Effect intensity"
+        value={60}
+        onChange={() => {}}
+        output
+      />
+    </BlockStack>
   );
 }
 
@@ -462,154 +536,194 @@ function FrameIntegrations(_: FrameProps) {
     { name: 'Postscript', desc: 'SMS for gift recipients', status: null },
   ];
   return (
-    <div>
-      <Section title="Email Marketing" description="Sync gift recipient data to your email platform.">
-        <div className="space-y-2">
-          {integrations.map((i) => (
-            <div key={i.name} className="flex items-center justify-between py-3 px-3 border border-[#e1e3e5] rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-[#f6f6f7] grid place-items-center text-sm font-semibold">
-                  {i.name[0]}
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{i.name}</p>
-                  {i.status === 'connected' ? (
-                    <p className="text-xs text-emerald-600">✓ Connected</p>
-                  ) : (
-                    <p className="text-xs text-[#6d7175]">{i.desc}</p>
-                  )}
-                </div>
-              </div>
-              <button
-                className={`text-xs px-3 py-1.5 rounded-lg ${
-                  i.status === 'connected'
-                    ? 'bg-[#e3f1df] text-[#0a5132]'
-                    : 'bg-black text-white'
-                }`}
+    <BlockStack gap="200">
+      {integrations.map((i) => (
+        <Box
+          key={i.name}
+          padding="300"
+          borderRadius="200"
+          borderWidth="025"
+          borderColor="border"
+        >
+          <InlineStack align="space-between" blockAlign="center">
+            <InlineStack gap="300" blockAlign="center">
+              <Box
+                background="bg-surface-secondary"
+                borderRadius="200"
+                minWidth="36px"
+                minHeight="36px"
+                padding="200"
               >
-                {i.status === 'connected' ? 'Configure →' : 'Connect'}
-              </button>
-            </div>
-          ))}
-        </div>
-      </Section>
-    </div>
+                <Text as="span" variant="bodyMd" fontWeight="bold">{i.name[0]}</Text>
+              </Box>
+              <BlockStack gap="050">
+                <Text as="p" variant="bodyMd" fontWeight="medium">{i.name}</Text>
+                {i.status === 'connected' ? (
+                  <InlineStack gap="100" blockAlign="center">
+                    <Badge tone="success">Connected</Badge>
+                  </InlineStack>
+                ) : (
+                  <Text as="p" tone="subdued" variant="bodySm">{i.desc}</Text>
+                )}
+              </BlockStack>
+            </InlineStack>
+            {i.status === 'connected' ? (
+              <Button>Configure</Button>
+            ) : (
+              <Button variant="primary">Connect</Button>
+            )}
+          </InlineStack>
+        </Box>
+      ))}
+    </BlockStack>
   );
 }
 
-function FrameOptIn({ answers, onChange }: FrameProps) {
+function FrameOptInEnable({ answers, onChange }: FrameProps) {
+  const current = answers.enableMarketingOptIn === undefined
+    ? undefined
+    : answers.enableMarketingOptIn ? 'yes' : 'no';
   return (
-    <div>
-      <Section title="Opt-In Settings">
-        <Toggle
-          checked={answers.enableMarketingOptIn ?? false}
-          onChange={(v) => onChange({ enableMarketingOptIn: v })}
-          label="Enable marketing opt-in"
-          helper="Show opt-in checkbox during gift claim"
-        />
-        <div className="mt-4">
-          <p className="text-sm font-medium mb-2">Where to show opt-in</p>
-          <TilePicker
-            mode="multi"
-            value={answers.optInPlacements}
-            onChange={(v) => onChange({ optInPlacements: v as string[] })}
-            columns={2}
-            options={[
-              { id: 'claim', title: 'Claim Form', description: 'When entering shipping address' },
-              { id: 'unwrap', title: 'Unwrapping Page', description: 'After revealing the gift' },
-            ]}
-          />
-        </div>
-        <div className="mt-4">
-          <TextInput
-            label="Opt-in checkbox text"
-            value="Keep me updated on exclusive offers and new products"
-            helper="Keep it short and clear about what they're signing up for."
-          />
-        </div>
-      </Section>
-
-      <Section title="Compliance">
-        <Toggle checked={false} onChange={() => {}} label="Pre-check the box" helper="Checkbox starts checked (not recommended for EU)" />
-        <Toggle
-          checked={answers.enableDoubleOptIn ?? false}
-          onChange={(v) => onChange({ enableDoubleOptIn: v })}
-          label="Enable double opt-in for EU"
-          helper="Auto-detect EU recipients and require email confirmation"
-        />
-        <div className="mt-3">
-          <TextInput label="Privacy policy URL" value="https://acmestore.com/privacy" />
-        </div>
-      </Section>
-
-      <Section title="What happens on opt-in">
-        <Toggle
-          checked={answers.addToKlaviyo ?? false}
-          onChange={(v) => onChange({ addToKlaviyo: v })}
-          label="Add to Klaviyo list"
-          helper="List: Gift Recipients"
-        />
-        <Toggle
-          checked={answers.applyTags ?? false}
-          onChange={(v) => onChange({ applyTags: v })}
-          label="Apply tags"
-          helper="Tags: gift_recipient, opted_in, source:giftwell"
-        />
-        <Toggle
-          checked={answers.triggerWelcome ?? false}
-          onChange={(v) => onChange({ triggerWelcome: v })}
-          label="Trigger welcome flow"
-          helper='Start "Gift Recipient Welcome" flow in Klaviyo'
-        />
-      </Section>
-    </div>
+    <TilePicker
+      mode="single"
+      columns={2}
+      value={current}
+      onChange={(v) => onChange({ enableMarketingOptIn: v === 'yes' })}
+      options={[
+        { id: 'yes', title: 'Yes, show opt-in', description: 'Recipients can join your list when they claim a gift', badge: 'Most opt in' },
+        { id: 'no', title: 'No, skip it', description: 'Recipients only see what they need to claim' },
+      ]}
+    />
   );
 }
 
-function FrameLanding({ answers, onChange }: FrameProps) {
+function FrameOptInPlacement({ answers, onChange }: FrameProps) {
   return (
-    <div>
-      <Section title="Public URL" description="Where corporate gifters land to start an order.">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-sm text-[#6d7175]">acmestore.com/</span>
-          <input
-            defaultValue="gift"
-            className="text-sm px-3 py-2 rounded-lg border border-[#e1e3e5] bg-white flex-1 focus:outline-none focus:border-black"
-          />
-        </div>
-        <a className="text-xs text-blue-600">Preview landing page →</a>
-      </Section>
+    <TilePicker
+      mode="multi"
+      columns={2}
+      value={answers.optInPlacements}
+      onChange={(v) => onChange({ optInPlacements: v as string[] })}
+      options={[
+        { id: 'claim', title: 'Claim Form', description: 'When entering shipping address' },
+        { id: 'unwrap', title: 'Unwrapping Page', description: 'After revealing the gift' },
+      ]}
+    />
+  );
+}
 
-      <Section title="Storefront placement">
-        <Toggle
-          checked={answers.addToNav ?? false}
-          onChange={(v) => onChange({ addToNav: v })}
-          label="Add to main navigation"
-          helper='Adds a "Corporate Gifting" link to your storefront nav'
-        />
-        <Toggle
-          checked={answers.addToFooter ?? false}
-          onChange={(v) => onChange({ addToFooter: v })}
-          label="Add to footer"
-          helper="Adds a link in the footer next to About, Contact, etc."
-        />
-      </Section>
-    </div>
+function FrameOptInCopy(_: FrameProps) {
+  return (
+    <TextField
+      label=""
+      labelHidden
+      value="Keep me updated on exclusive offers and new products"
+      helpText="Keep it short and clear about what they're signing up for."
+      autoComplete="off"
+      onChange={() => {}}
+    />
+  );
+}
+
+function FrameOptInCompliance({ answers, onChange }: FrameProps) {
+  return (
+    <BlockStack gap="400">
+      <Checkbox
+        label="Pre-check the box"
+        helpText="Not recommended for EU"
+        checked={answers.preCheckOptIn ?? false}
+        onChange={(v) => onChange({ preCheckOptIn: v })}
+      />
+      <Checkbox
+        label="Enable double opt-in for EU"
+        helpText="Auto-detect EU recipients and require email confirmation"
+        checked={answers.enableDoubleOptIn ?? false}
+        onChange={(v) => onChange({ enableDoubleOptIn: v })}
+      />
+      <TextField
+        label="Privacy policy URL"
+        value="https://acmestore.com/privacy"
+        autoComplete="off"
+        onChange={() => {}}
+      />
+    </BlockStack>
+  );
+}
+
+function FrameOptInActions({ answers, onChange }: FrameProps) {
+  return (
+    <BlockStack gap="400">
+      <Checkbox
+        label="Add to Klaviyo list"
+        helpText="List: Gift Recipients"
+        checked={answers.addToKlaviyo ?? false}
+        onChange={(v) => onChange({ addToKlaviyo: v })}
+      />
+      <Checkbox
+        label="Apply tags"
+        helpText="gift_recipient, opted_in, source:giftwell"
+        checked={answers.applyTags ?? false}
+        onChange={(v) => onChange({ applyTags: v })}
+      />
+      <Checkbox
+        label="Trigger welcome flow"
+        helpText='Start "Gift Recipient Welcome" flow in Klaviyo'
+        checked={answers.triggerWelcome ?? false}
+        onChange={(v) => onChange({ triggerWelcome: v })}
+      />
+    </BlockStack>
+  );
+}
+
+function FrameLandingUrl(_: FrameProps) {
+  return (
+    <BlockStack gap="200">
+      <InlineStack gap="200" blockAlign="center" wrap={false}>
+        <Text as="span" tone="subdued">acmestore.com/</Text>
+        <Box minWidth="200px">
+          <TextField
+            label=""
+            labelHidden
+            value="gift"
+            autoComplete="off"
+            onChange={() => {}}
+          />
+        </Box>
+      </InlineStack>
+      <Text as="p" tone="subdued" variant="bodySm">
+        This is where corporate buyers will land to start an order.
+      </Text>
+    </BlockStack>
+  );
+}
+
+function FrameLandingPlacement({ answers, onChange }: FrameProps) {
+  return (
+    <BlockStack gap="400">
+      <Checkbox
+        label="Add to main navigation"
+        helpText='Adds a "Corporate Gifting" link to your storefront nav'
+        checked={answers.addToNav ?? false}
+        onChange={(v) => onChange({ addToNav: v })}
+      />
+      <Checkbox
+        label="Add to footer"
+        helpText="Adds a link in the footer next to About, Contact, etc."
+        checked={answers.addToFooter ?? false}
+        onChange={(v) => onChange({ addToFooter: v })}
+      />
+    </BlockStack>
   );
 }
 
 function FrameSupport({ answers, onChange }: FrameProps) {
   return (
-    <div>
-      <Section title="Giftwell Concierge" description="Our team handles support questions from gifters and recipients on your behalf.">
-        <Toggle
-          checked={answers.enableConcierge ?? false}
-          onChange={(v) => onChange({ enableConcierge: v })}
-          label="Enable concierge support"
-          helper="Recipients with shipping or claim issues are routed to support@giftwell.io. Included in your plan."
-        />
-      </Section>
-    </div>
+    <Checkbox
+      label="Enable Giftwell concierge"
+      helpText="We handle support for gifters and recipients on your behalf. Included in your plan."
+      checked={answers.enableConcierge ?? false}
+      onChange={(v) => onChange({ enableConcierge: v })}
+    />
   );
 }
 
@@ -623,82 +737,94 @@ function FrameReview(_: FrameProps) {
     { title: 'Landing page', desc: 'acmestore.com/gift — added to nav & footer' },
     { title: 'Support', desc: 'Giftwell concierge enabled' },
   ];
-
   return (
-    <div>
-      <div className="space-y-2 mb-6">
+    <BlockStack gap="400">
+      <BlockStack gap="200">
         {items.map((i) => (
-          <div key={i.title} className="flex items-start gap-3 py-3 px-4 rounded-lg border border-[#e1e3e5] bg-[#fafbf9]">
-            <div className="w-5 h-5 rounded-full bg-emerald-500 grid place-items-center flex-shrink-0 mt-0.5">
-              <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none">
-                <path d="M2.5 6.5L5 9L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-medium">{i.title}</p>
-              <p className="text-xs text-[#6d7175]">{i.desc}</p>
-            </div>
-          </div>
+          <Box
+            key={i.title}
+            padding="300"
+            borderRadius="200"
+            borderWidth="025"
+            borderColor="border"
+            background="bg-surface-success"
+          >
+            <InlineStack gap="300" blockAlign="start">
+              <Box>
+                <Icon source={CheckIcon} tone="success" />
+              </Box>
+              <BlockStack gap="050">
+                <Text as="p" variant="bodyMd" fontWeight="medium">{i.title}</Text>
+                <Text as="p" tone="subdued" variant="bodySm">{i.desc}</Text>
+              </BlockStack>
+            </InlineStack>
+          </Box>
         ))}
-      </div>
-
-      <div>
-        <p className="text-sm font-semibold mb-3">Test the experience</p>
-        <div className="flex gap-2">
-          <button className="text-xs px-3 py-2 rounded-lg border border-[#e1e3e5] bg-white">Preview gift page</button>
-          <button className="text-xs px-3 py-2 rounded-lg border border-[#e1e3e5] bg-white">Send test gift</button>
-          <button className="text-xs px-3 py-2 rounded-lg border border-[#e1e3e5] bg-white">Preview recipient email</button>
-        </div>
-      </div>
-    </div>
+      </BlockStack>
+      <InlineStack gap="200">
+        <Button>Preview gift page</Button>
+        <Button>Send test gift</Button>
+        <Button>Preview recipient email</Button>
+      </InlineStack>
+    </BlockStack>
   );
 }
 
 function FrameLaunched(_: FrameProps) {
   return (
-    <div className="text-center py-6">
-      <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-black grid place-items-center">
-        <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none">
-          <path d="M5 12L10 17L20 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </div>
-      <h3 className="text-2xl font-semibold mb-2">You&apos;re live</h3>
-      <p className="text-[#6d7175] mb-5 max-w-md mx-auto">
-        Your corporate gifting page is ready to receive orders. Share the link with buyers or wait for organic discovery.
-      </p>
-      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f6f6f7] border border-[#e1e3e5] mb-6">
-        <span className="text-sm font-mono">acmestore.com/gift</span>
-        <button className="text-xs text-blue-600">Copy</button>
-      </div>
-      <div className="flex gap-2 justify-center mb-8">
-        <button className="text-sm px-4 py-2 rounded-lg bg-black text-white">Open Gift Page →</button>
-        <button className="text-sm px-4 py-2 rounded-lg border border-[#e1e3e5] bg-white">Go to Dashboard</button>
-      </div>
-      <div className="grid grid-cols-3 gap-3 max-w-2xl mx-auto text-left">
-        {[
-          { title: 'Book a strategy call', desc: '30 min with our team to optimize your setup', cta: 'Schedule →' },
-          { title: 'Download Ads Playbook', desc: 'Ready-to-run Google campaigns for corporate buyers', cta: 'Download →' },
-          { title: 'Join Slack community', desc: 'Connect with other merchants using Giftwell', cta: 'Join →' },
-        ].map((c) => (
-          <div key={c.title} className="p-4 rounded-lg border border-[#e1e3e5]">
-            <p className="text-sm font-medium mb-1">{c.title}</p>
-            <p className="text-xs text-[#6d7175] mb-3">{c.desc}</p>
-            <a className="text-xs text-blue-600">{c.cta}</a>
-          </div>
-        ))}
-      </div>
-    </div>
+    <BlockStack gap="400" inlineAlign="center">
+      <Box
+        background="bg-surface-success"
+        borderRadius="full"
+        minWidth="56px"
+        minHeight="56px"
+        padding="400"
+      >
+        <Icon source={CheckIcon} tone="success" />
+      </Box>
+      <Text as="p" tone="subdued" alignment="center">
+        Your corporate gifting page is ready to receive orders.
+      </Text>
+      <Box
+        padding="300"
+        borderRadius="200"
+        borderWidth="025"
+        borderColor="border"
+        background="bg-surface-secondary"
+      >
+        <InlineStack gap="200" blockAlign="center">
+          <Text as="span" variant="bodyMd" fontWeight="medium">acmestore.com/gift</Text>
+          <Button variant="plain">Copy</Button>
+        </InlineStack>
+      </Box>
+      <InlineStack gap="200">
+        <Button variant="primary">Open Gift Page</Button>
+        <Button>Go to Dashboard</Button>
+      </InlineStack>
+    </BlockStack>
   );
 }
 
-export const Frames: Record<typeof FRAMES[number]['id'], (p: FrameProps) => ReactNode> = {
-  welcome: FrameWelcome,
-  catalog: FrameCatalog,
-  pricing: FramePricing,
-  branding: FrameBranding,
+export const Frames: Record<string, (p: FrameProps) => ReactNode> = {
+  goals: FrameGoals,
+  buyers: FrameBuyers,
+  volume: FrameVolume,
+  'catalog-approach': FrameCatalogApproach,
+  'catalog-bundle': FrameCatalogBundle,
+  'pricing-fee': FramePricingFee,
+  'pricing-volume': FramePricingVolume,
+  'brand-identity': FrameBrandIdentity,
+  'brand-colors': FrameBrandColors,
+  'brand-background': FrameBrandBackground,
+  'brand-effects': FrameBrandEffects,
   integrations: FrameIntegrations,
-  optin: FrameOptIn,
-  landing: FrameLanding,
+  'optin-enable': FrameOptInEnable,
+  'optin-placement': FrameOptInPlacement,
+  'optin-copy': FrameOptInCopy,
+  'optin-compliance': FrameOptInCompliance,
+  'optin-actions': FrameOptInActions,
+  'landing-url': FrameLandingUrl,
+  'landing-placement': FrameLandingPlacement,
   support: FrameSupport,
   review: FrameReview,
   launched: FrameLaunched,
