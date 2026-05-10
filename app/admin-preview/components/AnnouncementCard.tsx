@@ -20,7 +20,7 @@ const SLIDES: Slide[] = [
     title: 'Paste any list. We handle the rest.',
     body:
       "Messy names and addresses get cleaned automatically. Anything we can't resolve routes into the claim flow — no more loading screens or row-by-row error fixes.",
-    illustration: '/g-gradient.png',
+    illustration: '/g-black-bold.png',
     primaryLabel: 'View Recipients',
     primaryHref: '/admin-preview/recipients',
     secondaryLabel: 'Learn more',
@@ -31,7 +31,7 @@ const SLIDES: Slide[] = [
     title: 'Catch payment issues before they hurt revenue',
     body:
       "When a payment method is missing and orders fail, we surface a top-of-page banner so you can fix it in seconds.",
-    illustration: '/g-gradient.png',
+    illustration: '/g-black-bold.png',
     primaryLabel: 'See orders',
     primaryHref: '/admin-preview/orders',
     secondaryLabel: 'Learn more',
@@ -42,7 +42,7 @@ const SLIDES: Slide[] = [
     title: 'Iterate on the gift experience anytime',
     body:
       "Email templates, brand colors, backgrounds, and unwrap effects all live on the Customize page. Tweak them per campaign without going back through onboarding.",
-    illustration: '/g-gradient.png',
+    illustration: '/g-black-bold.png',
     primaryLabel: 'Open Customize',
     primaryHref: '/admin-preview/customize',
     secondaryLabel: 'Learn more',
@@ -60,8 +60,8 @@ export function AnnouncementCard() {
         <Image
           src={slide.illustration}
           alt=""
-          width={120}
-          height={120}
+          width={88}
+          height={22}
           aria-hidden
         />
       </div>
@@ -110,15 +110,14 @@ export function AnnouncementCard() {
         }
         .ann-illustration {
           flex-shrink: 0;
-          width: 120px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          width: 100px;
+          padding-top: 24px;
         }
         .ann-illustration :global(img) {
           object-fit: contain;
           max-width: 100%;
           height: auto;
+          display: block;
         }
         .ann-body {
           flex: 1;

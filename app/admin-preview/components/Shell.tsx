@@ -27,7 +27,6 @@ const APPS = [
 
 const GIFTWELL_SUB = [
   { href: '/admin-preview', label: 'Dashboard', exact: true },
-  { href: '/admin-preview/setup', label: 'Setup' },
   { href: '/admin-preview/customize', label: 'Customize' },
 ];
 

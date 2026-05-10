@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { MiniHeader } from './components/MiniHeader';
+import { InlineSetupCard } from './components/InlineSetupCard';
 import { AnnouncementCard } from './components/AnnouncementCard';
 
 type Metric = {
@@ -13,38 +15,10 @@ type Metric = {
 };
 
 const METRICS: Metric[] = [
-  {
-    label: 'Gifts sent',
-    value: '1,284',
-    delta: '+18.2%',
-    positive: true,
-    range: 'Last 30 days',
-    spark: [12, 18, 14, 22, 20, 28, 26, 34, 30, 38, 42, 48],
-  },
-  {
-    label: 'Recipients claimed',
-    value: '947',
-    delta: '+22.4%',
-    positive: true,
-    range: 'Last 30 days',
-    spark: [8, 12, 10, 16, 14, 22, 24, 28, 26, 32, 36, 40],
-  },
-  {
-    label: 'Opt-in rate',
-    value: '64.8%',
-    delta: '+3.1pp',
-    positive: true,
-    range: 'Last 30 days',
-    spark: [55, 58, 56, 60, 59, 62, 63, 64, 63, 65, 66, 65],
-  },
-  {
-    label: 'Revenue',
-    value: '$84,210',
-    delta: '+12.7%',
-    positive: true,
-    range: 'Last 30 days',
-    spark: [400, 520, 480, 600, 580, 720, 760, 820, 800, 880, 940, 1020],
-  },
+  { label: 'Gifts sent', value: '1,284', delta: '+18.2%', positive: true, range: 'Last 30 days', spark: [12, 18, 14, 22, 20, 28, 26, 34, 30, 38, 42, 48] },
+  { label: 'Recipients claimed', value: '947', delta: '+22.4%', positive: true, range: 'Last 30 days', spark: [8, 12, 10, 16, 14, 22, 24, 28, 26, 32, 36, 40] },
+  { label: 'Opt-in rate', value: '64.8%', delta: '+3.1pp', positive: true, range: 'Last 30 days', spark: [55, 58, 56, 60, 59, 62, 63, 64, 63, 65, 66, 65] },
+  { label: 'Revenue', value: '$84,210', delta: '+12.7%', positive: true, range: 'Last 30 days', spark: [400, 520, 480, 600, 580, 720, 760, 820, 800, 880, 940, 1020] },
 ];
 
 const FUNNEL = [
@@ -72,164 +46,128 @@ function Sparkline({ data, positive }: { data: number[]; positive: boolean }) {
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden>
       <polygon points={polygon} fill={fill} />
-      <polyline
-        fill="none"
-        stroke={stroke}
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        points={polyline}
-      />
+      <polyline fill="none" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" points={polyline} />
     </svg>
   );
 }
 
 export default function DashboardPage() {
-  const [showSetupBanner, setShowSetupBanner] = useState(true);
-  const setupProgress = 35;
+  const [setupComplete, setSetupComplete] = useState(false);
 
   return (
-    <div className="dash">
-      <div className="dash-header">
-        <div>
-          <h1 className="dash-title">Dashboard</h1>
-          <p className="dash-subtitle">
-            Welcome back — here's how Acme Store's gifting is performing
-          </p>
-        </div>
-        <div className="dash-header-right">
-          <span className="live-pill">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            Live
-          </span>
-          <button className="dash-pill dash-pill-icon" aria-label="More actions">⋯</button>
-        </div>
-      </div>
+    <>
+      <MiniHeader />
 
-      {showSetupBanner && (
-        <div className="resume-banner">
-          <div className="resume-banner-body">
-            <div className="resume-eyebrow">Setup · 35% complete</div>
-            <div className="resume-title">Pick up where you left off</div>
-            <div className="resume-text">
-              We've saved your answers. Finish setup any time to launch your gift page.
-            </div>
-            <div className="resume-progress">
-              <div
-                className="resume-progress-fill"
-                style={{ width: `${setupProgress}%` }}
-              />
-            </div>
-          </div>
-          <div className="resume-actions">
-            <a className="dash-btn dash-btn-outline" href="/admin-preview/customize">
-              Customize first
-            </a>
-            <a className="dash-btn dash-btn-primary" href="/admin-preview/setup">
-              Resume setup
-            </a>
-          </div>
-          <button
-            className="resume-dismiss"
-            aria-label="Dismiss"
-            onClick={() => setShowSetupBanner(false)}
-          >
-            ×
-          </button>
-        </div>
-      )}
-
-      <AnnouncementCard />
-
-      <div className="dash-section">
-        <div className="dash-section-header">
+      <div className="dash">
+        <div className="dash-header">
           <div>
-            <h2 className="dash-section-title">Analytics</h2>
-            <p className="dash-section-sub">Last 30 days · May 9 – Jun 8</p>
+            <h1 className="dash-title">Dashboard</h1>
+            <p className="dash-subtitle">
+              Welcome back — here's how Acme Store's gifting is performing
+            </p>
           </div>
-          <div className="dash-section-actions">
-            <button className="dash-pill">📅 Last 30 days</button>
-            <button className="dash-pill">⇄ Compare to</button>
-            <button className="dash-pill dash-pill-icon" aria-label="More">⋯</button>
-          </div>
+          {setupComplete && (
+            <button
+              className="dash-link"
+              onClick={() => setSetupComplete(false)}
+            >
+              Reset setup (preview)
+            </button>
+          )}
         </div>
-        <div className="metric-grid">
-          {METRICS.map((m) => (
-            <div className="metric-card" key={m.label}>
-              <div className="metric-top">
-                <span className="metric-label">{m.label}</span>
-                <span className="metric-range">{m.range}</span>
-              </div>
-              <div className="metric-row">
-                <div>
-                  <div className="metric-value">{m.value}</div>
-                  <div className={`metric-delta ${m.positive ? 'pos' : 'neg'}`}>
-                    {m.delta} vs prior
-                  </div>
-                </div>
-                <Sparkline data={m.spark} positive={m.positive} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
 
-      <div className="dash-section">
-        <div className="card">
-          <div className="card-header">
+        {setupComplete ? (
+          <AnnouncementCard />
+        ) : (
+          <InlineSetupCard onComplete={() => setSetupComplete(true)} />
+        )}
+
+        <div className="dash-section">
+          <div className="dash-section-header">
             <div>
-              <h3 className="card-title">Recipient funnel</h3>
-              <p className="card-sub">Last 30 days · How recipients moved through the gift flow</p>
+              <h2 className="dash-section-title">Analytics</h2>
+              <p className="dash-section-sub">Last 30 days · May 9 – Jun 8</p>
             </div>
-            <button className="dash-pill">View report</button>
+            <div className="dash-section-actions">
+              <button className="dash-pill">📅 Last 30 days</button>
+              <button className="dash-pill">⇄ Compare to</button>
+              <button className="dash-pill dash-pill-icon" aria-label="More">⋯</button>
+            </div>
           </div>
-          <div className="funnel">
-            {FUNNEL.map((stage, i) => {
-              const max = Math.max(...FUNNEL.map((s) => s.value));
-              const pct = (stage.value / max) * 100;
-              const conv = i === 0 ? null : ((stage.value / FUNNEL[i - 1].value) * 100).toFixed(1);
-              return (
-                <div className="funnel-row" key={stage.label}>
-                  <div className="funnel-row-top">
-                    <span>
-                      <strong>{stage.label}</strong>
-                      {conv && <span className="funnel-conv">{conv}% from prior</span>}
-                    </span>
-                    <span>{stage.value.toLocaleString()}</span>
-                  </div>
-                  <div className="funnel-bar">
-                    <div
-                      className="funnel-bar-fill"
-                      style={{ width: `${pct}%`, background: stage.color }}
-                    />
-                  </div>
+          <div className="metric-grid">
+            {METRICS.map((m) => (
+              <div className="metric-card" key={m.label}>
+                <div className="metric-top">
+                  <span className="metric-label">{m.label}</span>
+                  <span className="metric-range">{m.range}</span>
                 </div>
-              );
-            })}
+                <div className="metric-row">
+                  <div>
+                    <div className="metric-value">{m.value}</div>
+                    <div className={`metric-delta ${m.positive ? 'pos' : 'neg'}`}>
+                      {m.delta} vs prior
+                    </div>
+                  </div>
+                  <Sparkline data={m.spark} positive={m.positive} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      <div className="dash-section">
-        <div className="card">
-          <div className="card-header">
-            <div>
-              <h3 className="card-title">Plan usage</h3>
-              <p className="card-sub">Pro plan · Resets on Jun 1</p>
+        <div className="dash-section">
+          <div className="card">
+            <div className="card-header">
+              <div>
+                <h3 className="card-title">Recipient funnel</h3>
+                <p className="card-sub">Last 30 days · How recipients moved through the gift flow</p>
+              </div>
+              <button className="dash-pill">View report</button>
             </div>
-            <a className="dash-btn dash-btn-primary" href="#">
-              Upgrade plan
-            </a>
+            <div className="funnel">
+              {FUNNEL.map((stage, i) => {
+                const max = Math.max(...FUNNEL.map((s) => s.value));
+                const pct = (stage.value / max) * 100;
+                const conv = i === 0 ? null : ((stage.value / FUNNEL[i - 1].value) * 100).toFixed(1);
+                return (
+                  <div className="funnel-row" key={stage.label}>
+                    <div className="funnel-row-top">
+                      <span>
+                        <strong>{stage.label}</strong>
+                        {conv && <span className="funnel-conv">{conv}% from prior</span>}
+                      </span>
+                      <span>{stage.value.toLocaleString()}</span>
+                    </div>
+                    <div className="funnel-bar">
+                      <div
+                        className="funnel-bar-fill"
+                        style={{ width: `${pct}%`, background: stage.color }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div className="plan-row">
-            <div className="plan-row-top">
-              <span>Recipients this month</span>
-              <span className="plan-row-sub">1,284 / 5,000</span>
+        </div>
+
+        <div className="dash-section">
+          <div className="card">
+            <div className="card-header">
+              <div>
+                <h3 className="card-title">Plan usage</h3>
+                <p className="card-sub">Pro plan · Resets on Jun 1</p>
+              </div>
+              <a className="dash-btn dash-btn-primary" href="#">Upgrade plan</a>
             </div>
-            <div className="resume-progress">
-              <div className="resume-progress-fill" style={{ width: '26%' }} />
+            <div className="plan-row">
+              <div className="plan-row-top">
+                <span>Recipients this month</span>
+                <span className="plan-row-sub">1,284 / 5,000</span>
+              </div>
+              <div className="plan-progress">
+                <div className="plan-progress-fill" style={{ width: '26%' }} />
+              </div>
             </div>
           </div>
         </div>
@@ -245,28 +183,11 @@ export default function DashboardPage() {
           margin: 0 auto;
         }
         .dash-header {
-          margin-bottom: 4px;
           display: flex;
           align-items: end;
           justify-content: space-between;
           gap: 16px;
-        }
-        .dash-header-right {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .live-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          background: #e6f6ec;
-          color: #146c43;
-          font-size: 12.5px;
-          font-weight: 500;
-          padding: 5px 11px 5px 9px;
-          border-radius: 999px;
-          border: 1px solid #c7ebd5;
+          margin-bottom: 4px;
         }
         .dash-title {
           font-size: 26px;
@@ -280,68 +201,16 @@ export default function DashboardPage() {
           color: #6b6b73;
           margin: 0;
         }
-
-        .resume-banner {
-          position: relative;
-          background: #fff;
-          border: 1px solid #ececef;
-          border-radius: 14px;
-          padding: 22px 24px;
-          display: flex;
-          align-items: center;
-          gap: 24px;
-        }
-        .resume-banner-body { flex: 1; min-width: 0; }
-        .resume-eyebrow {
-          font-size: 12px;
-          font-weight: 500;
-          color: #5c4dff;
-          margin-bottom: 6px;
-        }
-        .resume-title {
-          font-size: 17px;
-          font-weight: 600;
-          color: #111;
-          margin-bottom: 4px;
-        }
-        .resume-text {
-          font-size: 13.5px;
-          color: #6b6b73;
-          margin-bottom: 12px;
-        }
-        .resume-progress {
-          width: 280px;
-          height: 6px;
-          background: #ececef;
-          border-radius: 6px;
-          overflow: hidden;
-        }
-        .resume-progress-fill {
-          height: 100%;
-          background: linear-gradient(90deg, #7C5CFF, #A855F7);
-          border-radius: 6px;
-          transition: width 200ms ease;
-        }
-        .resume-actions {
-          display: flex;
-          gap: 10px;
-          flex-shrink: 0;
-        }
-        .resume-dismiss {
-          position: absolute;
-          top: 14px;
-          right: 14px;
+        .dash-link {
           background: transparent;
           border: none;
-          color: #8a8a93;
-          font-size: 22px;
+          color: #5c4dff;
+          font-size: 12.5px;
+          font-weight: 500;
           cursor: pointer;
-          line-height: 1;
-          width: 28px;
-          height: 28px;
-          border-radius: 6px;
+          padding: 6px 4px;
         }
-        .resume-dismiss:hover { background: #f5f5f7; }
+        .dash-link:hover { text-decoration: underline; }
 
         .dash-btn {
           display: inline-flex;
@@ -354,25 +223,12 @@ export default function DashboardPage() {
           text-decoration: none;
           cursor: pointer;
           border: 1px solid transparent;
-          transition: background 120ms ease, border-color 120ms ease;
+          transition: background 120ms ease;
         }
-        .dash-btn-outline {
-          background: #fff;
-          border-color: #d6d6db;
-          color: #111;
-        }
-        .dash-btn-outline:hover { background: #f5f5f7; }
-        .dash-btn-primary {
-          background: #111;
-          color: #fff;
-        }
+        .dash-btn-primary { background: #111; color: #fff; }
         .dash-btn-primary:hover { background: #2a2a30; }
 
-        .dash-section {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
+        .dash-section { display: flex; flex-direction: column; gap: 16px; }
         .dash-section-header {
           display: flex;
           align-items: end;
@@ -385,15 +241,9 @@ export default function DashboardPage() {
           color: #111;
           margin: 0 0 2px;
         }
-        .dash-section-sub {
-          font-size: 13px;
-          color: #6b6b73;
-          margin: 0;
-        }
-        .dash-section-actions {
-          display: flex;
-          gap: 8px;
-        }
+        .dash-section-sub { font-size: 13px; color: #6b6b73; margin: 0; }
+        .dash-section-actions { display: flex; gap: 8px; }
+
         .dash-pill {
           display: inline-flex;
           align-items: center;
@@ -411,14 +261,9 @@ export default function DashboardPage() {
         .dash-pill:hover { background: #f5f5f7; }
         .dash-pill-icon { padding: 7px 10px; }
 
-        .metric-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 16px;
-        }
-        @media (max-width: 760px) {
-          .metric-grid { grid-template-columns: 1fr; }
-        }
+        .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        @media (max-width: 760px) { .metric-grid { grid-template-columns: 1fr; } }
+
         .metric-card {
           background: #fff;
           border: 1px solid #ececef;
@@ -431,11 +276,7 @@ export default function DashboardPage() {
           align-items: center;
           margin-bottom: 12px;
         }
-        .metric-label {
-          font-size: 13px;
-          color: #6b6b73;
-          font-weight: 500;
-        }
+        .metric-label { font-size: 13px; color: #6b6b73; font-weight: 500; }
         .metric-range {
           font-size: 11px;
           color: #8a8a93;
@@ -456,11 +297,7 @@ export default function DashboardPage() {
           line-height: 1.1;
           letter-spacing: -0.01em;
         }
-        .metric-delta {
-          font-size: 12.5px;
-          margin-top: 4px;
-          font-weight: 500;
-        }
+        .metric-delta { font-size: 12.5px; margin-top: 4px; font-weight: 500; }
         .metric-delta.pos { color: #16A34A; }
         .metric-delta.neg { color: #DC2626; }
 
@@ -477,23 +314,10 @@ export default function DashboardPage() {
           gap: 16px;
           margin-bottom: 18px;
         }
-        .card-title {
-          font-size: 16px;
-          font-weight: 600;
-          color: #111;
-          margin: 0 0 2px;
-        }
-        .card-sub {
-          font-size: 13px;
-          color: #6b6b73;
-          margin: 0;
-        }
+        .card-title { font-size: 16px; font-weight: 600; color: #111; margin: 0 0 2px; }
+        .card-sub { font-size: 13px; color: #6b6b73; margin: 0; }
 
-        .funnel {
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-        }
+        .funnel { display: flex; flex-direction: column; gap: 14px; }
         .funnel-row-top {
           display: flex;
           justify-content: space-between;
@@ -502,23 +326,9 @@ export default function DashboardPage() {
           color: #111;
         }
         .funnel-row-top strong { font-weight: 600; }
-        .funnel-conv {
-          margin-left: 10px;
-          color: #8a8a93;
-          font-size: 12.5px;
-          font-weight: 400;
-        }
-        .funnel-bar {
-          background: #f5f5f7;
-          border-radius: 6px;
-          height: 10px;
-          overflow: hidden;
-        }
-        .funnel-bar-fill {
-          height: 100%;
-          border-radius: 6px;
-          transition: width 200ms ease;
-        }
+        .funnel-conv { margin-left: 10px; color: #8a8a93; font-size: 12.5px; font-weight: 400; }
+        .funnel-bar { background: #f5f5f7; border-radius: 6px; height: 10px; overflow: hidden; }
+        .funnel-bar-fill { height: 100%; border-radius: 6px; transition: width 200ms ease; }
 
         .plan-row-top {
           display: flex;
@@ -528,14 +338,23 @@ export default function DashboardPage() {
           margin-bottom: 8px;
         }
         .plan-row-sub { color: #8a8a93; }
+        .plan-progress {
+          width: 100%;
+          height: 6px;
+          background: #f5f5f7;
+          border-radius: 6px;
+          overflow: hidden;
+        }
+        .plan-progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #7C5CFF, #A855F7);
+          border-radius: 6px;
+        }
 
         @media (max-width: 720px) {
-          .resume-banner { flex-direction: column; align-items: stretch; }
-          .resume-actions { flex-direction: column; }
-          .resume-progress { width: 100%; }
           .dash-section-header { flex-direction: column; align-items: flex-start; }
         }
       `}</style>
-    </div>
+    </>
   );
 }
