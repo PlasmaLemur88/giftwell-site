@@ -1,0 +1,237 @@
+/* Alia-style admin shell — custom layout to bypass Polaris Frame defaults */
+
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 64px 1fr;
+  grid-template-areas:
+    "sidebar topbar"
+    "sidebar content";
+  min-height: 100vh;
+  background: #f5f5f7;
+  color: #111;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* ─── Top bar ──────────────────────────────────────────────────────────── */
+
+.topbar {
+  grid-area: topbar;
+  background: #ffffff;
+  border-bottom: 1px solid #ececef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbarLogo {
+  display: none; /* logo lives in sidebar; topbar-left is the center label */
+}
+
+.topbarCenter {
+  font-size: 13px;
+  color: #6b6b73;
+  letter-spacing: 0;
+}
+
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.livePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e6f6ec;
+  color: #146c43;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 5px 11px 5px 9px;
+  border-radius: 999px;
+  border: 1px solid #c7ebd5;
+}
+
+.livePill svg {
+  width: 14px;
+  height: 14px;
+}
+
+.storeDropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid #ececef;
+  color: #111;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 10px 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.storeDropdown:hover {
+  background: #f5f5f7;
+}
+
+.storeDropdown svg {
+  width: 14px;
+  height: 14px;
+  color: #6b6b73;
+}
+
+.storeMenu {
+  position: absolute;
+  top: 52px;
+  right: 64px;
+  background: #fff;
+  border: 1px solid #ececef;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 15, 25, 0.08);
+  padding: 6px;
+  min-width: 200px;
+  z-index: 20;
+}
+
+.storeMenuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.storeMenuItem:hover {
+  background: #f5f5f7;
+}
+
+.storeMenuItemActive {
+  color: #5c4dff;
+  font-weight: 500;
+}
+
+.overflowBtn {
+  background: transparent;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b6b73;
+  transition: background 120ms ease;
+}
+
+.overflowBtn:hover {
+  background: #f5f5f7;
+}
+
+/* ─── Sidebar ──────────────────────────────────────────────────────────── */
+
+.sidebar {
+  grid-area: sidebar;
+  background: #ffffff;
+  border-right: 1px solid #ececef;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 12px;
+}
+
+.sidebarLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 18px;
+}
+
+.sidebarLogo img {
+  height: 22px;
+  width: auto;
+}
+
+.navSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-bottom: 14px;
+}
+
+.navSectionTitle {
+  font-size: 11px;
+  font-weight: 500;
+  color: #8a8a93;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 8px 10px 4px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  color: #43434b;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.navItem:hover {
+  background: #f5f5f7;
+}
+
+.navItemActive {
+  background: #f0eefe;
+  color: #5c4dff;
+}
+
+.navItem svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+/* ─── Content area ─────────────────────────────────────────────────────── */
+
+.content {
+  grid-area: content;
+  padding: 32px 40px 48px;
+  overflow-y: auto;
+}
+
+.contentInner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ─── Mobile ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .shell {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "topbar"
+      "content";
+  }
+  .sidebar {
+    display: none;
+  }
+  .content {
+    padding: 20px 16px 32px;
+  }
+}

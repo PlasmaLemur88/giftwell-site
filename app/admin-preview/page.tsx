@@ -1,21 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Page,
-  Layout,
-  Card,
-  CalloutCard,
-  BlockStack,
-  InlineStack,
-  Text,
-  Box,
-  Banner,
-  ProgressBar,
-  Button,
-  Badge,
-  Divider,
-} from '@shopify/polaris';
+import { AnnouncementCard } from './components/AnnouncementCard';
 
 type Metric = {
   label: string;
@@ -62,131 +48,39 @@ const METRICS: Metric[] = [
 ];
 
 const FUNNEL = [
-  { label: 'Sent', value: 1284, color: '#5C6AC4' },
-  { label: 'Opened', value: 1102, color: '#7C5CFF' },
-  { label: 'Claimed', value: 947, color: '#A855F7' },
+  { label: 'Sent', value: 1284, color: '#7C5CFF' },
+  { label: 'Opened', value: 1102, color: '#9A7FFF' },
+  { label: 'Claimed', value: 947, color: '#B79CFF' },
   { label: 'Delivered', value: 902, color: '#16A34A' },
 ];
 
 function Sparkline({ data, positive }: { data: number[]; positive: boolean }) {
-  const w = 120;
-  const h = 36;
+  const w = 110;
+  const h = 32;
   const min = Math.min(...data);
   const max = Math.max(...data);
   const range = max - min || 1;
   const stroke = positive ? '#16A34A' : '#DC2626';
-  const points = data
-    .map((v, i) => {
-      const x = (i / (data.length - 1)) * w;
-      const y = h - ((v - min) / range) * h;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(' ');
+  const fill = positive ? 'rgba(22, 163, 74, 0.08)' : 'rgba(220, 38, 38, 0.08)';
+  const points = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * w;
+    const y = h - ((v - min) / range) * h;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  const polyline = points.join(' ');
+  const polygon = `0,${h} ${polyline} ${w},${h}`;
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden>
+      <polygon points={polygon} fill={fill} />
       <polyline
         fill="none"
         stroke={stroke}
         strokeWidth="1.75"
         strokeLinecap="round"
         strokeLinejoin="round"
-        points={points}
+        points={polyline}
       />
     </svg>
-  );
-}
-
-function MetricCard({ metric }: { metric: Metric }) {
-  return (
-    <Card>
-      <BlockStack gap="200">
-        <InlineStack align="space-between" blockAlign="center">
-          <Text as="span" tone="subdued" variant="bodySm">
-            {metric.label}
-          </Text>
-          <Badge size="small">{metric.range}</Badge>
-        </InlineStack>
-        <InlineStack align="space-between" blockAlign="end" gap="200">
-          <BlockStack gap="050">
-            <Text as="p" variant="heading2xl">
-              {metric.value}
-            </Text>
-            <Text
-              as="span"
-              variant="bodySm"
-              tone={metric.positive ? 'success' : 'critical'}
-            >
-              {metric.delta} vs prior period
-            </Text>
-          </BlockStack>
-          <Sparkline data={metric.spark} positive={metric.positive} />
-        </InlineStack>
-      </BlockStack>
-    </Card>
-  );
-}
-
-function FunnelChart() {
-  const max = Math.max(...FUNNEL.map((s) => s.value));
-  return (
-    <Card>
-      <BlockStack gap="400">
-        <InlineStack align="space-between" blockAlign="center">
-          <BlockStack gap="050">
-            <Text as="h3" variant="headingMd">
-              Recipient funnel
-            </Text>
-            <Text as="p" tone="subdued" variant="bodySm">
-              Last 30 days · How recipients moved through the gift flow
-            </Text>
-          </BlockStack>
-          <Button>View report</Button>
-        </InlineStack>
-        <BlockStack gap="300">
-          {FUNNEL.map((stage, i) => {
-            const pct = (stage.value / max) * 100;
-            const conv =
-              i === 0
-                ? null
-                : ((stage.value / FUNNEL[i - 1].value) * 100).toFixed(1);
-            return (
-              <BlockStack key={stage.label} gap="100">
-                <InlineStack align="space-between">
-                  <InlineStack gap="200" blockAlign="center">
-                    <Text as="span" variant="bodyMd" fontWeight="semibold">
-                      {stage.label}
-                    </Text>
-                    {conv && (
-                      <Text as="span" tone="subdued" variant="bodySm">
-                        {conv}% from prior
-                      </Text>
-                    )}
-                  </InlineStack>
-                  <Text as="span" variant="bodyMd">
-                    {stage.value.toLocaleString()}
-                  </Text>
-                </InlineStack>
-                <Box
-                  background="bg-surface-secondary"
-                  borderRadius="100"
-                  minHeight="10px"
-                >
-                  <div
-                    style={{
-                      width: `${pct}%`,
-                      height: 10,
-                      background: stage.color,
-                      borderRadius: 6,
-                      transition: 'width 200ms ease',
-                    }}
-                  />
-                </Box>
-              </BlockStack>
-            );
-          })}
-        </BlockStack>
-      </BlockStack>
-    </Card>
   );
 }
 
@@ -195,112 +89,420 @@ export default function DashboardPage() {
   const setupProgress = 35;
 
   return (
-    <Page
-      title="Dashboard"
-      subtitle="Welcome back — here's how Acme Store's gifting is performing"
-    >
-      <Layout>
-        {showSetupBanner && (
-          <Layout.Section>
-            <Banner
-              tone="info"
-              title="You're 35% through setup"
-              onDismiss={() => setShowSetupBanner(false)}
-              action={{ content: 'Resume setup', url: '/admin-preview/setup' }}
-              secondaryAction={{
-                content: 'Customize gift experience',
-                url: '/admin-preview/customize',
-              }}
-            >
-              <BlockStack gap="200">
-                <Text as="p">
-                  Pick up where you left off. We'll save your answers as you go.
-                </Text>
-                <Box maxWidth="320px">
-                  <ProgressBar progress={setupProgress} size="small" tone="primary" />
-                </Box>
-              </BlockStack>
-            </Banner>
-          </Layout.Section>
-        )}
+    <div className="dash">
+      <div className="dash-header">
+        <div>
+          <h1 className="dash-title">Dashboard</h1>
+          <p className="dash-subtitle">
+            Welcome back — here's how Acme Store's gifting is performing
+          </p>
+        </div>
+      </div>
 
-        <Layout.Section>
-          <CalloutCard
-            title="New: AI-powered recipient parsing"
-            illustration="/g-gradient.png"
-            primaryAction={{
-              content: 'See what changed',
-              url: '/admin-preview/recipients',
-            }}
+      {showSetupBanner && (
+        <div className="resume-banner">
+          <div className="resume-banner-body">
+            <div className="resume-eyebrow">Setup · 35% complete</div>
+            <div className="resume-title">Pick up where you left off</div>
+            <div className="resume-text">
+              We've saved your answers. Finish setup any time to launch your gift page.
+            </div>
+            <div className="resume-progress">
+              <div
+                className="resume-progress-fill"
+                style={{ width: `${setupProgress}%` }}
+              />
+            </div>
+          </div>
+          <div className="resume-actions">
+            <a className="dash-btn dash-btn-outline" href="/admin-preview/customize">
+              Customize first
+            </a>
+            <a className="dash-btn dash-btn-primary" href="/admin-preview/setup">
+              Resume setup
+            </a>
+          </div>
+          <button
+            className="resume-dismiss"
+            aria-label="Dismiss"
+            onClick={() => setShowSetupBanner(false)}
           >
-            <p>
-              Paste any messy list of names and addresses — we'll handle the
-              cleanup automatically and route the rest to the claim flow. No
-              more loading screens or row-by-row error fixes.
-            </p>
-          </CalloutCard>
-        </Layout.Section>
+            ×
+          </button>
+        </div>
+      )}
 
-        <Layout.Section>
-          <BlockStack gap="400">
-            <InlineStack align="space-between" blockAlign="center">
-              <BlockStack gap="050">
-                <Text as="h2" variant="headingLg">
-                  Analytics
-                </Text>
-                <Text as="p" tone="subdued" variant="bodySm">
-                  Last 30 days · May 9 – Jun 8
-                </Text>
-              </BlockStack>
-              <InlineStack gap="200">
-                <Button>Last 30 days</Button>
-                <Button>Compare to</Button>
-              </InlineStack>
-            </InlineStack>
-            <Layout>
-              {METRICS.map((m) => (
-                <Layout.Section key={m.label} variant="oneHalf">
-                  <MetricCard metric={m} />
-                </Layout.Section>
-              ))}
-            </Layout>
-          </BlockStack>
-        </Layout.Section>
+      <AnnouncementCard />
 
-        <Layout.Section>
-          <FunnelChart />
-        </Layout.Section>
+      <div className="dash-section">
+        <div className="dash-section-header">
+          <div>
+            <h2 className="dash-section-title">Analytics</h2>
+            <p className="dash-section-sub">Last 30 days · May 9 – Jun 8</p>
+          </div>
+          <div className="dash-section-actions">
+            <button className="dash-pill">📅 Last 30 days</button>
+            <button className="dash-pill">⇄ Compare to</button>
+            <button className="dash-pill dash-pill-icon" aria-label="More">⋯</button>
+          </div>
+        </div>
+        <div className="metric-grid">
+          {METRICS.map((m) => (
+            <div className="metric-card" key={m.label}>
+              <div className="metric-top">
+                <span className="metric-label">{m.label}</span>
+                <span className="metric-range">{m.range}</span>
+              </div>
+              <div className="metric-row">
+                <div>
+                  <div className="metric-value">{m.value}</div>
+                  <div className={`metric-delta ${m.positive ? 'pos' : 'neg'}`}>
+                    {m.delta} vs prior
+                  </div>
+                </div>
+                <Sparkline data={m.spark} positive={m.positive} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-        <Layout.Section>
-          <Card>
-            <BlockStack gap="400">
-              <BlockStack gap="050">
-                <Text as="h3" variant="headingMd">
-                  Plan usage
-                </Text>
-                <Text as="p" tone="subdued" variant="bodySm">
-                  Pro plan · Resets on Jun 1
-                </Text>
-              </BlockStack>
-              <Divider />
-              <BlockStack gap="200">
-                <InlineStack align="space-between">
-                  <Text as="span" variant="bodyMd">
-                    Recipients this month
-                  </Text>
-                  <Text as="span" variant="bodyMd" tone="subdued">
-                    1,284 / 5,000
-                  </Text>
-                </InlineStack>
-                <ProgressBar progress={26} size="small" tone="primary" />
-              </BlockStack>
-              <InlineStack align="end">
-                <Button variant="primary">Upgrade plan</Button>
-              </InlineStack>
-            </BlockStack>
-          </Card>
-        </Layout.Section>
-      </Layout>
-    </Page>
+      <div className="dash-section">
+        <div className="card">
+          <div className="card-header">
+            <div>
+              <h3 className="card-title">Recipient funnel</h3>
+              <p className="card-sub">Last 30 days · How recipients moved through the gift flow</p>
+            </div>
+            <button className="dash-pill">View report</button>
+          </div>
+          <div className="funnel">
+            {FUNNEL.map((stage, i) => {
+              const max = Math.max(...FUNNEL.map((s) => s.value));
+              const pct = (stage.value / max) * 100;
+              const conv = i === 0 ? null : ((stage.value / FUNNEL[i - 1].value) * 100).toFixed(1);
+              return (
+                <div className="funnel-row" key={stage.label}>
+                  <div className="funnel-row-top">
+                    <span>
+                      <strong>{stage.label}</strong>
+                      {conv && <span className="funnel-conv">{conv}% from prior</span>}
+                    </span>
+                    <span>{stage.value.toLocaleString()}</span>
+                  </div>
+                  <div className="funnel-bar">
+                    <div
+                      className="funnel-bar-fill"
+                      style={{ width: `${pct}%`, background: stage.color }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="dash-section">
+        <div className="card">
+          <div className="card-header">
+            <div>
+              <h3 className="card-title">Plan usage</h3>
+              <p className="card-sub">Pro plan · Resets on Jun 1</p>
+            </div>
+            <a className="dash-btn dash-btn-primary" href="#">
+              Upgrade plan
+            </a>
+          </div>
+          <div className="plan-row">
+            <div className="plan-row-top">
+              <span>Recipients this month</span>
+              <span className="plan-row-sub">1,284 / 5,000</span>
+            </div>
+            <div className="resume-progress">
+              <div className="resume-progress-fill" style={{ width: '26%' }} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .dash {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+        .dash-header {
+          margin-bottom: 4px;
+        }
+        .dash-title {
+          font-size: 26px;
+          font-weight: 700;
+          color: #111;
+          margin: 0 0 4px;
+          letter-spacing: -0.01em;
+        }
+        .dash-subtitle {
+          font-size: 14px;
+          color: #6b6b73;
+          margin: 0;
+        }
+
+        .resume-banner {
+          position: relative;
+          background: #fff;
+          border: 1px solid #ececef;
+          border-radius: 14px;
+          padding: 22px 24px;
+          display: flex;
+          align-items: center;
+          gap: 24px;
+        }
+        .resume-banner-body { flex: 1; min-width: 0; }
+        .resume-eyebrow {
+          font-size: 12px;
+          font-weight: 500;
+          color: #5c4dff;
+          margin-bottom: 6px;
+        }
+        .resume-title {
+          font-size: 17px;
+          font-weight: 600;
+          color: #111;
+          margin-bottom: 4px;
+        }
+        .resume-text {
+          font-size: 13.5px;
+          color: #6b6b73;
+          margin-bottom: 12px;
+        }
+        .resume-progress {
+          width: 280px;
+          height: 6px;
+          background: #ececef;
+          border-radius: 6px;
+          overflow: hidden;
+        }
+        .resume-progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #7C5CFF, #A855F7);
+          border-radius: 6px;
+          transition: width 200ms ease;
+        }
+        .resume-actions {
+          display: flex;
+          gap: 10px;
+          flex-shrink: 0;
+        }
+        .resume-dismiss {
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          background: transparent;
+          border: none;
+          color: #8a8a93;
+          font-size: 22px;
+          cursor: pointer;
+          line-height: 1;
+          width: 28px;
+          height: 28px;
+          border-radius: 6px;
+        }
+        .resume-dismiss:hover { background: #f5f5f7; }
+
+        .dash-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 9px 16px;
+          border-radius: 10px;
+          font-size: 13.5px;
+          font-weight: 500;
+          text-decoration: none;
+          cursor: pointer;
+          border: 1px solid transparent;
+          transition: background 120ms ease, border-color 120ms ease;
+        }
+        .dash-btn-outline {
+          background: #fff;
+          border-color: #d6d6db;
+          color: #111;
+        }
+        .dash-btn-outline:hover { background: #f5f5f7; }
+        .dash-btn-primary {
+          background: #111;
+          color: #fff;
+        }
+        .dash-btn-primary:hover { background: #2a2a30; }
+
+        .dash-section {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .dash-section-header {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 16px;
+        }
+        .dash-section-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #111;
+          margin: 0 0 2px;
+        }
+        .dash-section-sub {
+          font-size: 13px;
+          color: #6b6b73;
+          margin: 0;
+        }
+        .dash-section-actions {
+          display: flex;
+          gap: 8px;
+        }
+        .dash-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 7px 12px;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 500;
+          background: #fff;
+          border: 1px solid #ececef;
+          color: #111;
+          cursor: pointer;
+          transition: background 120ms ease;
+        }
+        .dash-pill:hover { background: #f5f5f7; }
+        .dash-pill-icon { padding: 7px 10px; }
+
+        .metric-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px;
+        }
+        @media (max-width: 760px) {
+          .metric-grid { grid-template-columns: 1fr; }
+        }
+        .metric-card {
+          background: #fff;
+          border: 1px solid #ececef;
+          border-radius: 14px;
+          padding: 18px 20px;
+        }
+        .metric-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+        .metric-label {
+          font-size: 13px;
+          color: #6b6b73;
+          font-weight: 500;
+        }
+        .metric-range {
+          font-size: 11px;
+          color: #8a8a93;
+          background: #f5f5f7;
+          padding: 3px 8px;
+          border-radius: 6px;
+        }
+        .metric-row {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 12px;
+        }
+        .metric-value {
+          font-size: 28px;
+          font-weight: 700;
+          color: #111;
+          line-height: 1.1;
+          letter-spacing: -0.01em;
+        }
+        .metric-delta {
+          font-size: 12.5px;
+          margin-top: 4px;
+          font-weight: 500;
+        }
+        .metric-delta.pos { color: #16A34A; }
+        .metric-delta.neg { color: #DC2626; }
+
+        .card {
+          background: #fff;
+          border: 1px solid #ececef;
+          border-radius: 14px;
+          padding: 22px 24px;
+        }
+        .card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: end;
+          gap: 16px;
+          margin-bottom: 18px;
+        }
+        .card-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: #111;
+          margin: 0 0 2px;
+        }
+        .card-sub {
+          font-size: 13px;
+          color: #6b6b73;
+          margin: 0;
+        }
+
+        .funnel {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+        .funnel-row-top {
+          display: flex;
+          justify-content: space-between;
+          font-size: 13.5px;
+          margin-bottom: 6px;
+          color: #111;
+        }
+        .funnel-row-top strong { font-weight: 600; }
+        .funnel-conv {
+          margin-left: 10px;
+          color: #8a8a93;
+          font-size: 12.5px;
+          font-weight: 400;
+        }
+        .funnel-bar {
+          background: #f5f5f7;
+          border-radius: 6px;
+          height: 10px;
+          overflow: hidden;
+        }
+        .funnel-bar-fill {
+          height: 100%;
+          border-radius: 6px;
+          transition: width 200ms ease;
+        }
+
+        .plan-row-top {
+          display: flex;
+          justify-content: space-between;
+          font-size: 13.5px;
+          color: #111;
+          margin-bottom: 8px;
+        }
+        .plan-row-sub { color: #8a8a93; }
+
+        @media (max-width: 720px) {
+          .resume-banner { flex-direction: column; align-items: stretch; }
+          .resume-actions { flex-direction: column; }
+          .resume-progress { width: 100%; }
+          .dash-section-header { flex-direction: column; align-items: flex-start; }
+        }
+      `}</style>
+    </div>
   );
 }
