@@ -112,24 +112,24 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
       <style jsx>{`
         .setup-card {
           background: #fff;
-          border: 1px solid #ececef;
+          border: 1px solid #dcdcde;
           border-radius: 14px;
           padding: 26px 28px;
           display: flex;
           gap: 28px;
           align-items: flex-start;
-          box-shadow: 0 1px 0 rgba(15, 15, 25, 0.04);
+          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
         }
         .setup-illustration {
           flex-shrink: 0;
-          width: 120px;
+          width: 80px;
           padding-top: 4px;
         }
         .setup-icon-block {
-          width: 120px;
-          height: 120px;
+          width: 80px;
+          height: 80px;
           background: linear-gradient(140deg, #7C5CFF 0%, #A855F7 100%);
-          border-radius: 18px;
+          border-radius: 14px;
           display: flex;
           align-items: center;
           justify-content: center;

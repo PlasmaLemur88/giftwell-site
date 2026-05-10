@@ -90,22 +90,16 @@ export default function DashboardPage() {
   return (
     <>
       <div className="dash">
-        <div className="dash-header">
-          <div>
-            <h1 className="dash-title">Dashboard</h1>
-            <p className="dash-subtitle">
-              Welcome back — here's how Acme Store's gifting is performing
-            </p>
-          </div>
-          {setupComplete && (
+        {setupComplete && (
+          <div className="dash-reset">
             <button
               className="dash-link"
               onClick={() => setSetupComplete(false)}
             >
               Reset setup (preview)
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         {setupComplete ? (
           <AnnouncementCard />
@@ -222,26 +216,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="dash-section">
-          <div className="card">
-            <div className="card-header">
-              <div>
-                <h3 className="card-title">Plan usage</h3>
-                <p className="card-sub">Pro plan · Resets on Jun 1</p>
-              </div>
-              <a className="dash-btn dash-btn-primary" href="#">Upgrade plan</a>
-            </div>
-            <div className="plan-row">
-              <div className="plan-row-top">
-                <span>Recipients this month</span>
-                <span className="plan-row-sub">1,284 / 5,000</span>
-              </div>
-              <div className="plan-progress">
-                <div className="plan-progress-fill" style={{ width: '26%' }} />
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <style jsx>{`
@@ -251,24 +225,9 @@ export default function DashboardPage() {
           gap: 20px;
           padding-top: 12px;
         }
-        .dash-header {
+        .dash-reset {
           display: flex;
-          align-items: end;
-          justify-content: space-between;
-          gap: 16px;
-          margin-bottom: 4px;
-        }
-        .dash-title {
-          font-size: 26px;
-          font-weight: 700;
-          color: #111;
-          margin: 0 0 4px;
-          letter-spacing: -0.01em;
-        }
-        .dash-subtitle {
-          font-size: 14px;
-          color: #6b6b73;
-          margin: 0;
+          justify-content: flex-end;
         }
         .dash-link {
           background: transparent;
@@ -322,7 +281,7 @@ export default function DashboardPage() {
           font-size: 13px;
           font-weight: 500;
           background: #fff;
-          border: 1px solid #ececef;
+          border: 1px solid #dcdcde;
           color: #111;
           cursor: pointer;
           transition: background 120ms ease;
@@ -351,7 +310,7 @@ export default function DashboardPage() {
           font-size: 13.5px;
           font-weight: 500;
           background: #fff;
-          border: 1px solid #ececef;
+          border: 1px solid #dcdcde;
           color: #111;
           cursor: pointer;
           transition: background 120ms ease;
@@ -374,9 +333,10 @@ export default function DashboardPage() {
 
         .metric-card {
           background: #fff;
-          border: 1px solid #ececef;
+          border: 1px solid #dcdcde;
           border-radius: 14px;
           padding: 18px 20px;
+          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
         }
         .metric-top {
           display: flex;
@@ -411,9 +371,10 @@ export default function DashboardPage() {
 
         .card {
           background: #fff;
-          border: 1px solid #ececef;
+          border: 1px solid #dcdcde;
           border-radius: 14px;
           padding: 22px 24px;
+          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
         }
         .card-header {
           display: flex;

@@ -122,22 +122,22 @@ export function AnnouncementCard() {
           display: flex;
           gap: 32px;
           align-items: flex-start;
-          box-shadow: 0 1px 0 rgba(15, 15, 25, 0.04);
-          border: 1px solid #ececef;
+          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
+          border: 1px solid #dcdcde;
         }
         .ann-illustration {
           flex-shrink: 0;
-          width: 120px;
+          width: 80px;
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: center;
           padding-top: 4px;
         }
         .ann-icon-block {
-          width: 120px;
-          height: 120px;
+          width: 80px;
+          height: 80px;
           background: linear-gradient(140deg, #7C5CFF 0%, #A855F7 100%);
-          border-radius: 18px;
+          border-radius: 14px;
           display: flex;
           align-items: center;
           justify-content: center;
