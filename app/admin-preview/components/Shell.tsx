@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './shell.module.css';
 import { AppEmbedStrip } from './AppEmbedStrip';
+import { MiniHeader } from './MiniHeader';
 
 const SHOPIFY_PRIMARY = [
   { label: 'Home', icon: HomeIcon },
@@ -163,7 +164,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {/* ─── Embedded app content ─── */}
       <main className={styles.content}>
         <AppEmbedStrip />
-        <div className={styles.contentInset}>{children}</div>
+        <div className={styles.contentInset}>
+          <MiniHeader />
+          {children}
+        </div>
       </main>
     </div>
   );

@@ -19,8 +19,8 @@ const SLIDES: Slide[] = [
     title: 'Paste any list. We handle the rest.',
     body:
       "Messy names and addresses get cleaned automatically. Anything we can't resolve routes into the claim flow — no more loading screens or row-by-row error fixes.",
-    primaryLabel: 'View Recipients',
-    primaryHref: '/admin-preview/recipients',
+    primaryLabel: 'View report',
+    primaryHref: '/admin-preview/reports/recipients',
     secondaryLabel: 'Learn more',
     secondaryHref: '#',
   },
@@ -29,8 +29,8 @@ const SLIDES: Slide[] = [
     title: 'Catch payment issues before they hurt revenue',
     body:
       "When a payment method is missing and orders fail, we surface a top-of-page banner so you can fix it in seconds.",
-    primaryLabel: 'See orders',
-    primaryHref: '/admin-preview/orders',
+    primaryLabel: 'See operations',
+    primaryHref: '/admin-preview/reports/operations',
     secondaryLabel: 'Learn more',
     secondaryHref: '#',
   },
@@ -50,7 +50,7 @@ const SLIDES: Slide[] = [
     body:
       "Sent → Opened → Claimed → Delivered conversion at every stage. Spot bottlenecks across campaigns or recipient cohorts in one chart.",
     primaryLabel: 'View report',
-    primaryHref: '/admin-preview/reports',
+    primaryHref: '/admin-preview/reports/funnel',
     secondaryLabel: 'Learn more',
     secondaryHref: '#',
   },

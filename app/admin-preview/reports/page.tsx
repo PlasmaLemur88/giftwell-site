@@ -144,9 +144,7 @@ export default function ReportsLandingPage() {
 
       <style jsx>{`
         .rp {
-          padding: 28px 32px 40px;
-          max-width: 1200px;
-          margin: 0 auto;
+          padding-top: 12px;
         }
         .rp-header {
           display: flex;

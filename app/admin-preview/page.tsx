@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { MiniHeader } from './components/MiniHeader';
 import { InlineSetupCard } from './components/InlineSetupCard';
 import { AnnouncementCard } from './components/AnnouncementCard';
 
@@ -90,8 +89,6 @@ export default function DashboardPage() {
 
   return (
     <>
-      <MiniHeader />
-
       <div className="dash">
         <div className="dash-header">
           <div>
@@ -196,7 +193,7 @@ export default function DashboardPage() {
                 <h3 className="card-title">Recipient funnel</h3>
                 <p className="card-sub">Last 30 days · How recipients moved through the gift flow</p>
               </div>
-              <button className="dash-pill">View report</button>
+              <a className="dash-pill" href="/admin-preview/reports/funnel">View report</a>
             </div>
             <div className="funnel">
               {FUNNEL.map((stage, i) => {
@@ -252,9 +249,7 @@ export default function DashboardPage() {
           display: flex;
           flex-direction: column;
           gap: 20px;
-          padding: 28px 32px 40px;
-          max-width: 1200px;
-          margin: 0 auto;
+          padding-top: 12px;
         }
         .dash-header {
           display: flex;

@@ -58,9 +58,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ slug: s
 
       <style jsx>{`
         .rd {
-          padding: 28px 32px 40px;
-          max-width: 1200px;
-          margin: 0 auto;
+          padding-top: 12px;
         }
         .rd-back {
           display: inline-flex;
