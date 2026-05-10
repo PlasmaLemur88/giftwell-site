@@ -97,6 +97,15 @@ export default function DashboardPage() {
             Welcome back — here's how Acme Store's gifting is performing
           </p>
         </div>
+        <div className="dash-header-right">
+          <span className="live-pill">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            Live
+          </span>
+          <button className="dash-pill dash-pill-icon" aria-label="More actions">⋯</button>
+        </div>
       </div>
 
       {showSetupBanner && (
@@ -231,9 +240,33 @@ export default function DashboardPage() {
           display: flex;
           flex-direction: column;
           gap: 20px;
+          padding: 28px 32px 40px;
+          max-width: 1200px;
+          margin: 0 auto;
         }
         .dash-header {
           margin-bottom: 4px;
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 16px;
+        }
+        .dash-header-right {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .live-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #e6f6ec;
+          color: #146c43;
+          font-size: 12.5px;
+          font-weight: 500;
+          padding: 5px 11px 5px 9px;
+          border-radius: 999px;
+          border: 1px solid #c7ebd5;
         }
         .dash-title {
           font-size: 26px;

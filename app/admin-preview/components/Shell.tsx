@@ -1,146 +1,185 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import styles from './shell.module.css';
 
-const STORES = [
-  { id: 'acme', name: 'Acme Store', plan: 'Pro plan' },
-  { id: 'feno', name: 'Feno', plan: 'Pro plan' },
-  { id: 'proud', name: 'Proud Labs', plan: 'Trial' },
+const SHOPIFY_PRIMARY = [
+  { label: 'Home', icon: HomeIcon },
+  { label: 'Orders', icon: OrdersIcon, badge: '3' },
+  { label: 'Products', icon: ProductsIcon },
+  { label: 'Customers', icon: CustomersIcon },
+  { label: 'Marketing', icon: MarketingIcon },
+  { label: 'Discounts', icon: DiscountsIcon },
+  { label: 'Content', icon: ContentIcon },
+  { label: 'Markets', icon: MarketsIcon },
+  { label: 'Analytics', icon: AnalyticsIcon },
 ];
 
-const NAV_PRIMARY = [
-  { href: '/admin-preview', label: 'Dashboard', icon: HomeIcon, exact: true },
-  { href: '/admin-preview/campaigns', label: 'Campaigns', icon: CalendarIcon },
-  { href: '/admin-preview/orders', label: 'Orders', icon: BoxIcon },
-  { href: '/admin-preview/recipients', label: 'Recipients', icon: UsersIcon },
-  { href: '/admin-preview/reports', label: 'Reports', icon: ChartIcon },
-  { href: '/admin-preview/integrations', label: 'Integrations', icon: PlugIcon },
-  { href: '/admin-preview/settings', label: 'Settings', icon: GearIcon },
+const SHOPIFY_CHANNELS = [
+  { label: 'Online Store', icon: StoreIcon },
 ];
 
-const NAV_CONFIGURE = [
-  { href: '/admin-preview/customize', label: 'Customize', icon: BrushIcon },
-  { href: '/admin-preview/setup', label: 'Setup', icon: SparkleIcon },
+const APPS = [
+  { label: 'Klaviyo', iconClass: styles.appIconKlaviyo, letter: 'K' },
+];
+
+const GIFTWELL_SUB = [
+  { href: '/admin-preview', label: 'Dashboard', exact: true },
+  { href: '/admin-preview/setup', label: 'Setup' },
+  { href: '/admin-preview/customize', label: 'Customize' },
 ];
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || '/admin-preview';
-  const [storeMenuOpen, setStoreMenuOpen] = useState(false);
-  const [activeStore, setActiveStore] = useState(STORES[0]);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const giftwellActive = pathname.startsWith('/admin-preview');
+  const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setStoreMenuOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
-
-  const isActive = (href: string, exact?: boolean) =>
+  const isSubActive = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
 
   return (
     <div className={styles.shell}>
-      <aside className={styles.sidebar}>
-        <Link href="/admin-preview" className={styles.sidebarLogo} aria-label="Giftwell">
-          <Image src="/g-black-bold.png" alt="Giftwell" width={120} height={28} priority />
-        </Link>
-
-        <nav className={styles.navSection}>
-          {NAV_PRIMARY.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.href, item.exact);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`${styles.navItem} ${active ? styles.navItemActive : ''}`}
-              >
-                <Icon />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className={styles.navSection}>
-          <div className={styles.navSectionTitle}>Configure</div>
-          {NAV_CONFIGURE.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`${styles.navItem} ${active ? styles.navItemActive : ''}`}
-              >
-                <Icon />
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
-      </aside>
-
+      {/* ─── Shopify dark top bar ─── */}
       <header className={styles.topbar}>
-        <div className={styles.topbarCenter}>
-          Use the menu on the left to navigate
-        </div>
-        <div className={styles.topbarRight} ref={menuRef}>
-          <span className={styles.livePill}>
-            <CheckIcon />
-            Live
+        <div className={styles.shopifyLogo} aria-label="Shopify">S</div>
+
+        <div className={styles.searchWrap}>
+          <span className={styles.searchIcon}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
           </span>
-          <button
-            className={styles.storeDropdown}
-            onClick={() => setStoreMenuOpen((o) => !o)}
-            aria-haspopup="menu"
-            aria-expanded={storeMenuOpen}
-          >
-            {activeStore.name}
-            <ChevronDownIcon />
+          <input
+            className={styles.search}
+            type="search"
+            placeholder="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        <div className={styles.topbarRight}>
+          <button className={styles.iconBtn} aria-label="Notifications">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+            </svg>
+            <span className={styles.notifDot} />
           </button>
-          {storeMenuOpen && (
-            <div className={styles.storeMenu} role="menu">
-              {STORES.map((s) => (
-                <div
-                  key={s.id}
-                  className={`${styles.storeMenuItem} ${
-                    s.id === activeStore.id ? styles.storeMenuItemActive : ''
-                  }`}
-                  onClick={() => {
-                    setActiveStore(s);
-                    setStoreMenuOpen(false);
-                  }}
-                  role="menuitem"
-                >
-                  <span>{s.name}</span>
-                  <span style={{ fontSize: 11, color: '#8a8a93' }}>{s.plan}</span>
-                </div>
-              ))}
-            </div>
-          )}
-          <button className={styles.overflowBtn} aria-label="More options">
-            <DotsIcon />
+          <button className={styles.shopifyStore}>
+            Acme Store
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <button className={styles.iconBtn} aria-label="Profile">
+            <span className={styles.shopifyAvatar}>BS</span>
           </button>
         </div>
       </header>
 
-      <main className={styles.content}>
-        <div className={styles.contentInner}>{children}</div>
-      </main>
+      {/* ─── Shopify left sidebar ─── */}
+      <aside className={styles.sidebar}>
+        <nav className={styles.sidebarSection}>
+          {SHOPIFY_PRIMARY.map((item) => {
+            const Icon = item.icon;
+            return (
+              <a className={styles.navItem} href="#" key={item.label}>
+                <Icon />
+                <span style={{ flex: 1 }}>{item.label}</span>
+                {item.badge && <NavBadge value={item.badge} />}
+              </a>
+            );
+          })}
+        </nav>
+
+        <div className={styles.sidebarSectionDivider} />
+
+        <nav className={styles.sidebarSection}>
+          <div className={styles.sidebarSectionTitle}>Sales channels</div>
+          {SHOPIFY_CHANNELS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <a className={styles.navItem} href="#" key={item.label}>
+                <Icon />
+                <span>{item.label}</span>
+              </a>
+            );
+          })}
+        </nav>
+
+        <div className={styles.sidebarSectionDivider} />
+
+        <nav className={styles.sidebarSection}>
+          <div className={styles.sidebarSectionTitle}>Apps</div>
+          {APPS.map((a) => (
+            <a className={styles.navItem} href="#" key={a.label}>
+              <span className={`${styles.appIcon} ${a.iconClass}`}>{a.letter}</span>
+              <span>{a.label}</span>
+            </a>
+          ))}
+
+          {/* Giftwell — active app, expanded */}
+          <a
+            className={`${styles.navItem} ${giftwellActive ? styles.navItemActive : ''}`}
+            href="/admin-preview"
+          >
+            <span className={`${styles.appIcon} ${styles.appIconGiftwell}`}>G</span>
+            <span>Giftwell</span>
+          </a>
+          {giftwellActive && (
+            <div className={styles.subNav}>
+              {GIFTWELL_SUB.map((item) => (
+                <Link
+                  href={item.href}
+                  key={item.href}
+                  className={`${styles.subNavItem} ${
+                    isSubActive(item.href, item.exact) ? styles.subNavItemActive : ''
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          )}
+        </nav>
+
+        <div className={styles.sidebarSpacer} />
+
+        <div className={styles.sidebarSectionDivider} />
+
+        <nav className={`${styles.sidebarSection} ${styles.sidebarSettings}`}>
+          <a className={styles.navItem} href="#">
+            <SettingsIcon />
+            <span>Settings</span>
+          </a>
+        </nav>
+      </aside>
+
+      {/* ─── Embedded app content ─── */}
+      <main className={styles.content}>{children}</main>
     </div>
   );
 }
 
-/* ─── Inline SVG icons (avoids polaris-icons name guessing) ────────────── */
+function NavBadge({ value }: { value: string }) {
+  return (
+    <span style={{
+      background: '#e3e3e7',
+      color: '#303030',
+      borderRadius: 999,
+      fontSize: 11,
+      fontWeight: 500,
+      padding: '1px 7px',
+      lineHeight: '16px',
+    }}>{value}</span>
+  );
+}
+
+/* ─── Shopify nav icons (inline SVG) ───────────────────────────────────── */
 
 function HomeIcon() {
   return (
@@ -149,23 +188,22 @@ function HomeIcon() {
     </svg>
   );
 }
-function CalendarIcon() {
+function OrdersIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="5" width="18" height="16" rx="2" />
-      <path d="M3 10h18M8 3v4M16 3v4" />
+      <path d="M9 2L4 7v15a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7l-5-5H9z" />
+      <path d="M3 7h18M16 11a4 4 0 0 1-8 0" />
     </svg>
   );
 }
-function BoxIcon() {
+function ProductsIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 7l9-4 9 4v10l-9 4-9-4V7z" />
-      <path d="M3 7l9 4 9-4M12 11v10" />
+      <path d="M20 7l-8-4-8 4 8 4 8-4zM4 7v10l8 4M20 7v10l-8 4M12 11v10" />
     </svg>
   );
 }
-function UsersIcon() {
+function CustomersIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -174,7 +212,38 @@ function UsersIcon() {
     </svg>
   );
 }
-function ChartIcon() {
+function MarketingIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 11h2l4-7v18l-4-7H3v-4zM21 6v12M17 9v6" />
+    </svg>
+  );
+}
+function DiscountsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 12V7a2 2 0 0 0-2-2h-5L2 16l6 6 11-11h-1z" />
+      <circle cx="14" cy="10" r="1" />
+    </svg>
+  );
+}
+function ContentIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+    </svg>
+  );
+}
+function MarketsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z" />
+    </svg>
+  );
+}
+function AnalyticsIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 3v18h18" />
@@ -182,55 +251,18 @@ function ChartIcon() {
     </svg>
   );
 }
-function PlugIcon() {
+function StoreIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0V8zM12 18v4" />
+      <path d="M3 9l1-5h16l1 5M3 9v11h18V9M3 9h18M9 13h6" />
     </svg>
   );
 }
-function GearIcon() {
+function SettingsIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="3" />
       <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />
-    </svg>
-  );
-}
-function BrushIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 11l-6 6a3 3 0 1 0 4.2 4.2l6-6M14 7l3 3M21 3a4 4 0 0 0-5.66 0L9 9.34 14.66 15 21 8.66A4 4 0 0 0 21 3z" />
-    </svg>
-  );
-}
-function SparkleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5zM19 14l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z" />
-    </svg>
-  );
-}
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-function ChevronDownIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
-  );
-}
-function DotsIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <circle cx="5" cy="12" r="1.6" />
-      <circle cx="12" cy="12" r="1.6" />
-      <circle cx="19" cy="12" r="1.6" />
     </svg>
   );
 }
