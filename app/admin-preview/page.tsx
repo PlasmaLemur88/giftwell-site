@@ -4,20 +4,21 @@ import { useState } from 'react';
 import { InlineSetupCard } from './components/InlineSetupCard';
 import { AnnouncementCard } from './components/AnnouncementCard';
 
+type MetricIcon = 'gift' | 'percent' | 'mail' | 'dollar';
 type Metric = {
   label: string;
   value: string;
   delta: string;
   positive: boolean;
-  range: string;
+  icon: MetricIcon;
   spark: number[];
 };
 
 const METRICS: Metric[] = [
-  { label: 'Gifts sent', value: '1,284', delta: '+18.2%', positive: true, range: 'Last 30 days', spark: [12, 18, 14, 22, 20, 28, 26, 34, 30, 38, 42, 48] },
-  { label: 'Recipients claimed', value: '947', delta: '+22.4%', positive: true, range: 'Last 30 days', spark: [8, 12, 10, 16, 14, 22, 24, 28, 26, 32, 36, 40] },
-  { label: 'Opt-in rate', value: '64.8%', delta: '+3.1pp', positive: true, range: 'Last 30 days', spark: [55, 58, 56, 60, 59, 62, 63, 64, 63, 65, 66, 65] },
-  { label: 'Revenue', value: '$84,210', delta: '+12.7%', positive: true, range: 'Last 30 days', spark: [400, 520, 480, 600, 580, 720, 760, 820, 800, 880, 940, 1020] },
+  { label: 'Gifts sent', value: '1,284', delta: '+18.2%', positive: true, icon: 'gift', spark: [12, 18, 14, 22, 20, 28, 26, 34, 30, 38, 42, 48] },
+  { label: 'Opt-in rate', value: '64.8%', delta: '+3.1pp', positive: true, icon: 'percent', spark: [55, 58, 56, 60, 59, 62, 63, 64, 63, 65, 66, 65] },
+  { label: 'New subscribers', value: '612', delta: '+28.5%', positive: true, icon: 'mail', spark: [8, 12, 10, 18, 22, 28, 32, 40, 38, 48, 52, 60] },
+  { label: 'Revenue', value: '$84,210', delta: '+12.7%', positive: true, icon: 'dollar', spark: [400, 520, 480, 600, 580, 720, 760, 820, 800, 880, 940, 1020] },
 ];
 
 const FUNNEL = [
@@ -27,18 +28,10 @@ const FUNNEL = [
   { label: 'Delivered', value: 902, color: '#16A34A' },
 ];
 
-function ChevronDownIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
-  );
-}
-
-function FilterIcon({ kind }: { kind: 'campaign' | 'bundle' | 'source' | 'channel' }) {
+function MetricIconGlyph({ icon }: { icon: MetricIcon }) {
   const common = {
-    width: 14,
-    height: 14,
+    width: 16,
+    height: 16,
     viewBox: '0 0 24 24',
     fill: 'none',
     stroke: 'currentColor',
@@ -47,39 +40,42 @@ function FilterIcon({ kind }: { kind: 'campaign' | 'bundle' | 'source' | 'channe
     strokeLinejoin: 'round' as const,
     'aria-hidden': true,
   };
-  if (kind === 'campaign') return (
-    <svg {...common}><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" /></svg>
+  if (icon === 'gift') return (
+    <svg {...common}><rect x="3" y="8" width="18" height="13" rx="1.5" /><path d="M3 12h18M12 8v13M8 8a2.5 2.5 0 1 1 0-5c1.8 0 3 2 4 5 1-3 2.2-5 4-5a2.5 2.5 0 1 1 0 5" /></svg>
   );
-  if (kind === 'bundle') return (
-    <svg {...common}><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z" /><path d="M3 7l9 4 9-4M12 11v10" /></svg>
+  if (icon === 'percent') return (
+    <svg {...common}><line x1="19" y1="5" x2="5" y2="19" /><circle cx="7" cy="7" r="2.5" /><circle cx="17" cy="17" r="2.5" /></svg>
   );
-  if (kind === 'source') return (
-    <svg {...common}><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z" /></svg>
+  if (icon === 'mail') return (
+    <svg {...common}><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 7l10 7 10-7" /></svg>
   );
   return (
-    <svg {...common}><rect x="2" y="6" width="20" height="14" rx="2" /><path d="M2 6l10 7 10-7" /></svg>
+    <svg {...common}><line x1="12" y1="2" x2="12" y2="22" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
   );
 }
 
-function Sparkline({ data, positive }: { data: number[]; positive: boolean }) {
-  const w = 110;
-  const h = 32;
+function Sparkline({ data }: { data: number[] }) {
+  const w = 200;
+  const h = 36;
   const min = Math.min(...data);
   const max = Math.max(...data);
   const range = max - min || 1;
-  const stroke = positive ? '#16A34A' : '#DC2626';
-  const fill = positive ? 'rgba(22, 163, 74, 0.08)' : 'rgba(220, 38, 38, 0.08)';
   const points = data.map((v, i) => {
     const x = (i / (data.length - 1)) * w;
-    const y = h - ((v - min) / range) * h;
+    const y = h - 2 - ((v - min) / range) * (h - 4);
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   });
-  const polyline = points.join(' ');
-  const polygon = `0,${h} ${polyline} ${w},${h}`;
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden>
-      <polygon points={polygon} fill={fill} />
-      <polyline fill="none" stroke={stroke} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" points={polyline} />
+    <svg className="metric-spark" width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden>
+      <polyline
+        fill="none"
+        stroke="#5C6AC4"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+        points={points.join(' ')}
+      />
     </svg>
   );
 }
@@ -135,46 +131,20 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="filter-row">
-            <span className="filter-label">Add filters</span>
-            <button className="filter-pill">
-              <FilterIcon kind="campaign" />
-              Campaign
-              <ChevronDownIcon />
-            </button>
-            <button className="filter-pill">
-              <FilterIcon kind="bundle" />
-              Bundle
-              <ChevronDownIcon />
-            </button>
-            <button className="filter-pill">
-              <FilterIcon kind="source" />
-              Recipient source
-              <ChevronDownIcon />
-            </button>
-            <button className="filter-pill">
-              <FilterIcon kind="channel" />
-              Channel
-              <ChevronDownIcon />
-            </button>
-          </div>
-
-          <div className="metric-grid">
+          <div className="metric-strip">
             {METRICS.map((m) => (
               <div className="metric-card" key={m.label}>
-                <div className="metric-top">
-                  <span className="metric-label">{m.label}</span>
-                  <span className="metric-range">{m.range}</span>
+                <div className="metric-card-top">
+                  <span className="metric-icon" aria-hidden>
+                    <MetricIconGlyph icon={m.icon} />
+                  </span>
+                  <span className={`metric-delta-pill ${m.positive ? 'pos' : 'neg'}`}>
+                    {m.delta}
+                  </span>
                 </div>
-                <div className="metric-row">
-                  <div>
-                    <div className="metric-value">{m.value}</div>
-                    <div className={`metric-delta ${m.positive ? 'pos' : 'neg'}`}>
-                      {m.delta} vs prior
-                    </div>
-                  </div>
-                  <Sparkline data={m.spark} positive={m.positive} />
-                </div>
+                <div className="metric-value">{m.value}</div>
+                <div className="metric-label">{m.label}</div>
+                <Sparkline data={m.spark} />
               </div>
             ))}
           </div>
@@ -240,22 +210,6 @@ export default function DashboardPage() {
         }
         .dash-link:hover { text-decoration: underline; }
 
-        .dash-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 9px 16px;
-          border-radius: 10px;
-          font-size: 13.5px;
-          font-weight: 500;
-          text-decoration: none;
-          cursor: pointer;
-          border: 1px solid transparent;
-          transition: background 120ms ease;
-        }
-        .dash-btn-primary { background: #111; color: #fff; }
-        .dash-btn-primary:hover { background: #2a2a30; }
-
         .dash-section { display: flex; flex-direction: column; gap: 16px; }
         .dash-section-header {
           display: flex;
@@ -290,84 +244,69 @@ export default function DashboardPage() {
         .dash-pill-icon { padding: 7px 10px; }
         .dash-pill-sub { color: #8a8a93; font-weight: 400; margin-left: 4px; }
 
-        .filter-row {
+        .metric-strip {
           display: grid;
-          grid-template-columns: auto repeat(4, 1fr);
-          gap: 10px;
-          align-items: center;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
         }
-        .filter-label {
-          font-size: 13px;
-          color: #6b6b73;
-          padding: 0 4px;
-        }
-        .filter-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 9px 14px;
-          border-radius: 10px;
-          font-size: 13.5px;
-          font-weight: 500;
-          background: #fff;
-          border: 1px solid #dcdcde;
-          color: #111;
-          cursor: pointer;
-          transition: background 120ms ease;
-          width: 100%;
-          text-align: left;
-        }
-        .filter-pill :global(svg) { color: #6b6b73; flex-shrink: 0; }
-        .filter-pill :global(svg:last-child) { margin-left: auto; }
-        .filter-pill:hover { background: #f5f5f7; }
-
-        @media (max-width: 900px) {
-          .filter-row { grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 540px) {
-          .filter-row { grid-template-columns: 1fr; }
-        }
-
-        .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-        @media (max-width: 760px) { .metric-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 1080px) { .metric-strip { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 540px) { .metric-strip { grid-template-columns: 1fr; } }
 
         .metric-card {
           background: #fff;
           border: 1px solid #dcdcde;
           border-radius: 14px;
-          padding: 18px 20px;
+          padding: 18px 18px 14px;
           box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          min-width: 0;
         }
-        .metric-top {
+        .metric-card-top {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 12px;
+          margin-bottom: 6px;
         }
-        .metric-label { font-size: 13px; color: #6b6b73; font-weight: 500; }
-        .metric-range {
-          font-size: 11px;
-          color: #8a8a93;
+        .metric-icon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 30px;
+          height: 30px;
+          border-radius: 8px;
           background: #f5f5f7;
+          color: #5c5c66;
+        }
+        .metric-delta-pill {
+          display: inline-flex;
+          align-items: center;
           padding: 3px 8px;
-          border-radius: 6px;
+          border-radius: 999px;
+          font-size: 11.5px;
+          font-weight: 600;
+          letter-spacing: -0.005em;
         }
-        .metric-row {
-          display: flex;
-          align-items: end;
-          justify-content: space-between;
-          gap: 12px;
-        }
+        .metric-delta-pill.pos { background: #ECFDF5; color: #047857; }
+        .metric-delta-pill.neg { background: #FEF2F2; color: #B91C1C; }
         .metric-value {
-          font-size: 28px;
+          font-size: 26px;
           font-weight: 700;
           color: #111;
           line-height: 1.1;
-          letter-spacing: -0.01em;
+          letter-spacing: -0.015em;
         }
-        .metric-delta { font-size: 12.5px; margin-top: 4px; font-weight: 500; }
-        .metric-delta.pos { color: #16A34A; }
-        .metric-delta.neg { color: #DC2626; }
+        .metric-label {
+          font-size: 13px;
+          color: #6b6b73;
+          font-weight: 500;
+          margin-bottom: 6px;
+        }
+        .metric-card :global(.metric-spark) {
+          display: block;
+          margin-top: auto;
+        }
 
         .card {
           background: #fff;
@@ -398,27 +337,6 @@ export default function DashboardPage() {
         .funnel-conv { margin-left: 10px; color: #8a8a93; font-size: 12.5px; font-weight: 400; }
         .funnel-bar { background: #f5f5f7; border-radius: 6px; height: 10px; overflow: hidden; }
         .funnel-bar-fill { height: 100%; border-radius: 6px; transition: width 200ms ease; }
-
-        .plan-row-top {
-          display: flex;
-          justify-content: space-between;
-          font-size: 13.5px;
-          color: #111;
-          margin-bottom: 8px;
-        }
-        .plan-row-sub { color: #8a8a93; }
-        .plan-progress {
-          width: 100%;
-          height: 6px;
-          background: #f5f5f7;
-          border-radius: 6px;
-          overflow: hidden;
-        }
-        .plan-progress-fill {
-          height: 100%;
-          background: linear-gradient(90deg, #7C5CFF, #A855F7);
-          border-radius: 6px;
-        }
 
         @media (max-width: 720px) {
           .dash-section-header { flex-direction: column; align-items: flex-start; }
