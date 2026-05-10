@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import styles from './reports.module.css';
 
-/* ─── Icons (declared before use to avoid hoisting issues) ──────────── */
+/* ─── Icons ──────────────────────────────────────────────────────────── */
 
 function DollarIcon() {
   return (
@@ -97,13 +98,13 @@ const REPORTS: Report[] = [
 
 export default function ReportsLandingPage() {
   return (
-    <div className="rp">
-      <div className="rp-header">
+    <div className={styles.rp}>
+      <div className={styles.rpHeader}>
         <div>
-          <h1 className="rp-title">Reports</h1>
-          <p className="rp-subtitle">View and export reports</p>
+          <h1 className={styles.rpTitle}>Reports</h1>
+          <p className={styles.rpSubtitle}>View and export reports</p>
         </div>
-        <button className="rp-create">
+        <button className={styles.rpCreate}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M12 5v14M5 12h14" />
           </svg>
@@ -111,166 +112,36 @@ export default function ReportsLandingPage() {
         </button>
       </div>
 
-      <div className="rp-grid">
+      <div className={styles.rpGrid}>
         {REPORTS.map((r) => {
           const Icon = r.Icon;
           return (
-            <Link key={r.slug} className="rp-card" href={`/admin-preview/reports/${r.slug}`}>
-              <div className="rp-card-icon"><Icon /></div>
-              <div className="rp-card-title">{r.title}</div>
-              <div className="rp-card-desc">{r.description}</div>
+            <Link key={r.slug} className={styles.rpCard} href={`/admin-preview/reports/${r.slug}`}>
+              <div className={styles.rpCardIcon}><Icon /></div>
+              <div className={styles.rpCardTitle}>{r.title}</div>
+              <div className={styles.rpCardDesc}>{r.description}</div>
             </Link>
           );
         })}
       </div>
 
-      <div className="rp-section">
-        <div className="rp-section-header">
-          <h2 className="rp-section-title">My reports</h2>
-          <span className="rp-badge">Early access</span>
+      <div className={styles.rpSection}>
+        <div className={styles.rpSectionHeader}>
+          <h2 className={styles.rpSectionTitle}>My reports</h2>
+          <span className={styles.rpBadge}>Early access</span>
         </div>
-        <div className="rp-grid">
-          <Link className="rp-card rp-card-dashed" href="#">
-            <div className="rp-card-icon">
+        <div className={styles.rpGrid}>
+          <Link className={`${styles.rpCard} ${styles.rpCardDashed}`} href="#">
+            <div className={styles.rpCardIcon}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M12 5v14M5 12h14" />
               </svg>
             </div>
-            <div className="rp-card-title">Create a report</div>
-            <div className="rp-card-desc">Build a custom dashboard for your data</div>
+            <div className={styles.rpCardTitle}>Create a report</div>
+            <div className={styles.rpCardDesc}>Build a custom dashboard for your data</div>
           </Link>
         </div>
       </div>
-
-      <style jsx>{`
-        .rp {
-          padding-top: 12px;
-        }
-        .rp-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 28px;
-        }
-        .rp-title {
-          font-size: 26px;
-          font-weight: 700;
-          color: #111;
-          margin: 0 0 4px;
-          letter-spacing: -0.01em;
-        }
-        .rp-subtitle {
-          font-size: 14px;
-          color: #6b6b73;
-          margin: 0;
-        }
-        .rp-create {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 9px 16px;
-          border-radius: 10px;
-          font-size: 13.5px;
-          font-weight: 500;
-          background: #111;
-          color: #fff;
-          border: none;
-          cursor: pointer;
-          transition: background 120ms ease;
-        }
-        .rp-create:hover { background: #2a2a30; }
-
-        .rp-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-        }
-        @media (max-width: 900px) {
-          .rp-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 600px) {
-          .rp-grid { grid-template-columns: 1fr; }
-        }
-
-        .rp-card {
-          background: #fff;
-          border: 1px solid #dcdcde;
-          border-radius: 14px;
-          padding: 28px 28px 32px;
-          min-height: 180px;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-          text-decoration: none;
-          color: inherit;
-          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
-          transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
-        }
-        .rp-card:hover {
-          border-color: #b8b8bd;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px -8px rgba(15, 15, 25, 0.12);
-        }
-        .rp-card-icon {
-          width: 32px;
-          height: 32px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          color: #111;
-          margin-bottom: 12px;
-        }
-        .rp-card-icon :global(svg) {
-          width: 24px;
-          height: 24px;
-        }
-        .rp-card-title {
-          font-size: 15.5px;
-          font-weight: 600;
-          color: #111;
-          margin: 0;
-        }
-        .rp-card-desc {
-          font-size: 13px;
-          color: #6b6b73;
-          line-height: 1.45;
-        }
-        .rp-card-dashed {
-          border-style: dashed;
-          border-color: #c4c4c8;
-          background: transparent;
-          box-shadow: none;
-        }
-        .rp-card-dashed:hover {
-          background: #fff;
-          border-style: solid;
-        }
-
-        .rp-section {
-          margin-top: 40px;
-        }
-        .rp-section-header {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin-bottom: 14px;
-        }
-        .rp-section-title {
-          font-size: 17px;
-          font-weight: 600;
-          color: #111;
-          margin: 0;
-        }
-        .rp-badge {
-          font-size: 11.5px;
-          color: #5c4dff;
-          background: #f0eefe;
-          padding: 3px 8px;
-          border-radius: 999px;
-          font-weight: 500;
-        }
-      `}</style>
     </div>
   );
 }
-
