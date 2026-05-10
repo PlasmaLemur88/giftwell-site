@@ -194,20 +194,22 @@ export default function ReportsLandingPage() {
 
         .rp-card {
           background: #fff;
-          border: 1px solid #ececef;
+          border: 1px solid #dcdcde;
           border-radius: 14px;
-          padding: 22px 24px;
+          padding: 28px 28px 32px;
+          min-height: 180px;
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 6px;
           text-decoration: none;
           color: inherit;
+          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
           transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
         }
         .rp-card:hover {
-          border-color: #d6d6db;
+          border-color: #b8b8bd;
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px -6px rgba(15, 15, 25, 0.08);
+          box-shadow: 0 6px 16px -8px rgba(15, 15, 25, 0.12);
         }
         .rp-card-icon {
           width: 32px;
@@ -216,11 +218,11 @@ export default function ReportsLandingPage() {
           align-items: center;
           justify-content: center;
           color: #111;
-          margin-bottom: 6px;
+          margin-bottom: 12px;
         }
         .rp-card-icon :global(svg) {
-          width: 22px;
-          height: 22px;
+          width: 24px;
+          height: 24px;
         }
         .rp-card-title {
           font-size: 15.5px;
@@ -235,8 +237,9 @@ export default function ReportsLandingPage() {
         }
         .rp-card-dashed {
           border-style: dashed;
-          border-color: #d6d6db;
+          border-color: #c4c4c8;
           background: transparent;
+          box-shadow: none;
         }
         .rp-card-dashed:hover {
           background: #fff;
