@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
 
 const STORES = [
   { id: 'acme', name: 'Acme Store', plan: 'Pro plan' },
@@ -27,13 +26,10 @@ export function MiniHeader() {
   return (
     <header className="mh">
       <div className="mh-left">
-        <Image
-          src="/g-black-bold.png"
-          alt="Giftwell"
-          width={88}
-          height={22}
-          priority
-        />
+        <div className="mh-logo">
+          <span className="mh-logo-icon">G</span>
+          <span className="mh-logo-text">Giftwell</span>
+        </div>
         <span className="mh-hint">Use the menu on the left to navigate</span>
       </div>
       <div className="mh-right" ref={menuRef}>
@@ -91,7 +87,30 @@ export function MiniHeader() {
           align-items: center;
           gap: 18px;
         }
-        .mh-left :global(img) { display: block; }
+        .mh-logo {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .mh-logo-icon {
+          width: 24px;
+          height: 24px;
+          border-radius: 6px;
+          background: linear-gradient(135deg, #7C5CFF, #A855F7);
+          color: #fff;
+          font-weight: 700;
+          font-size: 13px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          letter-spacing: -0.02em;
+        }
+        .mh-logo-text {
+          font-size: 15px;
+          font-weight: 600;
+          color: #111;
+          letter-spacing: -0.01em;
+        }
         .mh-hint {
           font-size: 13px;
           color: #6b6b73;
