@@ -102,19 +102,17 @@ Dashboard rebuild was broken into 4 chunks. Status:
 - Deleted Plan Usage card
 - Bumped card borders from `#ececef` → `#dcdcde` with subtle box-shadow across the dashboard (matches the Reports treatment)
 
-### ⏳ Chunk 2 — Metric strip rebuild (NEXT)
-Replace the 2×2 metric grid with a Shopify-native horizontal strip:
-- 4 metrics in a row (not 2×2)
-- Each card: icon top-left, big number, label, **delta pill top-right** (green/red, matches Figma)
-- **Sparklines**: either drop them (Figma Home doesn't have them) or make them thin neutral blue lines with no fill
-- **One global** "Last 30 days ▾" filter at the section level, not per-card
-- Drop the existing "Add filters" row from Home (filters belong in Reports)
+### ✅ Chunk 2 — Metric strip rebuild (DONE, commit `4f23df5`)
+- 2×2 grid → horizontal 4-up strip
+- Card layout: small icon-in-square top-left, delta pill top-right (green pos / red neg), 26px number, label, sparkline at bottom
+- Sparklines: thin (1.5px) neutral indigo (`#5C6AC4`) line, no fill, non-scaling-stroke + `preserveAspectRatio="none"` so they span card width cleanly
+- Removed per-card "Last 30 days" range badge — single global filter at section level
+- Removed "Add filters" row entirely (filters belong on Reports drill-downs)
+- Removed `FilterIcon`/`ChevronDownIcon` helpers + `.filter-*`, `.plan-*`, `.dash-btn*`, `.metric-range`, `.metric-row`, `.metric-top` CSS (dead)
+- **Brandon's call on the open question**: swap rate into slot #3, count into #4. Final metric set: **Gifts sent · Opt-in rate · New subscribers · Revenue** (Recipients claimed dropped — visible in the funnel below anyway)
 
-**Open question** (needs Brandon's call before building):
-- Metric #4 — **Opt-in rate** (a %) or **New email subscribers** (a count)? Figma showed the count. Claude argued the rate is more glance-friendly. Brandon to decide.
-
-### ⏳ Chunk 3 — Recent Orders + Activity panels
-- **Remove** the Recipient funnel chart from Home (it lives on Reports → Funnel)
+### ⏳ Chunk 3 — Recent Orders + Activity panels (NEXT)
+- **Remove** the Recipient funnel chart from Home (it lives on Reports → Funnel). Also kill the stray `<a href>` → `<Link>` lint error on the "View report" link by deleting the block.
 - **Add** a Recent Orders panel (3-5 latest, gifter avatar + name + ID + count + status pill + "View all →")
 - **Add** a Recent Activity feed panel (claims, opt-ins, shipped events with timestamps)
 - Side-by-side layout, matching Brandon's Figma Dashboard Home
