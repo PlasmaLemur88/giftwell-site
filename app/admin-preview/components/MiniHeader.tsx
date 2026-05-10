@@ -72,27 +72,19 @@ export function MiniHeader() {
             ))}
           </div>
         )}
-        <button className="mh-overflow" aria-label="More">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-            <circle cx="5" cy="12" r="1.6" />
-            <circle cx="12" cy="12" r="1.6" />
-            <circle cx="19" cy="12" r="1.6" />
-          </svg>
-        </button>
       </div>
 
       <style jsx>{`
         .mh {
-          position: sticky;
-          top: 0;
-          z-index: 10;
           background: #fff;
-          border-bottom: 1px solid #ececef;
+          border: 1px solid #ececef;
+          border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 24px;
+          padding: 0 20px;
           height: 56px;
+          box-shadow: 0 1px 0 rgba(15, 15, 25, 0.04);
         }
         .mh-left {
           display: flex;
@@ -138,23 +130,10 @@ export function MiniHeader() {
         }
         .mh-store:hover { background: #f5f5f7; }
         .mh-store :global(svg) { color: #6b6b73; }
-        .mh-overflow {
-          background: transparent;
-          border: none;
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          color: #6b6b73;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-        }
-        .mh-overflow:hover { background: #f5f5f7; }
         .mh-menu {
           position: absolute;
           top: 42px;
-          right: 44px;
+          right: 0;
           background: #fff;
           border: 1px solid #ececef;
           border-radius: 10px;

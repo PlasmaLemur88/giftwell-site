@@ -265,8 +265,12 @@
 
 .content {
   grid-area: content;
-  background: #f6f6f7;
+  background: #f1f1f1;
   overflow-y: auto;
+}
+
+.contentInset {
+  padding: 16px 24px 40px;
 }
 
 @media (max-width: 768px) {

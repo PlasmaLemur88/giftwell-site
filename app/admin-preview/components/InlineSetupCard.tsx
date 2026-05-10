@@ -43,13 +43,15 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
   return (
     <div className="setup-card">
       <div className="setup-illustration">
-        <Image
-          src="/g-black-bold.png"
-          alt=""
-          width={88}
-          height={22}
-          aria-hidden
-        />
+        <div className="setup-icon-block">
+          <Image
+            src="/g-white-bold.png"
+            alt=""
+            width={64}
+            height={64}
+            aria-hidden
+          />
+        </div>
       </div>
       <div className="setup-body">
         <div className="setup-eyebrow">
@@ -120,12 +122,24 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
         }
         .setup-illustration {
           flex-shrink: 0;
-          width: 100px;
-          padding-top: 24px;
+          width: 120px;
+          padding-top: 4px;
         }
-        .setup-illustration :global(img) {
+        .setup-icon-block {
+          width: 120px;
+          height: 120px;
+          background: linear-gradient(140deg, #7C5CFF 0%, #A855F7 100%);
+          border-radius: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow:
+            inset 0 -2px 0 rgba(15, 15, 25, 0.06),
+            0 6px 18px -8px rgba(124, 92, 255, 0.4);
+        }
+        .setup-icon-block :global(img) {
           object-fit: contain;
-          max-width: 100%;
+          width: 60%;
           height: auto;
         }
         .setup-body {
@@ -237,7 +251,8 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
 
         @media (max-width: 640px) {
           .setup-card { flex-direction: column; gap: 16px; padding: 20px; }
-          .setup-illustration { padding-top: 0; }
+          .setup-illustration { padding-top: 0; width: 80px; }
+          .setup-icon-block { width: 80px; height: 80px; border-radius: 14px; }
           .setup-actions { flex-direction: column; align-items: stretch; }
           .setup-actions-right { justify-content: flex-end; }
         }

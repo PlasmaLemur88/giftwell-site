@@ -7,7 +7,6 @@ type Slide = {
   eyebrow: string;
   title: string;
   body: string;
-  illustration: string;
   primaryLabel: string;
   primaryHref: string;
   secondaryLabel?: string;
@@ -20,7 +19,6 @@ const SLIDES: Slide[] = [
     title: 'Paste any list. We handle the rest.',
     body:
       "Messy names and addresses get cleaned automatically. Anything we can't resolve routes into the claim flow — no more loading screens or row-by-row error fixes.",
-    illustration: '/g-black-bold.png',
     primaryLabel: 'View Recipients',
     primaryHref: '/admin-preview/recipients',
     secondaryLabel: 'Learn more',
@@ -31,7 +29,6 @@ const SLIDES: Slide[] = [
     title: 'Catch payment issues before they hurt revenue',
     body:
       "When a payment method is missing and orders fail, we surface a top-of-page banner so you can fix it in seconds.",
-    illustration: '/g-black-bold.png',
     primaryLabel: 'See orders',
     primaryHref: '/admin-preview/orders',
     secondaryLabel: 'Learn more',
@@ -42,8 +39,27 @@ const SLIDES: Slide[] = [
     title: 'Iterate on the gift experience anytime',
     body:
       "Email templates, brand colors, backgrounds, and unwrap effects all live on the Customize page. Tweak them per campaign without going back through onboarding.",
-    illustration: '/g-black-bold.png',
     primaryLabel: 'Open Customize',
+    primaryHref: '/admin-preview/customize',
+    secondaryLabel: 'Learn more',
+    secondaryHref: '#',
+  },
+  {
+    eyebrow: 'Recipient funnel insights',
+    title: 'See where gifts drop off in the unwrap flow',
+    body:
+      "Sent → Opened → Claimed → Delivered conversion at every stage. Spot bottlenecks across campaigns or recipient cohorts in one chart.",
+    primaryLabel: 'View report',
+    primaryHref: '/admin-preview/reports',
+    secondaryLabel: 'Learn more',
+    secondaryHref: '#',
+  },
+  {
+    eyebrow: 'Transactional email upgrade',
+    title: 'Status updates land in the gifter’s inbox automatically',
+    body:
+      "Periodic recaps showing how many recipients opened the gift, claimed it, and got their products shipped. Configurable cadence, no setup needed.",
+    primaryLabel: 'Configure emails',
     primaryHref: '/admin-preview/customize',
     secondaryLabel: 'Learn more',
     secondaryHref: '#',
@@ -57,13 +73,15 @@ export function AnnouncementCard() {
   return (
     <div className="ann-card">
       <div className="ann-illustration">
-        <Image
-          src={slide.illustration}
-          alt=""
-          width={88}
-          height={22}
-          aria-hidden
-        />
+        <div className="ann-icon-block">
+          <Image
+            src="/g-white-bold.png"
+            alt=""
+            width={64}
+            height={64}
+            aria-hidden
+          />
+        </div>
       </div>
       <div className="ann-body">
         <div className="ann-eyebrow">{slide.eyebrow}</div>
@@ -84,7 +102,6 @@ export function AnnouncementCard() {
         <div className="ann-actions">
           {slide.secondaryLabel && (
             <a className="ann-btn ann-btn-outline" href={slide.secondaryHref}>
-              {/* external arrow */}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M7 17L17 7M9 7h8v8" />
               </svg>
@@ -101,23 +118,37 @@ export function AnnouncementCard() {
         .ann-card {
           background: #fff;
           border-radius: 14px;
-          padding: 26px 28px;
+          padding: 28px 32px;
           display: flex;
-          gap: 28px;
+          gap: 32px;
           align-items: flex-start;
           box-shadow: 0 1px 0 rgba(15, 15, 25, 0.04);
           border: 1px solid #ececef;
         }
         .ann-illustration {
           flex-shrink: 0;
-          width: 100px;
-          padding-top: 24px;
+          width: 120px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding-top: 4px;
         }
-        .ann-illustration :global(img) {
+        .ann-icon-block {
+          width: 120px;
+          height: 120px;
+          background: linear-gradient(140deg, #7C5CFF 0%, #A855F7 100%);
+          border-radius: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow:
+            inset 0 -2px 0 rgba(15, 15, 25, 0.06),
+            0 6px 18px -8px rgba(124, 92, 255, 0.4);
+        }
+        .ann-icon-block :global(img) {
           object-fit: contain;
-          max-width: 100%;
+          width: 60%;
           height: auto;
-          display: block;
         }
         .ann-body {
           flex: 1;
@@ -127,12 +158,12 @@ export function AnnouncementCard() {
           font-size: 13px;
           font-weight: 500;
           color: #5c4dff;
-          margin-bottom: 8px;
+          margin-bottom: 10px;
         }
         .ann-dots {
           display: flex;
           gap: 6px;
-          margin-bottom: 12px;
+          margin-bottom: 14px;
         }
         .ann-dot {
           width: 36px;
@@ -148,18 +179,19 @@ export function AnnouncementCard() {
           background: #111;
         }
         .ann-title {
-          font-size: 22px;
+          font-size: 24px;
           font-weight: 700;
           line-height: 1.25;
           color: #111;
-          margin: 0 0 8px;
+          margin: 0 0 10px;
+          letter-spacing: -0.01em;
         }
         .ann-text {
           font-size: 14px;
           line-height: 1.55;
           color: #43434b;
-          margin: 0 0 18px;
-          max-width: 560px;
+          margin: 0 0 22px;
+          max-width: 620px;
         }
         .ann-actions {
           display: flex;
@@ -184,33 +216,18 @@ export function AnnouncementCard() {
           border-color: #d6d6db;
           color: #111;
         }
-        .ann-btn-outline:hover {
-          background: #f5f5f7;
-        }
+        .ann-btn-outline:hover { background: #f5f5f7; }
         .ann-btn-primary {
           background: #111;
           color: #fff;
         }
-        .ann-btn-primary:hover {
-          background: #2a2a30;
-        }
+        .ann-btn-primary:hover { background: #2a2a30; }
 
         @media (max-width: 640px) {
-          .ann-card {
-            flex-direction: column;
-            gap: 16px;
-            padding: 20px;
-          }
-          .ann-illustration {
-            width: 80px;
-          }
-          .ann-actions {
-            justify-content: stretch;
-          }
-          .ann-btn {
-            flex: 1;
-            justify-content: center;
-          }
+          .ann-card { flex-direction: column; gap: 16px; padding: 20px; }
+          .ann-icon-block { width: 80px; height: 80px; border-radius: 14px; }
+          .ann-actions { justify-content: stretch; }
+          .ann-btn { flex: 1; justify-content: center; }
         }
       `}</style>
     </div>

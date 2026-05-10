@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './shell.module.css';
+import { AppEmbedStrip } from './AppEmbedStrip';
 
 const SHOPIFY_PRIMARY = [
   { label: 'Home', icon: HomeIcon },
@@ -159,7 +160,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* ─── Embedded app content ─── */}
-      <main className={styles.content}>{children}</main>
+      <main className={styles.content}>
+        <AppEmbedStrip />
+        <div className={styles.contentInset}>{children}</div>
+      </main>
     </div>
   );
 }
