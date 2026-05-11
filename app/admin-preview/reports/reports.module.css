@@ -51,7 +51,7 @@
 .rpGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 20px;
 }
 
 @media (max-width: 900px) {
@@ -68,15 +68,15 @@
 
 .rpCard {
   background: #fff;
-  border: 1px solid #dcdcde;
-  border-radius: 12px;
+  border: 1px solid #e1e3e5;
+  border-radius: 14px;
   padding: 24px;
-  min-height: 152px;
+  min-height: 146px;
   display: flex;
   flex-direction: column;
   text-decoration: none;
   color: inherit;
-  box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
+  box-shadow: 0 1px 0 rgba(15, 15, 25, 0.04);
   transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
 }
 
@@ -92,12 +92,12 @@
   align-items: center;
   justify-content: flex-start;
   color: #1a1a1f;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .rpCardIcon svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   fill: currentColor;
 }
 
