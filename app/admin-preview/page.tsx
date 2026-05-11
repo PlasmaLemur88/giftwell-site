@@ -36,13 +36,13 @@ const METRICS: Metric[] = [
 ];
 
 type OrderStatus = 'Delivered' | 'Shipped' | 'Claimed' | 'Pending';
-type Order = { id: string; name: string; count: number; status: OrderStatus; avatarColor: string };
+type Order = { id: string; name: string; count: number; status: OrderStatus };
 
 const RECENT_ORDERS: Order[] = [
-  { id: 'GW-1284', name: 'Sarah Chen',  count: 12, status: 'Delivered', avatarColor: '#7C5CFF' },
-  { id: 'GW-1283', name: 'Marcus Liu',  count:  8, status: 'Shipped',   avatarColor: '#16A34A' },
-  { id: 'GW-1282', name: 'Priya Patel', count: 24, status: 'Claimed',   avatarColor: '#F59E0B' },
-  { id: 'GW-1281', name: 'Jordan Park', count:  5, status: 'Pending',   avatarColor: '#3B82F6' },
+  { id: 'GW-1284', name: 'Sarah Chen',  count: 12, status: 'Delivered' },
+  { id: 'GW-1283', name: 'Marcus Liu',  count:  8, status: 'Shipped'   },
+  { id: 'GW-1282', name: 'Priya Patel', count: 24, status: 'Claimed'   },
+  { id: 'GW-1281', name: 'Jordan Park', count:  5, status: 'Pending'   },
 ];
 
 type Activity = { Icon: IconComp; text: string; time: string };
@@ -169,7 +169,7 @@ export default function DashboardPage() {
             <ul className="order-list">
               {RECENT_ORDERS.map((o) => (
                 <li className="order-row" key={o.id}>
-                  <span className="order-avatar" style={{ background: o.avatarColor }} aria-hidden>
+                  <span className="order-avatar" aria-hidden>
                     {o.name.charAt(0)}
                   </span>
                   <div className="order-meta">
@@ -415,7 +415,8 @@ export default function DashboardPage() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          color: #fff;
+          background: #ececef;
+          color: #4a4a52;
           font-size: 13px;
           font-weight: 600;
           flex-shrink: 0;
@@ -498,7 +499,7 @@ export default function DashboardPage() {
           height: 36px;
           border-radius: 9px;
           background: #f5f5f7;
-          color: #5c4dff;
+          color: #4a4a52;
           display: inline-flex;
           align-items: center;
           justify-content: center;
