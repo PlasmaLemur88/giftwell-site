@@ -95,7 +95,7 @@ Things we ruled out (and why):
 
 ## Chunk progress
 
-Dashboard rebuild was broken into 4 chunks. Status:
+Dashboard rebuild was broken into 4 chunks. **All four are now landed** — Home is in its target shape per Brandon's Figma. Next priority is real Reports detail views (see "Other in-flight work" below).
 
 ### ✅ Chunk 1 — Cleanup (DONE, commit `ec5381c`)
 - Removed redundant page title
@@ -112,17 +112,20 @@ Dashboard rebuild was broken into 4 chunks. Status:
 - Removed `FilterIcon`/`ChevronDownIcon` helpers + `.filter-*`, `.plan-*`, `.dash-btn*`, `.metric-range`, `.metric-row`, `.metric-top` CSS (dead)
 - **Brandon's call on the open question**: swap rate into slot #3, count into #4. Final metric set: **Gifts sent · Opt-in rate · New subscribers · Revenue** (Recipients claimed dropped — visible in the funnel below anyway)
 
-### ⏳ Chunk 3 — Recent Orders + Activity panels (NEXT)
-- **Remove** the Recipient funnel chart from Home (it lives on Reports → Funnel). Also kill the stray `<a href>` → `<Link>` lint error on the "View report" link by deleting the block.
-- **Add** a Recent Orders panel (3-5 latest, gifter avatar + name + ID + count + status pill + "View all →")
-- **Add** a Recent Activity feed panel (claims, opt-ins, shipped events with timestamps)
-- Side-by-side layout, matching Brandon's Figma Dashboard Home
+### ✅ Chunk 3 — Recent Orders + Activity panels (DONE, commit `545f4a8`)
+- Removed the Recipient funnel block from Home (only lives on Reports → Funnel now)
+- Recent Orders panel: 4 rows w/ colored initial-avatar + name + #ID + count + Shopify-style status pill (Delivered green / Shipped blue / Claimed purple / Pending amber)
+- Recent Activity feed: 6 events with icon-in-square + text + relative timestamp; icon switches on `kind` (claim → check, optin → mail, ship → truck, deliver → package)
+- Side-by-side 2-col grid (1.2fr : 1fr) on desktop, stacked at ≤900px
+- Swept the now-dead `.card-*` / `.funnel-*` CSS and `FUNNEL` constant
+- Switched the two "View all →" links to `next/link` — cleared the pre-existing `no-html-link-for-pages` lint
 
-### ⏳ Chunk 4 — Quick actions row
-Three tiles at the bottom of Home:
-- View Gift Page
-- Share Link
-- Open Reports (replaces Brandon's Figma "Download Report" since we have a Reports section now)
+### ✅ Chunk 4 — Quick actions row (DONE, commit `bf6ae3b`)
+- Three tiles at the bottom of Home, three-up grid → stacks at ≤900px:
+  - **View gift page** → `/demo` (eye icon)
+  - **Share link** → copy-to-clipboard button, shows transient "Copied!" for 1.5s
+  - **Open Reports** → `/admin-preview/reports` (trending-up icon, replaces Brandon's Figma "Download Report")
+- Shared `.action-tile` pattern: 36×36 light-gray rounded square icon (purple glyph), bold title + small subtext, right arrow, subtle hover
 
 ## Other in-flight work
 
