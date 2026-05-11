@@ -7,6 +7,7 @@ This doc carries forward design decisions and in-progress work from prior Claude
 The user (Brandon) is designing the Giftwell merchant admin so it feels Shopify-native — modeled on **Alia** (a Shopify app whose pattern matches Shopify's own analytics). The deliverable is a clickable prototype at `/admin-preview` that doubles as a code reference for the dev (Gustavo) who'll build it for real.
 
 **Branch**: `claude/giftwell-continue-P4dEd`
+**PR**: [#1](https://github.com/PlasmaLemur88/giftwell-site/pull/1) — Vercel-bot comments the current preview URL there on every push. Read it via `mcp__github__pull_request_read` with `method: get_comments`. Don't waste time trying to query Vercel directly — `api.vercel.com` is blocked from the Claude Code VM's network allowlist.
 **Live preview**: every push auto-deploys via Vercel. URL is in the GitHub repo's right sidebar → Deployments → Preview, or in vercel.com/dashboard → giftwell-site.
 **Production** is `giftwell-site-plum.vercel.app` (on `main`, the marketing site) — don't confuse with the admin preview.
 
