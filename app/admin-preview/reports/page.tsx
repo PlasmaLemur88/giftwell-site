@@ -40,7 +40,7 @@ export default function ReportsLandingPage() {
       <div className={styles.rpHeader}>
         <div>
           <h1 className={styles.rpTitle}>Reports</h1>
-          <p className={styles.rpSubtitle}>View and export reports</p>
+          <p className={styles.rpSubtitle}>View reports</p>
         </div>
         <button className={styles.rpCreate}>
           <PlusIcon aria-hidden />

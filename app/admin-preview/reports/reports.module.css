@@ -70,8 +70,8 @@
   background: #fff;
   border: 1px solid #dcdcde;
   border-radius: 12px;
-  padding: 22px;
-  min-height: 148px;
+  padding: 24px;
+  min-height: 152px;
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -87,10 +87,11 @@
 }
 
 .rpCardIcon {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  color: #4a4a52;
+  justify-content: flex-start;
+  color: #1a1a1f;
   margin-bottom: 16px;
 }
 
@@ -101,15 +102,15 @@
 }
 
 .rpCardTitle {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: #111;
-  margin: 0 0 4px;
-  letter-spacing: -0.005em;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
 }
 
 .rpCardDesc {
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: #6b6b73;
   line-height: 1.5;
   margin: 0;
