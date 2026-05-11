@@ -49,7 +49,11 @@ function ReportCard({ href, iconSource: IconSvg, title, description }: { href: s
     <Link href={href} className={styles.cardLink}>
       <Card padding="500">
         <BlockStack gap="500">
-          <IconSvg width={22} height={22} style={{ fill: '#1a1a1f' }} />
+          <IconSvg
+            width={22}
+            height={22}
+            style={{ fill: '#1a1a1f', alignSelf: 'flex-start' }}
+          />
           <BlockStack gap="100">
             <Text as="h3" variant="headingMd">{title}</Text>
             <Text as="p" variant="bodyMd" tone="subdued">{description}</Text>
