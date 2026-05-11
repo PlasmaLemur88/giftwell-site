@@ -2,24 +2,37 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import {
+  GiftCardIcon,
+  GiftCardFilledIcon,
+  ChartLineIcon,
+  ChartVerticalIcon,
+  EmailIcon,
+  EmailNewsletterIcon,
+  CashDollarIcon,
+  DeliveryIcon,
+  PackageFulfilledIcon,
+  ViewIcon,
+  ShareIcon,
+} from '@shopify/polaris-icons';
 import { InlineSetupCard } from './components/InlineSetupCard';
 import { AnnouncementCard } from './components/AnnouncementCard';
 
-type MetricIcon = 'gift' | 'percent' | 'mail' | 'dollar';
+type IconComp = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 type Metric = {
   label: string;
   value: string;
   delta: string;
   positive: boolean;
-  icon: MetricIcon;
+  Icon: IconComp;
   spark: number[];
 };
 
 const METRICS: Metric[] = [
-  { label: 'Gifts sent', value: '1,284', delta: '+18.2%', positive: true, icon: 'gift', spark: [12, 18, 14, 22, 20, 28, 26, 34, 30, 38, 42, 48] },
-  { label: 'Opt-in rate', value: '64.8%', delta: '+3.1pp', positive: true, icon: 'percent', spark: [55, 58, 56, 60, 59, 62, 63, 64, 63, 65, 66, 65] },
-  { label: 'New subscribers', value: '612', delta: '+28.5%', positive: true, icon: 'mail', spark: [8, 12, 10, 18, 22, 28, 32, 40, 38, 48, 52, 60] },
-  { label: 'Revenue', value: '$84,210', delta: '+12.7%', positive: true, icon: 'dollar', spark: [400, 520, 480, 600, 580, 720, 760, 820, 800, 880, 940, 1020] },
+  { label: 'Gifts sent',      value: '1,284',   delta: '+18.2%', positive: true, Icon: GiftCardIcon,  spark: [12, 18, 14, 22, 20, 28, 26, 34, 30, 38, 42, 48] },
+  { label: 'Opt-in rate',     value: '64.8%',   delta: '+3.1pp', positive: true, Icon: ChartLineIcon, spark: [55, 58, 56, 60, 59, 62, 63, 64, 63, 65, 66, 65] },
+  { label: 'New subscribers', value: '612',     delta: '+28.5%', positive: true, Icon: EmailIcon,     spark: [8, 12, 10, 18, 22, 28, 32, 40, 38, 48, 52, 60] },
+  { label: 'Revenue',         value: '$84,210', delta: '+12.7%', positive: true, Icon: CashDollarIcon, spark: [400, 520, 480, 600, 580, 720, 760, 820, 800, 880, 940, 1020] },
 ];
 
 type OrderStatus = 'Delivered' | 'Shipped' | 'Claimed' | 'Pending';
@@ -32,69 +45,16 @@ const RECENT_ORDERS: Order[] = [
   { id: 'GW-1281', name: 'Jordan Park', count:  5, status: 'Pending',   avatarColor: '#3B82F6' },
 ];
 
-type ActivityKind = 'claim' | 'optin' | 'ship' | 'deliver';
-type Activity = { kind: ActivityKind; text: string; time: string };
+type Activity = { Icon: IconComp; text: string; time: string };
 
 const RECENT_ACTIVITY: Activity[] = [
-  { kind: 'claim',   text: 'Sarah Chen claimed her gift',  time: '2m ago' },
-  { kind: 'optin',   text: 'Marcus Liu opted in',          time: '14m ago' },
-  { kind: 'ship',    text: 'Order #GW-1284 shipped',       time: '1h ago' },
-  { kind: 'claim',   text: 'Priya Patel claimed her gift', time: '2h ago' },
-  { kind: 'deliver', text: 'Order #GW-1281 delivered',     time: '3h ago' },
-  { kind: 'optin',   text: 'Alex Kim opted in',            time: '4h ago' },
+  { Icon: GiftCardFilledIcon,   text: 'Sarah Chen claimed her gift',  time: '2m ago' },
+  { Icon: EmailNewsletterIcon,  text: 'Marcus Liu opted in',          time: '14m ago' },
+  { Icon: DeliveryIcon,         text: 'Order #GW-1284 shipped',       time: '1h ago' },
+  { Icon: GiftCardFilledIcon,   text: 'Priya Patel claimed her gift', time: '2h ago' },
+  { Icon: PackageFulfilledIcon, text: 'Order #GW-1281 delivered',     time: '3h ago' },
+  { Icon: EmailNewsletterIcon,  text: 'Alex Kim opted in',            time: '4h ago' },
 ];
-
-function MetricIconGlyph({ icon }: { icon: MetricIcon }) {
-  const common = {
-    width: 16,
-    height: 16,
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 1.8,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-    'aria-hidden': true,
-  };
-  if (icon === 'gift') return (
-    <svg {...common}><rect x="3" y="8" width="18" height="13" rx="1.5" /><path d="M3 12h18M12 8v13M8 8a2.5 2.5 0 1 1 0-5c1.8 0 3 2 4 5 1-3 2.2-5 4-5a2.5 2.5 0 1 1 0 5" /></svg>
-  );
-  if (icon === 'percent') return (
-    <svg {...common}><line x1="19" y1="5" x2="5" y2="19" /><circle cx="7" cy="7" r="2.5" /><circle cx="17" cy="17" r="2.5" /></svg>
-  );
-  if (icon === 'mail') return (
-    <svg {...common}><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 7l10 7 10-7" /></svg>
-  );
-  return (
-    <svg {...common}><line x1="12" y1="2" x2="12" y2="22" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
-  );
-}
-
-function ActivityIcon({ kind }: { kind: ActivityKind }) {
-  const common = {
-    width: 14,
-    height: 14,
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 1.8,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-    'aria-hidden': true,
-  };
-  if (kind === 'claim') return (
-    <svg {...common}><polyline points="20 6 9 17 4 12" /></svg>
-  );
-  if (kind === 'optin') return (
-    <svg {...common}><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 7l10 7 10-7" /></svg>
-  );
-  if (kind === 'ship') return (
-    <svg {...common}><rect x="1" y="6" width="13" height="11" rx="1.5" /><path d="M14 9h4l3 3v5h-7V9z" /><circle cx="6" cy="19" r="1.8" /><circle cx="18" cy="19" r="1.8" /></svg>
-  );
-  return (
-    <svg {...common}><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z" /><path d="M3 7l9 4 9-4M12 11v10" /></svg>
-  );
-}
 
 function Sparkline({ data }: { data: number[] }) {
   const w = 200;
@@ -181,21 +141,22 @@ export default function DashboardPage() {
           </div>
 
           <div className="metric-strip">
-            {METRICS.map((m) => (
-              <div className="metric-card" key={m.label}>
-                <div className="metric-card-top">
-                  <span className="metric-icon" aria-hidden>
-                    <MetricIconGlyph icon={m.icon} />
-                  </span>
-                  <span className={`metric-delta-pill ${m.positive ? 'pos' : 'neg'}`}>
-                    {m.delta}
-                  </span>
+            {METRICS.map((m) => {
+              const Icon = m.Icon;
+              return (
+                <div className="metric-card" key={m.label}>
+                  <div className="metric-card-top">
+                    <span className="metric-icon" aria-hidden><Icon /></span>
+                    <span className={`metric-delta-pill ${m.positive ? 'pos' : 'neg'}`}>
+                      {m.delta}
+                    </span>
+                  </div>
+                  <div className="metric-value">{m.value}</div>
+                  <div className="metric-label">{m.label}</div>
+                  <Sparkline data={m.spark} />
                 </div>
-                <div className="metric-value">{m.value}</div>
-                <div className="metric-label">{m.label}</div>
-                <Sparkline data={m.spark} />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -227,25 +188,23 @@ export default function DashboardPage() {
               <Link className="panel-link" href="/admin-preview/reports">View all →</Link>
             </div>
             <ul className="activity-list">
-              {RECENT_ACTIVITY.map((a, i) => (
-                <li className="activity-row" key={i}>
-                  <span className="activity-icon" aria-hidden><ActivityIcon kind={a.kind} /></span>
-                  <span className="activity-text">{a.text}</span>
-                  <span className="activity-time">{a.time}</span>
-                </li>
-              ))}
+              {RECENT_ACTIVITY.map((a, i) => {
+                const Icon = a.Icon;
+                return (
+                  <li className="activity-row" key={i}>
+                    <span className="activity-icon" aria-hidden><Icon /></span>
+                    <span className="activity-text">{a.text}</span>
+                    <span className="activity-time">{a.time}</span>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         </div>
 
         <div className="quick-actions">
           <Link href="/demo" className="action-tile">
-            <span className="action-icon" aria-hidden>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            </span>
+            <span className="action-icon" aria-hidden><ViewIcon /></span>
             <span className="action-body">
               <strong>View gift page</strong>
               <span>See how recipients experience your gift</span>
@@ -254,15 +213,7 @@ export default function DashboardPage() {
           </Link>
 
           <button type="button" className="action-tile" onClick={handleShare}>
-            <span className="action-icon" aria-hidden>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <circle cx="18" cy="5" r="3" />
-                <circle cx="6" cy="12" r="3" />
-                <circle cx="18" cy="19" r="3" />
-                <line x1="8.6" y1="13.5" x2="15.4" y2="17.5" />
-                <line x1="15.4" y1="6.5" x2="8.6" y2="10.5" />
-              </svg>
-            </span>
+            <span className="action-icon" aria-hidden><ShareIcon /></span>
             <span className="action-body">
               <strong>{copied ? 'Copied!' : 'Share link'}</strong>
               <span>Copy your gift page URL to clipboard</span>
@@ -271,12 +222,7 @@ export default function DashboardPage() {
           </button>
 
           <Link href="/admin-preview/reports" className="action-tile">
-            <span className="action-icon" aria-hidden>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                <polyline points="16 7 22 7 22 13" />
-              </svg>
-            </span>
+            <span className="action-icon" aria-hidden><ChartVerticalIcon /></span>
             <span className="action-body">
               <strong>Open Reports</strong>
               <span>Drill into revenue, funnel, and more</span>
@@ -376,7 +322,12 @@ export default function DashboardPage() {
           height: 30px;
           border-radius: 8px;
           background: #f5f5f7;
-          color: #5c5c66;
+          color: #4a4a52;
+        }
+        .metric-icon :global(svg) {
+          width: 18px;
+          height: 18px;
+          fill: currentColor;
         }
         .metric-delta-pill {
           display: inline-flex;
@@ -500,11 +451,16 @@ export default function DashboardPage() {
           height: 26px;
           border-radius: 7px;
           background: #f5f5f7;
-          color: #5c5c66;
+          color: #4a4a52;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+        }
+        .activity-icon :global(svg) {
+          width: 14px;
+          height: 14px;
+          fill: currentColor;
         }
         .activity-text { flex: 1; font-size: 13px; color: #111; min-width: 0; }
         .activity-time { font-size: 12px; color: #8a8a93; flex-shrink: 0; }
@@ -547,6 +503,11 @@ export default function DashboardPage() {
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+        }
+        .action-icon :global(svg) {
+          width: 18px;
+          height: 18px;
+          fill: currentColor;
         }
         .action-body {
           flex: 1;
