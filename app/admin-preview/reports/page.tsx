@@ -8,7 +8,6 @@ import {
   Card,
   Text,
   Button,
-  Icon,
   Badge,
 } from '@shopify/polaris';
 import {
@@ -45,12 +44,12 @@ const REPORTS: Report[] = [
   { slug: 'operations',  title: 'Operations',          description: 'Unclaimed, failed orders, refunds, and time-to-claim',       iconSource: WrenchIcon },
 ];
 
-function ReportCard({ href, iconSource, title, description }: { href: string; iconSource: IconSource; title: string; description: string }) {
+function ReportCard({ href, iconSource: IconSvg, title, description }: { href: string; iconSource: IconSource; title: string; description: string }) {
   return (
     <Link href={href} className={styles.cardLink}>
       <Card padding="500">
         <BlockStack gap="500">
-          <Icon source={iconSource} />
+          <IconSvg width={22} height={22} style={{ fill: '#1a1a1f' }} />
           <BlockStack gap="100">
             <Text as="h3" variant="headingMd">{title}</Text>
             <Text as="p" variant="bodyMd" tone="subdued">{description}</Text>
