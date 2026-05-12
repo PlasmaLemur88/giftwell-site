@@ -164,8 +164,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {/* ─── Embedded app content ─── */}
       <main className={styles.content}>
         <AppEmbedStrip />
+        <MiniHeader />
         <div className={styles.contentInset}>
-          <MiniHeader />
           {children}
         </div>
       </main>

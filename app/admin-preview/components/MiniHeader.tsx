@@ -73,14 +73,12 @@ export function MiniHeader() {
       <style jsx>{`
         .mh {
           background: #fff;
-          border: 1px solid #ececef;
-          border-radius: 12px;
+          border-bottom: 1px solid #e1e3e5;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 20px;
+          padding: 0 24px;
           height: 56px;
-          box-shadow: 0 1px 0 rgba(15, 15, 25, 0.04);
         }
         .mh-left {
           display: flex;
