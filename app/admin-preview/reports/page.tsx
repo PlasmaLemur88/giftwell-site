@@ -67,7 +67,7 @@ function ReportCard({ href, iconSource: IconSvg, title, description }: { href: s
 export default function ReportsLandingPage() {
   return (
     <BlockStack gap="800">
-      <InlineStack align="space-between" blockAlign="center" gap="400">
+      <InlineStack align="space-between" blockAlign="center" gap="500">
         <BlockStack gap="100">
           <Text as="h1" variant="headingXl">Reports</Text>
           <Text as="p" variant="bodyMd" tone="subdued">View reports</Text>
@@ -75,7 +75,7 @@ export default function ReportsLandingPage() {
         <Button variant="primary" icon={PlusIcon}>Create</Button>
       </InlineStack>
 
-      <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="400">
+      <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="500">
         {REPORTS.map((r) => (
           <ReportCard
             key={r.slug}
@@ -87,12 +87,12 @@ export default function ReportsLandingPage() {
         ))}
       </InlineGrid>
 
-      <BlockStack gap="400">
+      <BlockStack gap="500">
         <InlineStack gap="300" blockAlign="center">
           <Text as="h2" variant="headingMd">My reports</Text>
           <Badge>Early access</Badge>
         </InlineStack>
-        <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="400">
+        <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="500">
           <ReportCard
             href="#"
             iconSource={PlusIcon}
