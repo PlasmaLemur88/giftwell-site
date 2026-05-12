@@ -27,7 +27,8 @@ export function MiniHeader() {
     <header className="mh">
       <div className="mh-left">
         <div className="mh-logo">
-          <span className="mh-logo-icon">G</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/g-black-bold.png" alt="" className="mh-logo-icon" />
           <span className="mh-logo-text">Giftwell</span>
         </div>
         <span className="mh-hint">Use the menu on the left to navigate</span>
@@ -93,15 +94,8 @@ export function MiniHeader() {
         .mh-logo-icon {
           width: 24px;
           height: 24px;
-          border-radius: 6px;
-          background: linear-gradient(135deg, #7C5CFF, #A855F7);
-          color: #fff;
-          font-weight: 700;
-          font-size: 13px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          letter-spacing: -0.02em;
+          object-fit: contain;
+          display: block;
         }
         .mh-logo-text {
           font-size: 15px;

@@ -129,7 +129,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
             className={`${styles.navItem} ${giftwellActive ? styles.navItemActive : ''}`}
             href="/admin-preview"
           >
-            <span className={`${styles.appIcon} ${styles.appIconGiftwell}`}>G</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/g-black-bold.png" alt="" className={styles.giftwellLogo} />
             <span>Giftwell</span>
           </a>
           {giftwellActive && (

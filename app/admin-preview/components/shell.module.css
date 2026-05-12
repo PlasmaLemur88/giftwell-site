@@ -251,8 +251,11 @@
 }
 
 .appIconKlaviyo { background: #000; font-family: serif; }
-.appIconGiftwell {
-  background: linear-gradient(135deg, #7C5CFF, #A855F7);
+.giftwellLogo {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .sidebarSpacer { flex: 1; }
