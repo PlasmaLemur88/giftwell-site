@@ -112,7 +112,7 @@ export default function DesignPage() {
       {/* 1. Themes */}
       <LibrarySection
         title="Themes"
-        subtitle="Backgrounds gifters can pick when designing a gift."
+        subtitle="Looping video backgrounds gifters can pick when designing a gift."
         on={themesOn}
         onToggleOn={() => setThemesOn((v) => !v)}
         selectedCount={themesSelected.size}
@@ -182,20 +182,23 @@ export default function DesignPage() {
         open={themesModal}
         onClose={() => setThemesModal(false)}
         title="Edit themes"
-        uploadLabel="Upload a theme image"
-        uploadHint="JPG or PNG. We'll crop it to fit the unboxing screen."
+        uploadLabel="Upload a theme video"
+        uploadHint="MP4 or WebM, ideally seamless-looping. Plays as a full-screen background behind the gift."
         items={THEMES.map((t) => ({
           id: t.id,
           name: t.name,
           render: (
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                background: t.preview,
-                borderRadius: 10,
-              }}
-            />
+            <>
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  background: t.preview,
+                  borderRadius: 10,
+                }}
+              />
+              <PlayBadge size="md" />
+            </>
           ),
         }))}
         selected={themesSelected}
@@ -386,14 +389,47 @@ function MiniThemeTile({ theme }: { theme: Theme }) {
     <div
       title={theme.name}
       style={{
+        position: 'relative',
         width: 64,
         height: 48,
         flexShrink: 0,
         borderRadius: 8,
         background: theme.preview,
         border: '1px solid var(--p-color-border)',
+        overflow: 'hidden',
       }}
-    />
+    >
+      <PlayBadge />
+    </div>
+  );
+}
+
+function PlayBadge({ size = 'sm' }: { size?: 'sm' | 'md' }) {
+  const dim = size === 'md' ? 24 : 14;
+  const icon = size === 'md' ? 11 : 7;
+  const offset = size === 'md' ? 8 : 4;
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        bottom: offset,
+        right: offset,
+        width: dim,
+        height: dim,
+        borderRadius: '50%',
+        background: 'rgba(0, 0, 0, 0.55)',
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backdropFilter: 'blur(4px)',
+      }}
+      aria-hidden
+    >
+      <svg width={icon} height={icon} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <polygon points="5 3 19 12 5 21 5 3" />
+      </svg>
+    </div>
   );
 }
 
