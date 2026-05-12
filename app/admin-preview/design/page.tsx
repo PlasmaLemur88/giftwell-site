@@ -9,9 +9,10 @@ import {
   Text,
   Button,
   Box,
+  Modal,
   Divider,
 } from '@shopify/polaris';
-import { ImageIcon, UploadIcon } from '@shopify/polaris-icons';
+import { PlusIcon, DeleteIcon } from '@shopify/polaris-icons';
 
 /* ─── Data ─── */
 
@@ -42,16 +43,16 @@ const THEMES: Theme[] = [
 const POSTERS: Poster[] = [
   { id: 'cheers',          title: 'Cheers\nFor You',          bg: '#F4ECD8',                                                          color: '#1E40AF', fontFamily: 'Georgia, serif', fontStyle: 'italic' },
   { id: 'just-for-you',    title: 'Just\nFor You',            bg: 'radial-gradient(circle at 50% 30%, #2a2a4a, #0a0a20)',              color: '#fff',    fontFamily: 'Georgia, serif', fontStyle: 'italic' },
-  { id: 'good-vibes',      title: 'good\nvibes\nonly',        bg: 'linear-gradient(135deg, #87CEEB, #B0E0E6 60%, #FFE4B5)',            color: '#fff',    fontFamily: 'Georgia, serif',  },
-  { id: 'good-food',       title: 'good food\ngood mood',     bg: 'linear-gradient(135deg, #2d5016, #4a7c2c)',                         color: '#fff',                                                       },
+  { id: 'good-vibes',      title: 'good\nvibes\nonly',        bg: 'linear-gradient(135deg, #87CEEB, #B0E0E6 60%, #FFE4B5)',            color: '#fff',    fontFamily: 'Georgia, serif' },
+  { id: 'good-food',       title: 'good food\ngood mood',     bg: 'linear-gradient(135deg, #2d5016, #4a7c2c)',                         color: '#fff' },
   { id: 'lets-go',         title: "LET'S\nGO",                bg: 'linear-gradient(135deg, #d2691e, #1a1a1a)',                         color: '#fff',                                  textTransform: 'uppercase' },
   { id: 'movie-night',     title: 'MOVIE\nNIGHT',             bg: 'linear-gradient(180deg, #1a1a3a, #0a0a1a)',                         color: '#FFD93D',                               textTransform: 'uppercase' },
-  { id: 'sending-vibes',   title: 'Sending\ngood vibes',      bg: 'linear-gradient(135deg, #C4B68A, #8B7E5E)',                         color: '#5B4E37', fontFamily: 'Georgia, serif',                              },
+  { id: 'sending-vibes',   title: 'Sending\ngood vibes',      bg: 'linear-gradient(135deg, #C4B68A, #8B7E5E)',                         color: '#5B4E37', fontFamily: 'Georgia, serif' },
   { id: 'great-is-coming', title: 'GREAT\nIS ON THE WAY',     bg: 'radial-gradient(circle at 80% 20%, #5C2BD3, #1a1a3a 70%)',          color: '#fff',                                  textTransform: 'uppercase', letterSpacing: '0.02em' },
   { id: 'happy-birthday',  title: 'Happy\nBirthday!',         bg: 'linear-gradient(135deg, #FF9EC8, #FFD93D)',                         color: '#fff',    fontFamily: 'Georgia, serif', fontStyle: 'italic' },
-  { id: 'congrats',        title: 'Congrats!',                bg: 'linear-gradient(135deg, #FFE9A0, #F4C430)',                         color: '#7C2D12', fontFamily: 'Georgia, serif',                              },
+  { id: 'congrats',        title: 'Congrats!',                bg: 'linear-gradient(135deg, #FFE9A0, #F4C430)',                         color: '#7C2D12', fontFamily: 'Georgia, serif' },
   { id: 'thank-you',       title: 'Thank\nYou',               bg: 'linear-gradient(180deg, #0D9488, #134E4A)',                         color: '#fff',    fontFamily: 'Georgia, serif', fontStyle: 'italic' },
-  { id: 'welcome',         title: 'Welcome',                  bg: 'linear-gradient(135deg, #DCDCFF, #A8A8F0)',                         color: '#1E1B4B', fontFamily: 'Georgia, serif',                              },
+  { id: 'welcome',         title: 'Welcome',                  bg: 'linear-gradient(135deg, #DCDCFF, #A8A8F0)',                         color: '#1E1B4B', fontFamily: 'Georgia, serif' },
 ];
 
 const FONTS: Font[] = [
@@ -61,15 +62,40 @@ const FONTS: Font[] = [
   { id: 'sophisticated', name: 'Sophisticated', cssFamily: '"Didot", "Bodoni 72", "Playfair Display", serif' },
 ];
 
+type Upload = { id: string; name: string };
+
 /* ─── Page ─── */
 
 export default function DesignPage() {
-  const [themes, setThemes] = useState<Set<string>>(new Set(['midnight', 'sunlit', 'rose', 'mint', 'lavender', 'noir']));
-  const [posters, setPosters] = useState<Set<string>>(
+  // Themes
+  const [themesOn, setThemesOn] = useState(true);
+  const [themesSelected, setThemesSelected] = useState<Set<string>>(
+    new Set(['midnight', 'sunlit', 'rose', 'mint', 'lavender', 'noir']),
+  );
+  const [themeUploads] = useState<Upload[]>([]);
+  const [themesModal, setThemesModal] = useState(false);
+
+  // Posters
+  const [postersOn, setPostersOn] = useState(true);
+  const [postersSelected, setPostersSelected] = useState<Set<string>>(
     new Set(POSTERS.map((p) => p.id)),
   );
+  const [posterUploads] = useState<Upload[]>([]);
+  const [postersModal, setPostersModal] = useState(false);
+
+  // GIFs
+  const [gifsOn, setGifsOn] = useState(true);
+  const [allowGiphy, setAllowGiphy] = useState(true);
+  const [allowGifUploads, setAllowGifUploads] = useState(true);
+  const [gifUploads] = useState<Upload[]>([]);
+  const [gifsModal, setGifsModal] = useState(false);
+
+  // Fonts
   const [fonts, setFonts] = useState<Set<string>>(new Set(['default', 'elegant', 'sophisticated']));
-  const [media, setMedia] = useState({ giphy: true, upload: true });
+
+  // Build preview rows
+  const selectedThemes = THEMES.filter((t) => themesSelected.has(t.id)).slice(0, 4);
+  const selectedPosters = POSTERS.filter((p) => postersSelected.has(p.id)).slice(0, 4);
 
   return (
     <BlockStack gap="800">
@@ -83,99 +109,61 @@ export default function DesignPage() {
         <Button variant="primary">Save</Button>
       </InlineStack>
 
-      {/* 1. Theme library */}
-      <Card padding="500">
-        <SectionHeader
-          title="Theme library"
-          subtitle="Backgrounds your gifters can pick when designing a gift's unboxing."
-          right={<CountText current={themes.size} total={THEMES.length} />}
-        />
-        <Box paddingBlockStart="400">
-          <InlineGrid gap="300" columns={4}>
-            {THEMES.map((t) => (
-              <ThemeTile
-                key={t.id}
-                theme={t}
-                selected={themes.has(t.id)}
-                onToggle={() => toggleSet(themes, t.id, setThemes, { minimum: 1 })}
-              />
-            ))}
-          </InlineGrid>
-        </Box>
-      </Card>
+      {/* 1. Themes */}
+      <LibrarySection
+        title="Themes"
+        subtitle="Backgrounds gifters can pick when designing a gift."
+        on={themesOn}
+        onToggleOn={() => setThemesOn((v) => !v)}
+        selectedCount={themesSelected.size}
+        totalCount={THEMES.length + themeUploads.length}
+        emptyLabel="No themes selected — gifters won't be able to pick a background."
+        editLabel="Edit themes"
+        onEdit={() => setThemesModal(true)}
+        preview={selectedThemes.map((t) => (
+          <MiniThemeTile key={t.id} theme={t} />
+        ))}
+      />
 
-      {/* 2. Stock poster library */}
-      <Card padding="500">
-        <SectionHeader
-          title="Stock poster library"
-          subtitle="Greeting-card-style posters gifters can add to a gift. Pick the ones that fit your brand."
-          right={
-            <InlineStack gap="200" blockAlign="center">
-              <CountText current={posters.size} total={POSTERS.length} />
-              <Button
-                onClick={() =>
-                  setPosters(
-                    posters.size === POSTERS.length
-                      ? new Set()
-                      : new Set(POSTERS.map((p) => p.id))
-                  )
-                }
-                variant="plain"
-              >
-                {posters.size === POSTERS.length ? 'Deselect all' : 'Select all'}
-              </Button>
-            </InlineStack>
-          }
-        />
-        <Box paddingBlockStart="400">
-          <InlineGrid gap="300" columns={4}>
-            {POSTERS.map((p) => (
-              <PosterTile
-                key={p.id}
-                poster={p}
-                selected={posters.has(p.id)}
-                onToggle={() => toggleSet(posters, p.id, setPosters)}
-              />
-            ))}
-          </InlineGrid>
-        </Box>
-      </Card>
+      {/* 2. Stock posters */}
+      <LibrarySection
+        title="Stock posters"
+        subtitle="Greeting-card-style posters gifters can add to a gift."
+        on={postersOn}
+        onToggleOn={() => setPostersOn((v) => !v)}
+        selectedCount={postersSelected.size}
+        totalCount={POSTERS.length + posterUploads.length}
+        emptyLabel="No posters selected — gifters won't see the poster picker."
+        editLabel="Edit posters"
+        onEdit={() => setPostersModal(true)}
+        preview={selectedPosters.map((p) => (
+          <MiniPosterTile key={p.id} poster={p} />
+        ))}
+      />
 
-      {/* 3. Media sources */}
-      <Card padding="500">
-        <SectionHeader
-          title="Media sources"
-          subtitle="Other ways gifters can add a personal touch beyond the poster library."
-        />
-        <Box paddingBlockStart="400">
-          <BlockStack gap="0">
-            <MediaRow
-              Icon={ImageIcon}
-              name="Giphy"
-              description="Let gifters add an animated GIF from Giphy's library."
-              on={media.giphy}
-              onToggle={() => setMedia((m) => ({ ...m, giphy: !m.giphy }))}
-            />
-            <Divider />
-            <MediaRow
-              Icon={UploadIcon}
-              name="File upload"
-              description="Let gifters upload their own image or short video."
-              on={media.upload}
-              onToggle={() => setMedia((m) => ({ ...m, upload: !m.upload }))}
-            />
-          </BlockStack>
-        </Box>
-      </Card>
+      {/* 3. GIFs */}
+      <GifsSection
+        on={gifsOn}
+        onToggleOn={() => setGifsOn((v) => !v)}
+        allowGiphy={allowGiphy}
+        uploadCount={gifUploads.length}
+        onEdit={() => setGifsModal(true)}
+      />
 
-      {/* 4. Title fonts */}
+      {/* 4. Title fonts (inline) */}
       <Card padding="500">
-        <SectionHeader
-          title="Title fonts"
-          subtitle="Fonts gifters can use for the gift title. Default is always available."
-          right={<CountText current={fonts.size} total={FONTS.length} />}
-        />
-        <Box paddingBlockStart="400">
+        <BlockStack gap="400">
+          <InlineStack align="space-between" blockAlign="start" gap="400" wrap={false}>
+            <BlockStack gap="050">
+              <Text as="h3" variant="headingMd">Title fonts</Text>
+              <Text as="p" variant="bodySm" tone="subdued">
+                Fonts gifters can use for the gift title. Default is always available.
+              </Text>
+            </BlockStack>
+            <Text as="span" variant="bodySm" tone="subdued">
+              {fonts.size} of {FONTS.length} selected
+            </Text>
+          </InlineStack>
           <InlineStack gap="200" wrap>
             {FONTS.map((f) => (
               <FontPill
@@ -186,52 +174,485 @@ export default function DesignPage() {
               />
             ))}
           </InlineStack>
-        </Box>
+        </BlockStack>
       </Card>
+
+      {/* Modals */}
+      <LibraryModal
+        open={themesModal}
+        onClose={() => setThemesModal(false)}
+        title="Edit themes"
+        uploadLabel="Upload a theme image"
+        uploadHint="JPG or PNG. We'll crop it to fit the unboxing screen."
+        items={THEMES.map((t) => ({
+          id: t.id,
+          name: t.name,
+          render: (
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                background: t.preview,
+                borderRadius: 10,
+              }}
+            />
+          ),
+        }))}
+        selected={themesSelected}
+        setSelected={setThemesSelected}
+        uploads={themeUploads}
+      />
+
+      <LibraryModal
+        open={postersModal}
+        onClose={() => setPostersModal(false)}
+        title="Edit posters"
+        uploadLabel="Upload a poster"
+        uploadHint="JPG or PNG, ideally 3:4 aspect ratio. Title will display as-is."
+        items={POSTERS.map((p) => ({
+          id: p.id,
+          name: p.title.replace('\n', ' '),
+          render: <PosterFace poster={p} />,
+        }))}
+        selected={postersSelected}
+        setSelected={setPostersSelected}
+        uploads={posterUploads}
+        tileAspect="3 / 4"
+      />
+
+      <GifsModal
+        open={gifsModal}
+        onClose={() => setGifsModal(false)}
+        allowGiphy={allowGiphy}
+        setAllowGiphy={setAllowGiphy}
+        allowUploads={allowGifUploads}
+        setAllowUploads={setAllowGifUploads}
+        uploads={gifUploads}
+      />
     </BlockStack>
   );
 }
 
-/* ─── Section helpers ─── */
+/* ─── Section wrappers ─── */
 
-function SectionHeader({
+function LibrarySection({
   title,
   subtitle,
-  right,
+  on,
+  onToggleOn,
+  selectedCount,
+  totalCount,
+  emptyLabel,
+  editLabel,
+  onEdit,
+  preview,
 }: {
   title: string;
   subtitle: string;
-  right?: React.ReactNode;
+  on: boolean;
+  onToggleOn: () => void;
+  selectedCount: number;
+  totalCount: number;
+  emptyLabel: string;
+  editLabel: string;
+  onEdit: () => void;
+  preview: React.ReactNode[];
 }) {
   return (
-    <InlineStack align="space-between" blockAlign="start" gap="400" wrap={false}>
-      <BlockStack gap="050">
-        <Text as="h3" variant="headingMd">{title}</Text>
-        <Text as="p" variant="bodySm" tone="subdued">{subtitle}</Text>
+    <Card padding="500">
+      <BlockStack gap="400">
+        <InlineStack align="space-between" blockAlign="start" gap="400" wrap={false}>
+          <BlockStack gap="050">
+            <Text as="h3" variant="headingMd">{title}</Text>
+            <Text as="p" variant="bodySm" tone="subdued">{subtitle}</Text>
+          </BlockStack>
+          <Toggle on={on} onToggle={onToggleOn} />
+        </InlineStack>
+
+        {on ? (
+          selectedCount === 0 ? (
+            <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
+              <Text as="p" variant="bodySm" tone="subdued">{emptyLabel}</Text>
+              <Button onClick={onEdit} variant="primary">{editLabel}</Button>
+            </InlineStack>
+          ) : (
+            <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
+              <InlineStack gap="400" blockAlign="center" wrap={false}>
+                <PreviewRow>{preview}</PreviewRow>
+                <Text as="span" variant="bodySm" tone="subdued">
+                  {selectedCount} of {totalCount}
+                </Text>
+              </InlineStack>
+              <Button onClick={onEdit}>{editLabel}</Button>
+            </InlineStack>
+          )
+        ) : (
+          <Text as="p" variant="bodySm" tone="subdued">
+            Gifters won&apos;t see this option.
+          </Text>
+        )}
       </BlockStack>
-      {right}
-    </InlineStack>
+    </Card>
   );
 }
 
-function CountText({ current, total }: { current: number; total: number }) {
+function GifsSection({
+  on,
+  onToggleOn,
+  allowGiphy,
+  uploadCount,
+  onEdit,
+}: {
+  on: boolean;
+  onToggleOn: () => void;
+  allowGiphy: boolean;
+  uploadCount: number;
+  onEdit: () => void;
+}) {
+  let summary = '';
+  if (allowGiphy && uploadCount > 0) summary = `Giphy library + ${uploadCount} custom upload${uploadCount === 1 ? '' : 's'}`;
+  else if (allowGiphy) summary = 'Giphy library';
+  else if (uploadCount > 0) summary = `${uploadCount} custom upload${uploadCount === 1 ? '' : 's'}`;
+  else summary = 'No source enabled — gifters won’t see the GIF picker.';
+
   return (
-    <Text as="span" variant="bodySm" tone="subdued">
-      {current} of {total} selected
-    </Text>
+    <Card padding="500">
+      <BlockStack gap="400">
+        <InlineStack align="space-between" blockAlign="start" gap="400" wrap={false}>
+          <BlockStack gap="050">
+            <Text as="h3" variant="headingMd">GIFs</Text>
+            <Text as="p" variant="bodySm" tone="subdued">
+              Animated GIFs gifters can add to a gift.
+            </Text>
+          </BlockStack>
+          <Toggle on={on} onToggle={onToggleOn} />
+        </InlineStack>
+
+        {on ? (
+          <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
+            <Text as="p" variant="bodySm" tone="subdued">{summary}</Text>
+            <Button onClick={onEdit}>Edit GIFs</Button>
+          </InlineStack>
+        ) : (
+          <Text as="p" variant="bodySm" tone="subdued">
+            Gifters won&apos;t see this option.
+          </Text>
+        )}
+      </BlockStack>
+    </Card>
   );
 }
 
-/* ─── Tile components ─── */
+/* ─── Preview row (compact tiles + fade) ─── */
 
-function ThemeTile({
-  theme,
+function PreviewRow({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        position: 'relative',
+        flex: 1,
+        minWidth: 0,
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          alignItems: 'center',
+        }}
+      >
+        {children}
+      </div>
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          right: 0,
+          width: 56,
+          background:
+            'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,1) 80%)',
+          pointerEvents: 'none',
+        }}
+        aria-hidden
+      />
+    </div>
+  );
+}
+
+function MiniThemeTile({ theme }: { theme: Theme }) {
+  return (
+    <div
+      title={theme.name}
+      style={{
+        width: 64,
+        height: 48,
+        flexShrink: 0,
+        borderRadius: 8,
+        background: theme.preview,
+        border: '1px solid var(--p-color-border)',
+      }}
+    />
+  );
+}
+
+function MiniPosterTile({ poster }: { poster: Poster }) {
+  return (
+    <div
+      title={poster.title.replace('\n', ' ')}
+      style={{
+        width: 40,
+        height: 56,
+        flexShrink: 0,
+        borderRadius: 6,
+        background: poster.bg,
+        color: poster.color,
+        border: '1px solid var(--p-color-border)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 4,
+        overflow: 'hidden',
+      }}
+    >
+      <span
+        style={{
+          fontSize: 6.5,
+          lineHeight: 1.05,
+          textAlign: 'center',
+          whiteSpace: 'pre-line',
+          fontFamily: poster.fontFamily ?? '-apple-system, sans-serif',
+          fontStyle: poster.fontStyle ?? 'normal',
+          textTransform: poster.textTransform,
+          fontWeight: 700,
+        }}
+      >
+        {poster.title}
+      </span>
+    </div>
+  );
+}
+
+/* ─── Modals ─── */
+
+type LibraryItem = { id: string; name: string; render: React.ReactNode };
+
+function LibraryModal({
+  open,
+  onClose,
+  title,
+  uploadLabel,
+  uploadHint,
+  items,
+  selected,
+  setSelected,
+  uploads,
+  tileAspect = '4 / 3',
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  uploadLabel: string;
+  uploadHint: string;
+  items: LibraryItem[];
+  selected: Set<string>;
+  setSelected: (s: Set<string>) => void;
+  uploads: Upload[];
+  tileAspect?: string;
+}) {
+  const allSelected = items.every((i) => selected.has(i.id));
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={title}
+      primaryAction={{ content: 'Save', onAction: onClose }}
+      secondaryActions={[{ content: 'Cancel', onAction: onClose }]}
+      size="large"
+    >
+      <Modal.Section>
+        <BlockStack gap="500">
+          {/* Upload affordance */}
+          <Box
+            background="bg-surface-secondary"
+            borderRadius="200"
+            borderWidth="025"
+            borderColor="border"
+            padding="400"
+          >
+            <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
+              <BlockStack gap="050">
+                <Text as="p" variant="bodyMd" fontWeight="semibold">{uploadLabel}</Text>
+                <Text as="p" variant="bodySm" tone="subdued">{uploadHint}</Text>
+              </BlockStack>
+              <Button icon={PlusIcon}>Upload</Button>
+            </InlineStack>
+          </Box>
+
+          {/* Library grid */}
+          <BlockStack gap="300">
+            <InlineStack align="space-between" blockAlign="center" gap="200" wrap={false}>
+              <Text as="h3" variant="headingSm">Library</Text>
+              <InlineStack gap="200" blockAlign="center">
+                <Text as="span" variant="bodySm" tone="subdued">
+                  {selected.size} of {items.length} selected
+                </Text>
+                <Button
+                  variant="plain"
+                  onClick={() =>
+                    setSelected(allSelected ? new Set() : new Set(items.map((i) => i.id)))
+                  }
+                >
+                  {allSelected ? 'Deselect all' : 'Select all'}
+                </Button>
+              </InlineStack>
+            </InlineStack>
+            <InlineGrid gap="300" columns={4}>
+              {items.map((item) => (
+                <LibraryTile
+                  key={item.id}
+                  item={item}
+                  selected={selected.has(item.id)}
+                  onToggle={() => toggleSet(selected, item.id, setSelected)}
+                  aspect={tileAspect}
+                />
+              ))}
+            </InlineGrid>
+          </BlockStack>
+
+          {/* Custom uploads */}
+          <BlockStack gap="200">
+            <Text as="h3" variant="headingSm">
+              Your uploads ({uploads.length})
+            </Text>
+            {uploads.length === 0 ? (
+              <Box
+                borderRadius="200"
+                borderWidth="025"
+                borderColor="border"
+                padding="400"
+              >
+                <Text as="p" variant="bodySm" tone="subdued" alignment="center">
+                  No uploads yet. Use the upload area above to add your own.
+                </Text>
+              </Box>
+            ) : (
+              <Text as="p" variant="bodySm" tone="subdued">
+                {uploads.length} custom item{uploads.length === 1 ? '' : 's'}
+              </Text>
+            )}
+          </BlockStack>
+        </BlockStack>
+      </Modal.Section>
+    </Modal>
+  );
+}
+
+function GifsModal({
+  open,
+  onClose,
+  allowGiphy,
+  setAllowGiphy,
+  allowUploads,
+  setAllowUploads,
+  uploads,
+}: {
+  open: boolean;
+  onClose: () => void;
+  allowGiphy: boolean;
+  setAllowGiphy: (v: boolean) => void;
+  allowUploads: boolean;
+  setAllowUploads: (v: boolean) => void;
+  uploads: Upload[];
+}) {
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Edit GIFs"
+      primaryAction={{ content: 'Save', onAction: onClose }}
+      secondaryActions={[{ content: 'Cancel', onAction: onClose }]}
+    >
+      <Modal.Section>
+        <BlockStack gap="500">
+          <BlockStack gap="200">
+            <Text as="h3" variant="headingSm">Sources</Text>
+            <Card padding="0">
+              <Box padding="400">
+                <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
+                  <BlockStack gap="050">
+                    <Text as="p" variant="bodyMd" fontWeight="semibold">Giphy library</Text>
+                    <Text as="p" variant="bodySm" tone="subdued">
+                      Let gifters search Giphy and add an animated GIF.
+                    </Text>
+                  </BlockStack>
+                  <Toggle on={allowGiphy} onToggle={() => setAllowGiphy(!allowGiphy)} />
+                </InlineStack>
+              </Box>
+              <Divider />
+              <Box padding="400">
+                <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
+                  <BlockStack gap="050">
+                    <Text as="p" variant="bodyMd" fontWeight="semibold">Custom uploads</Text>
+                    <Text as="p" variant="bodySm" tone="subdued">
+                      Let gifters use the GIFs you upload below.
+                    </Text>
+                  </BlockStack>
+                  <Toggle on={allowUploads} onToggle={() => setAllowUploads(!allowUploads)} />
+                </InlineStack>
+              </Box>
+            </Card>
+          </BlockStack>
+
+          <BlockStack gap="200">
+            <InlineStack align="space-between" blockAlign="center" gap="200" wrap={false}>
+              <Text as="h3" variant="headingSm">
+                Your uploads ({uploads.length})
+              </Text>
+              <Button icon={PlusIcon}>Upload GIF</Button>
+            </InlineStack>
+            {uploads.length === 0 ? (
+              <Box
+                borderRadius="200"
+                borderWidth="025"
+                borderColor="border"
+                padding="400"
+              >
+                <Text as="p" variant="bodySm" tone="subdued" alignment="center">
+                  No uploads yet. Click Upload GIF to add your own.
+                </Text>
+              </Box>
+            ) : (
+              <BlockStack gap="200">
+                {uploads.map((u) => (
+                  <InlineStack key={u.id} align="space-between" blockAlign="center">
+                    <Text as="span" variant="bodySm">{u.name}</Text>
+                    <Button icon={DeleteIcon} variant="plain" />
+                  </InlineStack>
+                ))}
+              </BlockStack>
+            )}
+          </BlockStack>
+        </BlockStack>
+      </Modal.Section>
+    </Modal>
+  );
+}
+
+/* ─── Tile components inside modal ─── */
+
+function LibraryTile({
+  item,
   selected,
   onToggle,
+  aspect,
 }: {
-  theme: Theme;
+  item: LibraryItem;
   selected: boolean;
   onToggle: () => void;
+  aspect: string;
 }) {
   return (
     <button
@@ -244,9 +665,8 @@ function ThemeTile({
         <div
           style={{
             position: 'relative',
-            aspectRatio: '4 / 3',
+            aspectRatio: aspect,
             borderRadius: 10,
-            background: theme.preview,
             outline: selected
               ? '2px solid var(--p-color-border-emphasis)'
               : '1px solid var(--p-color-border)',
@@ -256,118 +676,52 @@ function ThemeTile({
             overflow: 'hidden',
           }}
         >
+          {item.render}
           {selected && <CheckBadge />}
         </div>
         <Text as="span" variant="bodySm" fontWeight={selected ? 'semibold' : 'regular'}>
-          {theme.name}
+          {item.name}
         </Text>
       </BlockStack>
     </button>
   );
 }
 
-function PosterTile({
-  poster,
-  selected,
-  onToggle,
-}: {
-  poster: Poster;
-  selected: boolean;
-  onToggle: () => void;
-}) {
+function PosterFace({ poster }: { poster: Poster }) {
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-pressed={selected}
-      style={{ all: 'unset', cursor: 'pointer', display: 'block' }}
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        background: poster.bg,
+        color: poster.color,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 12,
+        borderRadius: 10,
+      }}
     >
-      <div
+      <span
         style={{
-          position: 'relative',
-          aspectRatio: '3 / 4',
-          borderRadius: 10,
-          background: poster.bg,
-          color: poster.color,
-          outline: selected
-            ? '2px solid var(--p-color-border-emphasis)'
-            : '1px solid var(--p-color-border)',
-          outlineOffset: selected ? 2 : 0,
-          opacity: selected ? 1 : 0.4,
-          transition: 'opacity 120ms ease',
-          overflow: 'hidden',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 12,
+          fontFamily: poster.fontFamily ?? '-apple-system, sans-serif',
+          fontStyle: poster.fontStyle ?? 'normal',
+          textTransform: poster.textTransform,
+          letterSpacing: poster.letterSpacing,
+          fontWeight: 700,
+          fontSize: 15,
+          lineHeight: 1.1,
+          textAlign: 'center',
+          whiteSpace: 'pre-line',
         }}
       >
-        {selected && <CheckBadge />}
-        <span
-          style={{
-            fontFamily: poster.fontFamily ?? '-apple-system, sans-serif',
-            fontStyle: poster.fontStyle ?? 'normal',
-            textTransform: poster.textTransform,
-            letterSpacing: poster.letterSpacing,
-            fontWeight: 700,
-            fontSize: 15,
-            lineHeight: 1.1,
-            textAlign: 'center',
-            whiteSpace: 'pre-line',
-          }}
-        >
-          {poster.title}
-        </span>
-      </div>
-    </button>
+        {poster.title}
+      </span>
+    </div>
   );
 }
 
-function MediaRow({
-  Icon,
-  name,
-  description,
-  on,
-  onToggle,
-}: {
-  Icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
-  name: string;
-  description: string;
-  on: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <Box paddingBlock="400">
-      <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
-        <InlineStack gap="400" blockAlign="center" wrap={false}>
-          <Box
-            background="bg-surface-secondary"
-            borderRadius="200"
-            minWidth="40px"
-            minHeight="40px"
-          >
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Icon width={20} height={20} style={{ fill: '#1a1a1f' }} />
-            </div>
-          </Box>
-          <BlockStack gap="050">
-            <Text as="p" variant="bodyMd" fontWeight="semibold">{name}</Text>
-            <Text as="p" variant="bodySm" tone="subdued">{description}</Text>
-          </BlockStack>
-        </InlineStack>
-        <Toggle on={on} onToggle={onToggle} />
-      </InlineStack>
-    </Box>
-  );
-}
+/* ─── Font pill ─── */
 
 function FontPill({
   font,
@@ -416,7 +770,7 @@ function FontPill({
   );
 }
 
-/* ─── Reusable pieces ─── */
+/* ─── Shared primitives ─── */
 
 function CheckBadge() {
   return (
@@ -496,8 +850,6 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
     </button>
   );
 }
-
-/* ─── Set toggle helper ─── */
 
 function toggleSet(
   set: Set<string>,
