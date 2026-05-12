@@ -63,7 +63,7 @@ function TemplateShowcase({ onCustomize }: { onCustomize: () => void }) {
           <Button variant="plain">Send test gift to myself</Button>
           <Text as="span" tone="subdued" variant="bodySm">·</Text>
           <Button variant="plain" onClick={onCustomize}>
-            Customize yourself →
+            Edit the design →
           </Button>
         </InlineStack>
       </BlockStack>
@@ -92,9 +92,9 @@ function CustomEditor({
 
       <InlineStack align="space-between" blockAlign="center" gap="500">
         <BlockStack gap="100">
-          <Text as="h1" variant="headingXl">Customize</Text>
+          <Text as="h1" variant="headingXl">Design</Text>
           <Text as="p" variant="bodyMd" tone="subdued">
-            Tune the recipient email and digital unboxing experience.
+            Brand the gift email and the digital unboxing experience.
           </Text>
         </BlockStack>
         <InlineStack gap="200">
