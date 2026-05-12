@@ -47,11 +47,11 @@ const REPORTS: Report[] = [
 function ReportCard({ href, iconSource: IconSvg, title, description }: { href: string; iconSource: IconSource; title: string; description: string }) {
   return (
     <Link href={href} className={styles.cardLink}>
-      <Card padding="500">
-        <BlockStack gap="500">
+      <Card padding="400">
+        <BlockStack gap="400">
           <IconSvg
-            width={28}
-            height={28}
+            width={32}
+            height={32}
             style={{ fill: '#1a1a1f', alignSelf: 'flex-start' }}
           />
           <BlockStack gap="100">

@@ -7,7 +7,7 @@
   text-decoration: none;
   color: inherit;
   height: 100%;
-  min-height: 168px;
+  min-height: 140px;
 }
 
 /* Make Polaris's Card fill the Link's height so all cards align uniformly,
