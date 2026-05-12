@@ -2,148 +2,299 @@
 
 import { useState } from 'react';
 import {
-  Page,
   Card,
   BlockStack,
   InlineStack,
+  InlineGrid,
   Text,
   Button,
   Box,
   Badge,
   TextField,
-  Checkbox,
-  Tabs,
-  RangeSlider,
-  InlineGrid,
-  Divider,
   Icon,
+  Tabs,
 } from '@shopify/polaris';
-import { CheckIcon } from '@shopify/polaris-icons';
+import { CheckIcon, StarFilledIcon, EditIcon } from '@shopify/polaris-icons';
 
-type TabId = 'email' | 'unboxing';
+type Mode = 'template' | 'custom';
+type CustomTab = 'email' | 'unboxing';
+
+const TEMPLATE_FEATURES = [
+  'Beautifully designed by our team — mobile-optimized layout',
+  'Brand pulled from Shopify (store name, logo, colors)',
+  'Reminder + shipped + delivered emails included',
+  'Spam-tested subject line, deliverability tuned',
+  'Updated automatically when we ship improvements',
+];
 
 export default function CustomizePage() {
-  const [tab, setTab] = useState<TabId>('email');
+  const [mode, setMode] = useState<Mode>('template');
+  const [customTab, setCustomTab] = useState<CustomTab>('email');
 
+  return (
+    <BlockStack gap="800">
+      {/* ── Page header ── */}
+      <InlineStack align="space-between" blockAlign="center" gap="500">
+        <BlockStack gap="100">
+          <Text as="h1" variant="headingXl">Customize</Text>
+          <Text as="p" variant="bodyMd" tone="subdued">
+            Use our polished Giftwell template, or tweak the basics to match your brand.
+          </Text>
+        </BlockStack>
+        <InlineStack gap="200">
+          <Button>Preview</Button>
+          <Button>Send test gift</Button>
+          <Button variant="primary">Save</Button>
+        </InlineStack>
+      </InlineStack>
+
+      {/* ── Mode chooser ── */}
+      <ModeChooser mode={mode} onSelect={setMode} />
+
+      {/* ── Conditional content ── */}
+      {mode === 'template'
+        ? <TemplateView />
+        : <CustomView tab={customTab} onTabChange={setCustomTab} />
+      }
+    </BlockStack>
+  );
+}
+
+/* ─── Mode chooser (recommended + custom side-by-side) ─── */
+
+function ModeChooser({ mode, onSelect }: { mode: Mode; onSelect: (m: Mode) => void }) {
+  return (
+    <InlineGrid gap="400" columns={['twoThirds', 'oneThird']}>
+      <ChoiceCard
+        recommended
+        icon={StarFilledIcon}
+        title="Use the Giftwell template"
+        description="Beautifully designed by us, mobile-optimized, spam-tested. Your store name and logo are pulled from Shopify automatically — no setup required."
+        ctaActive="✓ Using this template"
+        ctaInactive="Use this template"
+        active={mode === 'template'}
+        onClick={() => onSelect('template')}
+      />
+      <ChoiceCard
+        icon={EditIcon}
+        title="Customize"
+        description="Tweak the subject line, button text, and brand colors yourself. A few fields, not a full editor."
+        ctaActive="✓ Customizing"
+        ctaInactive="Customize"
+        active={mode === 'custom'}
+        onClick={() => onSelect('custom')}
+      />
+    </InlineGrid>
+  );
+}
+
+function ChoiceCard({
+  recommended,
+  icon,
+  title,
+  description,
+  ctaActive,
+  ctaInactive,
+  active,
+  onClick,
+}: {
+  recommended?: boolean;
+  icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
+  title: string;
+  description: string;
+  ctaActive: string;
+  ctaInactive: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const IconSvg = icon;
+  return (
+    <Card padding="500" background={active ? 'bg-surface-selected' : undefined}>
+      <BlockStack gap="400">
+        <InlineStack gap="300" blockAlign="center">
+          <IconSvg width={22} height={22} style={{ fill: '#1a1a1f' }} />
+          {recommended && <Badge tone="success">Recommended</Badge>}
+        </InlineStack>
+        <BlockStack gap="100">
+          <Text as="h3" variant="headingMd">{title}</Text>
+          <Text as="p" variant="bodyMd" tone="subdued">{description}</Text>
+        </BlockStack>
+        <InlineStack>
+          <Button variant={active ? 'primary' : 'secondary'} onClick={onClick}>
+            {active ? ctaActive : ctaInactive}
+          </Button>
+        </InlineStack>
+      </BlockStack>
+    </Card>
+  );
+}
+
+/* ─── Template view: feature list + preview ─── */
+
+function TemplateView() {
+  return (
+    <Card padding="500">
+      <InlineGrid gap="500" columns={['oneHalf', 'oneHalf']}>
+        <BlockStack gap="400">
+          <BlockStack gap="200">
+            <Text as="h3" variant="headingMd">What's included</Text>
+            <Text as="p" variant="bodyMd" tone="subdued">
+              The Giftwell template handles everything below — no decisions needed.
+            </Text>
+          </BlockStack>
+          <BlockStack gap="300">
+            {TEMPLATE_FEATURES.map((f) => (
+              <InlineStack key={f} gap="200" blockAlign="start" wrap={false}>
+                <Box paddingBlockStart="050">
+                  <Icon source={CheckIcon} tone="success" />
+                </Box>
+                <Text as="span" variant="bodyMd">{f}</Text>
+              </InlineStack>
+            ))}
+          </BlockStack>
+          <Box paddingBlockStart="300">
+            <Button variant="plain">Send test gift to myself →</Button>
+          </Box>
+        </BlockStack>
+        <EmailPreview />
+      </InlineGrid>
+    </Card>
+  );
+}
+
+/* ─── Custom view: limited fields per tab ─── */
+
+function CustomView({ tab, onTabChange }: { tab: CustomTab; onTabChange: (t: CustomTab) => void }) {
   const tabs = [
     { id: 'email' as const, content: 'Recipient email' },
     { id: 'unboxing' as const, content: 'Digital unboxing' },
   ];
-
   const selected = tabs.findIndex((t) => t.id === tab);
 
   return (
-    <Page
-      title="Customize"
-      subtitle="Tune the gift recipient email and the digital unboxing experience."
-      primaryAction={{ content: 'Save', disabled: true }}
-      secondaryActions={[{ content: 'Preview' }, { content: 'Send test gift' }]}
-    >
-      <Card padding="0">
-        <Tabs
-          tabs={tabs}
-          selected={selected}
-          onSelect={(i) => setTab(tabs[i].id)}
-        >
-          <Box padding="500">
-            {tab === 'email' && <EmailTab />}
-            {tab === 'unboxing' && <UnboxingTab />}
-          </Box>
-        </Tabs>
-      </Card>
-    </Page>
+    <Card padding="0">
+      <Tabs tabs={tabs} selected={selected} onSelect={(i) => onTabChange(tabs[i].id)}>
+        <Box padding="500">
+          {tab === 'email' ? <EmailCustomFields /> : <UnboxingCustomFields />}
+        </Box>
+      </Tabs>
+    </Card>
   );
 }
 
-/* ─── Email tab ─── */
-
-function EmailTab() {
+function EmailCustomFields() {
   return (
-    <InlineGrid gap="500" columns={['twoThirds', 'oneThird']}>
-      <BlockStack gap="500">
-        <Section title="From">
-          <BlockStack gap="400">
-            <TextField
-              label="From name"
-              value="Acme Store via Giftwell"
-              helpText="Recipients will see this as the sender."
-              autoComplete="off"
-              onChange={() => {}}
-            />
-            <TextField
-              label="Subject line"
-              value="🎁 [[Sender Name]] sent you a gift!"
-              helpText="Available variables: [[Sender Name]], [[Company]], [[Recipient Name]]"
-              autoComplete="off"
-              onChange={() => {}}
-            />
-            <TextField
-              label="Preview text"
-              value="You've received a gift from [[Company]]. Tap to unwrap."
-              autoComplete="off"
-              onChange={() => {}}
-            />
-          </BlockStack>
-        </Section>
-
-        <Section title="Content">
-          <BlockStack gap="400">
-            <TextField
-              label="Headline"
-              value="You've received a gift!"
-              autoComplete="off"
-              onChange={() => {}}
-            />
-            <TextField
-              label="Body text"
-              value="[[Sender Name]] from [[Company]] wanted to send you something special. Tap below to unwrap your gift!"
-              multiline={3}
-              autoComplete="off"
-              onChange={() => {}}
-            />
-            <TextField
-              label="Button text"
-              value="Unwrap Your Gift"
-              autoComplete="off"
-              onChange={() => {}}
-            />
-            <TextField
-              label="Footer text"
-              value="This gift expires in 30 days"
-              autoComplete="off"
-              onChange={() => {}}
-            />
-          </BlockStack>
-        </Section>
-
-        <Section title="Additional emails">
-          <BlockStack gap="400">
-            <Checkbox
-              label="Reminder email (7 days)"
-              helpText="Send if gift hasn't been claimed"
-              checked
-              onChange={() => {}}
-            />
-            <Checkbox
-              label="Shipped notification"
-              helpText="Notify when gift ships"
-              checked
-              onChange={() => {}}
-            />
-            <Checkbox
-              label="Delivered notification"
-              helpText="Notify when gift is delivered"
-              checked
-              onChange={() => {}}
-            />
-          </BlockStack>
-        </Section>
+    <InlineGrid gap="500" columns={['oneHalf', 'oneHalf']}>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <Text as="h3" variant="headingSm">Email basics</Text>
+          <Text as="p" variant="bodySm" tone="subdued">
+            Just three fields — layout and styling stay on the Giftwell template.
+          </Text>
+        </BlockStack>
+        <TextField
+          label="Subject line"
+          value="🎁 [[Sender Name]] sent you a gift!"
+          helpText="Variables: [[Sender Name]], [[Company]]"
+          autoComplete="off"
+          onChange={() => {}}
+        />
+        <TextField
+          label="Button text"
+          value="Unwrap Your Gift"
+          autoComplete="off"
+          onChange={() => {}}
+        />
+        <BrandColor />
       </BlockStack>
-
       <EmailPreview />
     </InlineGrid>
   );
 }
+
+function UnboxingCustomFields() {
+  return (
+    <InlineGrid gap="500" columns={['oneHalf', 'oneHalf']}>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <Text as="h3" variant="headingSm">Unboxing basics</Text>
+          <Text as="p" variant="bodySm" tone="subdued">
+            Pick a background and an effect. Animation timing and layout stay on the
+            Giftwell template.
+          </Text>
+        </BlockStack>
+        <BrandColor />
+        <BlockStack gap="200">
+          <Text as="span" variant="bodyMd" fontWeight="medium">Background</Text>
+          <InlineGrid gap="300" columns={6}>
+            {[
+              'linear-gradient(180deg, #1F3A5F, #0F1A2E)',
+              '#FFE9A0',
+              '#FFC9D5',
+              '#A8E5C5',
+              '#DCDCFF',
+              '#1a1a1a',
+            ].map((bg, i) => (
+              <button
+                key={i}
+                type="button"
+                style={{
+                  all: 'unset',
+                  cursor: 'pointer',
+                  aspectRatio: '3/4',
+                  borderRadius: 8,
+                  background: bg,
+                  outline: i === 0 ? '2px solid var(--p-color-border-emphasis)' : '1px solid var(--p-color-border)',
+                  outlineOffset: i === 0 ? 2 : 0,
+                  boxSizing: 'border-box',
+                }}
+              />
+            ))}
+          </InlineGrid>
+        </BlockStack>
+        <BlockStack gap="200">
+          <Text as="span" variant="bodyMd" fontWeight="medium">Effect</Text>
+          <InlineStack gap="200">
+            {['Sparkles', 'Snow', 'Confetti', 'Hearts', 'None'].map((e, i) => (
+              <Button key={e} pressed={i === 0}>{e}</Button>
+            ))}
+          </InlineStack>
+        </BlockStack>
+      </BlockStack>
+      <UnboxingPreview />
+    </InlineGrid>
+  );
+}
+
+function BrandColor() {
+  return (
+    <BlockStack gap="200">
+      <Text as="span" variant="bodyMd" fontWeight="medium">Brand color</Text>
+      <InlineStack gap="200">
+        {['#5B6CFF', '#E04F4F', '#3FB950', '#F0883E', '#A371F7', '#1a1a1a'].map((c, i) => (
+          <button
+            key={c}
+            type="button"
+            aria-label={`Color ${c}`}
+            style={{
+              all: 'unset',
+              cursor: 'pointer',
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              background: c,
+              outline: i === 0 ? '2px solid var(--p-color-border-emphasis)' : '1px solid var(--p-color-border)',
+              outlineOffset: i === 0 ? 2 : 0,
+              boxSizing: 'border-box',
+            }}
+          />
+        ))}
+      </InlineStack>
+    </BlockStack>
+  );
+}
+
+/* ─── Previews ─── */
 
 function EmailPreview() {
   return (
@@ -202,149 +353,8 @@ function EmailPreview() {
             </Text>
           </BlockStack>
         </Box>
-        <Button variant="plain">Send test email to myself</Button>
       </BlockStack>
     </Box>
-  );
-}
-
-/* ─── Unboxing tab ─── */
-
-function UnboxingTab() {
-  return (
-    <InlineGrid gap="500" columns={['twoThirds', 'oneThird']}>
-      <BlockStack gap="500">
-        <Section
-          title="Brand identity"
-          subtitle="We pulled these from your Shopify theme — adjust as needed."
-        >
-          <InlineGrid gap="400" columns={2}>
-            <TextField
-              label="Brand name"
-              value="Acme Store"
-              autoComplete="off"
-              onChange={() => {}}
-            />
-            <BlockStack gap="100">
-              <Text as="span" variant="bodyMd" fontWeight="medium">Logo</Text>
-              <InlineStack gap="200" blockAlign="center">
-                <Box
-                  background="bg-surface-secondary"
-                  borderRadius="200"
-                  borderWidth="025"
-                  borderColor="border"
-                  minWidth="40px"
-                  minHeight="40px"
-                />
-                <Button>Change</Button>
-              </InlineStack>
-            </BlockStack>
-          </InlineGrid>
-        </Section>
-
-        <Section title="Brand colors">
-          <InlineGrid gap="500" columns={2}>
-            <BlockStack gap="200">
-              <Text as="p" tone="subdued" variant="bodySm">PRIMARY</Text>
-              <InlineStack gap="200">
-                {['#5B6CFF', '#E04F4F', '#3FB950', '#F0883E', '#A371F7'].map((c, i) => (
-                  <Swatch key={c} color={c} selected={i === 0} />
-                ))}
-                <Swatch gradient />
-              </InlineStack>
-            </BlockStack>
-            <BlockStack gap="200">
-              <Text as="p" tone="subdued" variant="bodySm">SECONDARY</Text>
-              <InlineStack gap="200">
-                {['#1a1a1a', '#7B2FBE', '#1F3A5F', '#0D9488', '#A371F7'].map((c, i) => (
-                  <Swatch key={c} color={c} selected={i === 1} />
-                ))}
-                <Swatch gradient />
-              </InlineStack>
-            </BlockStack>
-          </InlineGrid>
-        </Section>
-
-        <Section
-          title="Background"
-          subtitle="Choose from our library, upload your own, or generate with AI."
-        >
-          <BlockStack gap="400">
-            <InlineStack gap="100">
-              <Button pressed>Library</Button>
-              <Button>Upload</Button>
-              <Button>AI Generate</Button>
-            </InlineStack>
-            <InlineGrid gap="300" columns={6}>
-              {[
-                'linear-gradient(180deg, #1F3A5F, #0F1A2E)',
-                '#FFE9A0',
-                '#FFC9D5',
-                '#A8E5C5',
-                '#DCDCFF',
-                '#1a1a1a',
-              ].map((bg, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  style={{
-                    all: 'unset',
-                    cursor: 'pointer',
-                    aspectRatio: '3/4',
-                    borderRadius: 8,
-                    background: bg,
-                    outline: i === 0 ? '2px solid var(--p-color-border-emphasis)' : '1px solid var(--p-color-border)',
-                    outlineOffset: i === 0 ? 2 : 0,
-                  }}
-                />
-              ))}
-            </InlineGrid>
-          </BlockStack>
-        </Section>
-
-        <Section
-          title="Effects & particles"
-          subtitle="Add animated elements to the unwrapping experience."
-        >
-          <BlockStack gap="400">
-            <InlineGrid gap="200" columns={6}>
-              {[
-                { id: 'sparkles', label: 'Sparkles' },
-                { id: 'snow', label: 'Snow' },
-                { id: 'confetti', label: 'Confetti' },
-                { id: 'hearts', label: 'Hearts' },
-                { id: 'stars', label: 'Stars' },
-                { id: 'none', label: 'None' },
-              ].map((e, i) => (
-                <button key={e.id} type="button" style={{ all: 'unset', cursor: 'pointer', display: 'block' }}>
-                  <Box
-                    padding="300"
-                    borderRadius="200"
-                    borderWidth="025"
-                    borderColor={i === 0 ? 'border-emphasis' : 'border'}
-                    background={i === 0 ? 'bg-surface-selected' : 'bg-surface'}
-                  >
-                    <BlockStack gap="100" inlineAlign="center">
-                      <Box minHeight="20px" />
-                      <Text as="span" variant="bodySm">{e.label}</Text>
-                    </BlockStack>
-                  </Box>
-                </button>
-              ))}
-            </InlineGrid>
-            <RangeSlider
-              label="Effect intensity"
-              value={60}
-              onChange={() => {}}
-              output
-            />
-            <Button variant="plain">Upload custom Lottie animation</Button>
-          </BlockStack>
-        </Section>
-      </BlockStack>
-
-      <UnboxingPreview />
-    </InlineGrid>
   );
 }
 
@@ -356,14 +366,14 @@ function UnboxingPreview() {
         <Box
           borderRadius="300"
           padding="0"
-          minHeight="500px"
+          minHeight="420px"
           background="bg-fill-inverse"
         >
           <BlockStack gap="400" inlineAlign="center">
             <Box padding="500">
               <BlockStack gap="800" inlineAlign="center">
                 <Text as="p" tone="text-inverse-secondary" variant="bodySm">ACME STORE</Text>
-                <Box minHeight="160px" />
+                <Box minHeight="120px" />
                 <Box
                   background="bg-surface"
                   borderRadius="300"
@@ -385,49 +395,5 @@ function UnboxingPreview() {
         </Box>
       </BlockStack>
     </Box>
-  );
-}
-
-/* ─── Building blocks ─── */
-
-function Swatch({ color, selected, gradient }: { color?: string; selected?: boolean; gradient?: boolean }) {
-  return (
-    <button
-      type="button"
-      style={{
-        all: 'unset',
-        cursor: 'pointer',
-        width: 28,
-        height: 28,
-        borderRadius: '50%',
-        background: gradient
-          ? 'conic-gradient(from 0deg, red, yellow, green, cyan, blue, magenta, red)'
-          : color,
-        outline: selected ? '2px solid var(--p-color-border-emphasis)' : '1px solid var(--p-color-border)',
-        outlineOffset: selected ? 2 : 0,
-        boxSizing: 'border-box',
-      }}
-    />
-  );
-}
-
-function Section({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <BlockStack gap="300">
-      <BlockStack gap="050">
-        <Text as="h3" variant="headingSm">{title}</Text>
-        {subtitle && <Text as="p" tone="subdued" variant="bodySm">{subtitle}</Text>}
-      </BlockStack>
-      {children}
-      <Divider />
-    </BlockStack>
   );
 }
