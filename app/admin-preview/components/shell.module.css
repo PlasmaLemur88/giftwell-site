@@ -272,7 +272,7 @@
 .contentInset {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 16px 40px 40px;
+  padding: 16px 64px 40px;
   display: flex;
   flex-direction: column;
   gap: 20px;
