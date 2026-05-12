@@ -9,163 +9,103 @@ import {
   Text,
   Button,
   Box,
-  Badge,
   TextField,
   Checkbox,
   Tabs,
   RangeSlider,
   Divider,
-  Icon,
 } from '@shopify/polaris';
-import {
-  CheckIcon,
-  StarFilledIcon,
-  EditIcon,
-} from '@shopify/polaris-icons';
+import { StarFilledIcon, ArrowLeftIcon } from '@shopify/polaris-icons';
 
 type Mode = 'template' | 'custom';
 type CustomTab = 'email' | 'unboxing';
-
-const TEMPLATE_FEATURES = [
-  'Beautifully designed by our team — mobile-optimized layout',
-  'Brand pulled from Shopify (store name, logo, colors)',
-  'Reminder + shipped + delivered emails included',
-  'Spam-tested subject line, deliverability tuned',
-  'Updated automatically when we ship improvements',
-];
 
 export default function CustomizePage() {
   const [mode, setMode] = useState<Mode>('template');
   const [customTab, setCustomTab] = useState<CustomTab>('email');
 
-  return (
-    <BlockStack gap="800">
-      <PageHeader />
-      <ModeChooser mode={mode} onSelect={setMode} />
-      {mode === 'template'
-        ? <TemplateView />
-        : <CustomFullView tab={customTab} onTabChange={setCustomTab} />}
-    </BlockStack>
-  );
+  return mode === 'template'
+    ? <TemplateShowcase onCustomize={() => setMode('custom')} />
+    : <CustomEditor
+        tab={customTab}
+        onTabChange={setCustomTab}
+        onBackToTemplate={() => setMode('template')}
+      />;
 }
 
-function PageHeader() {
-  return (
-    <InlineStack align="space-between" blockAlign="center" gap="500">
-      <BlockStack gap="100">
-        <Text as="h1" variant="headingXl">Customize</Text>
-        <Text as="p" variant="bodyMd" tone="subdued">
-          Use our polished Giftwell template, or tweak the details to match your brand.
-        </Text>
-      </BlockStack>
-      <InlineStack gap="200">
-        <Button>Preview</Button>
-        <Button>Send test gift</Button>
-        <Button variant="primary">Save</Button>
-      </InlineStack>
-    </InlineStack>
-  );
-}
+/* ─── Template mode: centered hero showcase ─── */
 
-/* ─── Mode chooser ─── */
-
-function ModeChooser({ mode, onSelect }: { mode: Mode; onSelect: (m: Mode) => void }) {
+function TemplateShowcase({ onCustomize }: { onCustomize: () => void }) {
   return (
-    <InlineGrid gap="400" columns={['twoThirds', 'oneThird']}>
-      <ChoiceCard
-        recommended
-        icon={StarFilledIcon}
-        title="Use the Giftwell template"
-        description="Beautifully designed by us, mobile-optimized, spam-tested. Your store name and logo are pulled from Shopify automatically — no setup required."
-        ctaActive="✓ Using this template"
-        ctaInactive="Use this template"
-        active={mode === 'template'}
-        onClick={() => onSelect('template')}
-      />
-      <ChoiceCard
-        icon={EditIcon}
-        title="Customize"
-        description="Full control over the recipient email and the digital unwrap experience."
-        ctaActive="✓ Customizing"
-        ctaInactive="Customize"
-        active={mode === 'custom'}
-        onClick={() => onSelect('custom')}
-      />
-    </InlineGrid>
-  );
-}
-
-function ChoiceCard({
-  recommended,
-  icon,
-  title,
-  description,
-  ctaActive,
-  ctaInactive,
-  active,
-  onClick,
-}: {
-  recommended?: boolean;
-  icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
-  title: string;
-  description: string;
-  ctaActive: string;
-  ctaInactive: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  const IconSvg = icon;
-  return (
-    <Card padding="500" background={active ? 'bg-surface-selected' : undefined}>
-      <BlockStack gap="400">
-        <InlineStack gap="300" blockAlign="center">
-          <IconSvg width={22} height={22} style={{ fill: '#1a1a1f' }} />
-          {recommended && <Badge tone="success">Recommended</Badge>}
+    <div style={{ maxWidth: 640, margin: '24px auto 0' }}>
+      <BlockStack gap="500" inlineAlign="center">
+        <InlineStack gap="150" blockAlign="center">
+          <StarFilledIcon width={14} height={14} style={{ fill: '#A855F7' }} />
+          <Text as="p" variant="bodySm" fontWeight="semibold" tone="subdued">
+            RECOMMENDED
+          </Text>
         </InlineStack>
-        <BlockStack gap="100">
-          <Text as="h3" variant="headingMd">{title}</Text>
-          <Text as="p" variant="bodyMd" tone="subdued">{description}</Text>
-        </BlockStack>
-        <InlineStack>
-          <Button variant={active ? 'primary' : 'secondary'} onClick={onClick}>
-            {active ? ctaActive : ctaInactive}
+
+        <Text as="h1" variant="heading2xl" alignment="center">
+          Your gift, beautifully delivered
+        </Text>
+        <Text as="p" variant="bodyLg" tone="subdued" alignment="center">
+          Designed by us. Just confirm your branding — we&apos;ll handle the rest.
+        </Text>
+
+        <Box paddingBlockStart="500" paddingBlockEnd="400">
+          <PolishedPreview />
+        </Box>
+
+        <Button size="large" variant="primary">Use this template</Button>
+
+        <InlineStack gap="400" blockAlign="center">
+          <Button variant="plain">Send test gift to myself</Button>
+          <Text as="span" tone="subdued" variant="bodySm">·</Text>
+          <Button variant="plain" onClick={onCustomize}>
+            Customize yourself →
           </Button>
         </InlineStack>
       </BlockStack>
-    </Card>
+    </div>
   );
 }
 
-/* ─── Template mode: feature list + polished branded preview ─── */
+/* ─── Custom mode: full editor with back-to-template link ─── */
 
-function TemplateView() {
+function CustomEditor({
+  tab,
+  onTabChange,
+  onBackToTemplate,
+}: {
+  tab: CustomTab;
+  onTabChange: (t: CustomTab) => void;
+  onBackToTemplate: () => void;
+}) {
   return (
-    <InlineGrid gap="500" columns={['oneHalf', 'oneHalf']}>
-      <Card padding="500">
-        <BlockStack gap="400">
-          <BlockStack gap="200">
-            <Text as="h3" variant="headingMd">The Giftwell template</Text>
-            <Text as="p" variant="bodyMd" tone="subdued">
-              No setup needed. Your store name and logo come from Shopify; we handle the rest.
-            </Text>
-          </BlockStack>
-          <BlockStack gap="300">
-            {TEMPLATE_FEATURES.map((f) => (
-              <InlineStack key={f} gap="200" blockAlign="start" wrap={false}>
-                <Box paddingBlockStart="050">
-                  <Icon source={CheckIcon} tone="success" />
-                </Box>
-                <Text as="span" variant="bodyMd">{f}</Text>
-              </InlineStack>
-            ))}
-          </BlockStack>
-          <Box paddingBlockStart="300">
-            <Button variant="plain">Send test gift to myself →</Button>
-          </Box>
+    <BlockStack gap="600">
+      <Box>
+        <Button variant="plain" icon={ArrowLeftIcon} onClick={onBackToTemplate}>
+          Use the Giftwell template instead
+        </Button>
+      </Box>
+
+      <InlineStack align="space-between" blockAlign="center" gap="500">
+        <BlockStack gap="100">
+          <Text as="h1" variant="headingXl">Customize</Text>
+          <Text as="p" variant="bodyMd" tone="subdued">
+            Tune the recipient email and digital unboxing experience.
+          </Text>
         </BlockStack>
-      </Card>
-      <PolishedPreview />
-    </InlineGrid>
+        <InlineStack gap="200">
+          <Button>Preview</Button>
+          <Button>Send test gift</Button>
+          <Button variant="primary">Save</Button>
+        </InlineStack>
+      </InlineStack>
+
+      <CustomFullView tab={tab} onTabChange={onTabChange} />
+    </BlockStack>
   );
 }
 
