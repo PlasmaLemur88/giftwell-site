@@ -28,7 +28,6 @@ const APPS = [
 ];
 
 const GIFTWELL_SUB = [
-  { href: '/admin-preview', label: 'Dashboard', exact: true },
   { href: '/admin-preview/reports', label: 'Reports' },
   { href: '/admin-preview/emails', label: 'Emails' },
   { href: '/admin-preview/design', label: 'Design' },
@@ -141,7 +140,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   key={item.href}
                   className={`${styles.subNavItem} ${
-                    isSubActive(item.href, item.exact) ? styles.subNavItemActive : ''
+                    isSubActive(item.href) ? styles.subNavItemActive : ''
                   }`}
                 >
                   {item.label}
