@@ -75,7 +75,7 @@ export default function ReportsLandingPage() {
         <Button variant="primary" icon={PlusIcon}>Create</Button>
       </InlineStack>
 
-      <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="500">
+      <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="400">
         {REPORTS.map((r) => (
           <ReportCard
             key={r.slug}
@@ -92,7 +92,7 @@ export default function ReportsLandingPage() {
           <Text as="h2" variant="headingMd">My reports</Text>
           <Badge>Early access</Badge>
         </InlineStack>
-        <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="500">
+        <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="400">
           <ReportCard
             href="#"
             iconSource={PlusIcon}
