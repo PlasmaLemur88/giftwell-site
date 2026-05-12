@@ -9,19 +9,23 @@ import {
   Text,
   Button,
   Box,
-  TextField,
   Divider,
 } from '@shopify/polaris';
-import {
-  ImageIcon,
-  PageIcon,
-  UploadIcon,
-} from '@shopify/polaris-icons';
+import { ImageIcon, UploadIcon } from '@shopify/polaris-icons';
 
 /* ─── Data ─── */
 
 type Theme = { id: string; name: string; preview: string };
-type ElementOption = { id: string; name: string; locked?: boolean; sample: string };
+type Poster = {
+  id: string;
+  title: string;
+  bg: string;
+  color: string;
+  fontFamily?: string;
+  fontStyle?: 'normal' | 'italic';
+  textTransform?: 'uppercase' | 'none';
+  letterSpacing?: string;
+};
 type Font = { id: string; name: string; cssFamily: string; locked?: boolean };
 
 const THEMES: Theme[] = [
@@ -35,11 +39,19 @@ const THEMES: Theme[] = [
   { id: 'starfield', name: 'Starfield',        preview: 'radial-gradient(circle at 30% 20%, #6464a0 0px, transparent 1px), radial-gradient(circle at 70% 60%, #8484c0 0px, transparent 1px), linear-gradient(180deg, #1a1a3a, #0a0a20)' },
 ];
 
-const ELEMENTS: ElementOption[] = [
-  { id: 'none',     name: 'None',     locked: true, sample: '–' },
-  { id: 'sparkles', name: 'Sparkles', sample: '✨' },
-  { id: 'confetti', name: 'Confetti', sample: '🎉' },
-  { id: 'hearts',   name: 'Hearts',   sample: '❤️' },
+const POSTERS: Poster[] = [
+  { id: 'cheers',          title: 'Cheers\nFor You',          bg: '#F4ECD8',                                                          color: '#1E40AF', fontFamily: 'Georgia, serif', fontStyle: 'italic' },
+  { id: 'just-for-you',    title: 'Just\nFor You',            bg: 'radial-gradient(circle at 50% 30%, #2a2a4a, #0a0a20)',              color: '#fff',    fontFamily: 'Georgia, serif', fontStyle: 'italic' },
+  { id: 'good-vibes',      title: 'good\nvibes\nonly',        bg: 'linear-gradient(135deg, #87CEEB, #B0E0E6 60%, #FFE4B5)',            color: '#fff',    fontFamily: 'Georgia, serif',  },
+  { id: 'good-food',       title: 'good food\ngood mood',     bg: 'linear-gradient(135deg, #2d5016, #4a7c2c)',                         color: '#fff',                                                       },
+  { id: 'lets-go',         title: "LET'S\nGO",                bg: 'linear-gradient(135deg, #d2691e, #1a1a1a)',                         color: '#fff',                                  textTransform: 'uppercase' },
+  { id: 'movie-night',     title: 'MOVIE\nNIGHT',             bg: 'linear-gradient(180deg, #1a1a3a, #0a0a1a)',                         color: '#FFD93D',                               textTransform: 'uppercase' },
+  { id: 'sending-vibes',   title: 'Sending\ngood vibes',      bg: 'linear-gradient(135deg, #C4B68A, #8B7E5E)',                         color: '#5B4E37', fontFamily: 'Georgia, serif',                              },
+  { id: 'great-is-coming', title: 'GREAT\nIS ON THE WAY',     bg: 'radial-gradient(circle at 80% 20%, #5C2BD3, #1a1a3a 70%)',          color: '#fff',                                  textTransform: 'uppercase', letterSpacing: '0.02em' },
+  { id: 'happy-birthday',  title: 'Happy\nBirthday!',         bg: 'linear-gradient(135deg, #FF9EC8, #FFD93D)',                         color: '#fff',    fontFamily: 'Georgia, serif', fontStyle: 'italic' },
+  { id: 'congrats',        title: 'Congrats!',                bg: 'linear-gradient(135deg, #FFE9A0, #F4C430)',                         color: '#7C2D12', fontFamily: 'Georgia, serif',                              },
+  { id: 'thank-you',       title: 'Thank\nYou',               bg: 'linear-gradient(180deg, #0D9488, #134E4A)',                         color: '#fff',    fontFamily: 'Georgia, serif', fontStyle: 'italic' },
+  { id: 'welcome',         title: 'Welcome',                  bg: 'linear-gradient(135deg, #DCDCFF, #A8A8F0)',                         color: '#1E1B4B', fontFamily: 'Georgia, serif',                              },
 ];
 
 const FONTS: Font[] = [
@@ -53,9 +65,11 @@ const FONTS: Font[] = [
 
 export default function DesignPage() {
   const [themes, setThemes] = useState<Set<string>>(new Set(['midnight', 'sunlit', 'rose', 'mint', 'lavender', 'noir']));
-  const [elements, setElements] = useState<Set<string>>(new Set(['none', 'sparkles', 'confetti']));
+  const [posters, setPosters] = useState<Set<string>>(
+    new Set(POSTERS.map((p) => p.id)),
+  );
   const [fonts, setFonts] = useState<Set<string>>(new Set(['default', 'elegant', 'sophisticated']));
-  const [media, setMedia] = useState({ giphy: true, posters: true, upload: true });
+  const [media, setMedia] = useState({ giphy: true, upload: true });
 
   return (
     <BlockStack gap="800">
@@ -69,62 +83,7 @@ export default function DesignPage() {
         <Button variant="primary">Save</Button>
       </InlineStack>
 
-      {/* 1. Brand identity */}
-      <Card padding="500">
-        <SectionHeader
-          title="Brand identity"
-          subtitle="Pulled from your Shopify theme — override if needed. Used in the wrapper around every gift."
-        />
-        <Box paddingBlockStart="400">
-          <InlineGrid gap="400" columns={3}>
-            <TextField
-              label="Brand name"
-              value="Acme Store"
-              autoComplete="off"
-              onChange={() => {}}
-            />
-            <BlockStack gap="100">
-              <Text as="span" variant="bodyMd" fontWeight="medium">Logo</Text>
-              <InlineStack gap="200" blockAlign="center">
-                <Box
-                  background="bg-surface-secondary"
-                  borderRadius="200"
-                  borderWidth="025"
-                  borderColor="border"
-                  minWidth="40px"
-                  minHeight="40px"
-                />
-                <Button>Change</Button>
-              </InlineStack>
-            </BlockStack>
-            <BlockStack gap="100">
-              <Text as="span" variant="bodyMd" fontWeight="medium">Brand color</Text>
-              <InlineStack gap="200" blockAlign="center">
-                {['#5B6CFF', '#E04F4F', '#3FB950', '#F0883E', '#A371F7', '#1a1a1a'].map((c, i) => (
-                  <button
-                    key={c}
-                    type="button"
-                    aria-label={c}
-                    style={{
-                      all: 'unset',
-                      cursor: 'pointer',
-                      width: 28,
-                      height: 28,
-                      borderRadius: '50%',
-                      background: c,
-                      outline: i === 0 ? '2px solid var(--p-color-border-emphasis)' : '1px solid var(--p-color-border)',
-                      outlineOffset: i === 0 ? 2 : 0,
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                ))}
-              </InlineStack>
-            </BlockStack>
-          </InlineGrid>
-        </Box>
-      </Card>
-
-      {/* 2. Theme library */}
+      {/* 1. Theme library */}
       <Card padding="500">
         <SectionHeader
           title="Theme library"
@@ -145,32 +104,48 @@ export default function DesignPage() {
         </Box>
       </Card>
 
-      {/* 3. Decorative elements library */}
+      {/* 2. Stock poster library */}
       <Card padding="500">
         <SectionHeader
-          title="Decorative elements"
-          subtitle="Embellishments layered over the background. Gifters can pick one per gift, or none."
-          right={<CountText current={elements.size} total={ELEMENTS.length} />}
+          title="Stock poster library"
+          subtitle="Greeting-card-style posters gifters can add to a gift. Pick the ones that fit your brand."
+          right={
+            <InlineStack gap="200" blockAlign="center">
+              <CountText current={posters.size} total={POSTERS.length} />
+              <Button
+                onClick={() =>
+                  setPosters(
+                    posters.size === POSTERS.length
+                      ? new Set()
+                      : new Set(POSTERS.map((p) => p.id))
+                  )
+                }
+                variant="plain"
+              >
+                {posters.size === POSTERS.length ? 'Deselect all' : 'Select all'}
+              </Button>
+            </InlineStack>
+          }
         />
         <Box paddingBlockStart="400">
           <InlineGrid gap="300" columns={4}>
-            {ELEMENTS.map((e) => (
-              <ElementTile
-                key={e.id}
-                element={e}
-                selected={elements.has(e.id)}
-                onToggle={() => toggleSet(elements, e.id, setElements)}
+            {POSTERS.map((p) => (
+              <PosterTile
+                key={p.id}
+                poster={p}
+                selected={posters.has(p.id)}
+                onToggle={() => toggleSet(posters, p.id, setPosters)}
               />
             ))}
           </InlineGrid>
         </Box>
       </Card>
 
-      {/* 4. Media sources */}
+      {/* 3. Media sources */}
       <Card padding="500">
         <SectionHeader
           title="Media sources"
-          subtitle="Where your gifters can pull media from when adding a personal touch."
+          subtitle="Other ways gifters can add a personal touch beyond the poster library."
         />
         <Box paddingBlockStart="400">
           <BlockStack gap="0">
@@ -180,14 +155,6 @@ export default function DesignPage() {
               description="Let gifters add an animated GIF from Giphy's library."
               on={media.giphy}
               onToggle={() => setMedia((m) => ({ ...m, giphy: !m.giphy }))}
-            />
-            <Divider />
-            <MediaRow
-              Icon={PageIcon}
-              name="Stock posters"
-              description="Let gifters pick from our branded poster library — Cheers, Good Vibes, Movie Night, etc."
-              on={media.posters}
-              onToggle={() => setMedia((m) => ({ ...m, posters: !m.posters }))}
             />
             <Divider />
             <MediaRow
@@ -201,7 +168,7 @@ export default function DesignPage() {
         </Box>
       </Card>
 
-      {/* 5. Title fonts */}
+      {/* 4. Title fonts */}
       <Card padding="500">
         <SectionHeader
           title="Title fonts"
@@ -271,11 +238,7 @@ function ThemeTile({
       type="button"
       onClick={onToggle}
       aria-pressed={selected}
-      style={{
-        all: 'unset',
-        cursor: 'pointer',
-        display: 'block',
-      }}
+      style={{ all: 'unset', cursor: 'pointer', display: 'block' }}
     >
       <BlockStack gap="200">
         <div
@@ -303,59 +266,59 @@ function ThemeTile({
   );
 }
 
-function ElementTile({
-  element,
+function PosterTile({
+  poster,
   selected,
   onToggle,
 }: {
-  element: ElementOption;
+  poster: Poster;
   selected: boolean;
   onToggle: () => void;
 }) {
-  const locked = element.locked;
   return (
     <button
       type="button"
-      onClick={locked ? undefined : onToggle}
+      onClick={onToggle}
       aria-pressed={selected}
-      disabled={locked}
-      style={{
-        all: 'unset',
-        cursor: locked ? 'default' : 'pointer',
-        display: 'block',
-      }}
+      style={{ all: 'unset', cursor: 'pointer', display: 'block' }}
     >
-      <BlockStack gap="200">
-        <div
+      <div
+        style={{
+          position: 'relative',
+          aspectRatio: '3 / 4',
+          borderRadius: 10,
+          background: poster.bg,
+          color: poster.color,
+          outline: selected
+            ? '2px solid var(--p-color-border-emphasis)'
+            : '1px solid var(--p-color-border)',
+          outlineOffset: selected ? 2 : 0,
+          opacity: selected ? 1 : 0.4,
+          transition: 'opacity 120ms ease',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 12,
+        }}
+      >
+        {selected && <CheckBadge />}
+        <span
           style={{
-            position: 'relative',
-            aspectRatio: '4 / 3',
-            borderRadius: 10,
-            background: '#f5f5f7',
-            outline: selected
-              ? '2px solid var(--p-color-border-emphasis)'
-              : '1px solid var(--p-color-border)',
-            outlineOffset: selected ? 2 : 0,
-            opacity: selected ? 1 : 0.4,
-            transition: 'opacity 120ms ease',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 32,
+            fontFamily: poster.fontFamily ?? '-apple-system, sans-serif',
+            fontStyle: poster.fontStyle ?? 'normal',
+            textTransform: poster.textTransform,
+            letterSpacing: poster.letterSpacing,
+            fontWeight: 700,
+            fontSize: 15,
+            lineHeight: 1.1,
+            textAlign: 'center',
+            whiteSpace: 'pre-line',
           }}
         >
-          {selected && <CheckBadge />}
-          <span aria-hidden style={{ filter: selected ? 'none' : 'grayscale(1)' }}>{element.sample}</span>
-        </div>
-        <InlineStack gap="100" blockAlign="center">
-          <Text as="span" variant="bodySm" fontWeight={selected ? 'semibold' : 'regular'}>
-            {element.name}
-          </Text>
-          {locked && (
-            <Text as="span" variant="bodySm" tone="subdued">(always)</Text>
-          )}
-        </InlineStack>
-      </BlockStack>
+          {poster.title}
+        </span>
+      </div>
     </button>
   );
 }
