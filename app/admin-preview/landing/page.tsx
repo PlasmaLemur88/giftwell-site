@@ -32,7 +32,7 @@ export default function LandingPage() {
           </Text>
         </BlockStack>
         <InlineStack gap="200">
-          <Button>Preview</Button>
+          <Button url="/landing-preview" external>Preview</Button>
           <Button variant="primary">Save</Button>
         </InlineStack>
       </InlineStack>
