@@ -22,10 +22,6 @@ const BUNDLES: Bundle[] = [
 
 export default function LandingPreviewPage() {
   const [chatOpen, setChatOpen] = useState(false);
-  const [recipientCount, setRecipientCount] = useState('25');
-  const [budget, setBudget] = useState('100');
-  const [date, setDate] = useState('');
-  const [occasion, setOccasion] = useState('');
 
   return (
     <div style={{ fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif', color: '#1a1a1f', background: '#fff' }}>
@@ -39,12 +35,6 @@ export default function LandingPreviewPage() {
       <ThemeHeader />
 
       <Hero />
-      <QuickStartForm
-        recipientCount={recipientCount} setRecipientCount={setRecipientCount}
-        budget={budget} setBudget={setBudget}
-        date={date} setDate={setDate}
-        occasion={occasion} setOccasion={setOccasion}
-      />
       <NoAddressesSection />
       <DigitalUnboxingSection />
       <BundleShowcase />
@@ -193,142 +183,7 @@ function Hero() {
   );
 }
 
-/* ─── 2. Quick-start form (the form Brandon wanted) ─── */
-
-const RECIPIENT_CHIPS = ['5', '10', '25', '50', '100+'];
-const BUDGET_CHIPS = ['$25', '$50', '$100', '$200', '$500'];
-
-function QuickStartForm({
-  recipientCount, setRecipientCount,
-  budget, setBudget,
-  date, setDate,
-  occasion, setOccasion,
-}: {
-  recipientCount: string; setRecipientCount: (v: string) => void;
-  budget: string; setBudget: (v: string) => void;
-  date: string; setDate: (v: string) => void;
-  occasion: string; setOccasion: (v: string) => void;
-}) {
-  return (
-    <section id="start" style={{ background: '#fff', padding: '72px 32px' }}>
-      <div style={{ maxWidth: 760, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.015em', margin: '0 0 10px' }}>
-            Start a gift order
-          </h2>
-          <p style={{ fontSize: 14.5, color: '#5a5a62', margin: 0 }}>
-            Tell us a bit, we'll show you what fits.
-          </p>
-        </div>
-
-        <div style={{
-          background: '#fff', borderRadius: 14, padding: 28,
-          border: '1px solid #ececef',
-        }}>
-          <FieldGroup label="How many recipients?">
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {RECIPIENT_CHIPS.map((c) => (
-                <Chip key={c} active={recipientCount === c} onClick={() => setRecipientCount(c)}>{c}</Chip>
-              ))}
-              <input
-                type="text"
-                placeholder="Custom"
-                value={RECIPIENT_CHIPS.includes(recipientCount) ? '' : recipientCount}
-                onChange={(e) => setRecipientCount(e.target.value)}
-                style={chipInput}
-              />
-            </div>
-          </FieldGroup>
-
-          <FieldGroup label="Budget per person?">
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {BUDGET_CHIPS.map((c) => (
-                <Chip key={c} active={budget === c.replace('$', '')} onClick={() => setBudget(c.replace('$', ''))}>{c}</Chip>
-              ))}
-              <input
-                type="text"
-                placeholder="Custom"
-                value={BUDGET_CHIPS.map((c) => c.replace('$', '')).includes(budget) ? '' : budget}
-                onChange={(e) => setBudget(e.target.value)}
-                style={chipInput}
-              />
-            </div>
-          </FieldGroup>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <FieldGroup label="When should it ship?">
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={textInput} />
-            </FieldGroup>
-            <FieldGroup label="What's the occasion?">
-              <select value={occasion} onChange={(e) => setOccasion(e.target.value)} style={textInput}>
-                <option value="">Optional</option>
-                <option value="thanks">Client thank-you</option>
-                <option value="newhire">New hire</option>
-                <option value="holiday">Holiday</option>
-                <option value="promotion">Promotion</option>
-                <option value="other">Other</option>
-              </select>
-            </FieldGroup>
-          </div>
-
-          <button style={{
-            width: '100%', marginTop: 20, padding: '14px 24px', borderRadius: 10,
-            background: '#1a1a1f', color: '#fff',
-            border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer',
-          }}>
-            Continue →
-          </button>
-
-          <p style={{ fontSize: 12.5, color: '#8a8a93', textAlign: 'center', margin: '12px 0 0' }}>
-            Takes 2 minutes. No signup until checkout.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div style={{ marginBottom: 18 }}>
-      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: '#1a1a1f' }}>{label}</label>
-      {children}
-    </div>
-  );
-}
-
-function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        all: 'unset', cursor: 'pointer',
-        padding: '8px 16px', borderRadius: 999, fontSize: 13.5, fontWeight: 500,
-        background: active ? '#1a1a1f' : '#fff',
-        color: active ? '#fff' : '#1a1a1f',
-        border: `1px solid ${active ? '#1a1a1f' : '#dcdcde'}`,
-        transition: 'all 120ms ease',
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-const chipInput: React.CSSProperties = {
-  padding: '8px 14px', borderRadius: 999, fontSize: 13.5, fontWeight: 500,
-  background: '#fff', border: '1px solid #dcdcde', width: 90,
-  fontFamily: 'inherit', outline: 'none',
-};
-
-const textInput: React.CSSProperties = {
-  width: '100%', padding: '11px 14px', borderRadius: 10, fontSize: 14,
-  background: '#fff', border: '1px solid #dcdcde',
-  fontFamily: 'inherit', outline: 'none', color: '#1a1a1f',
-};
-
-/* ─── 3. "No addresses? No problem" (image + bullets + CTA, split) ─── */
+/* ─── 2. "No addresses? No problem" (image + bullets + CTA, split) ─── */
 
 function NoAddressesSection() {
   const items = [
