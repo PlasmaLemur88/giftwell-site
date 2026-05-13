@@ -31,7 +31,6 @@ import {
   FlagIcon,
 } from '@shopify/polaris-icons';
 import { Toggle } from '../components/Toggle';
-import { ModalBloom } from '../components/ModalBloom';
 
 type IconSrc = React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
 type Status =
@@ -324,7 +323,6 @@ export default function EmailsPage() {
         />
       </BlockStack>
 
-      <ModalBloom open={previewRow !== null || colorModalOpen} color={brandColor} />
       <Modal
         open={previewRow !== null}
         onClose={() => setPreviewId(null)}

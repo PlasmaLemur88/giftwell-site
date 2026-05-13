@@ -14,7 +14,6 @@ import {
 } from '@shopify/polaris';
 import { PlusIcon, DeleteIcon } from '@shopify/polaris-icons';
 import { Toggle } from '../components/Toggle';
-import { ModalBloom } from '../components/ModalBloom';
 
 /* ─── Data ─── */
 
@@ -180,7 +179,6 @@ export default function DesignPage() {
       </Card>
 
       {/* Modals */}
-      <ModalBloom open={themesModal || postersModal || gifsModal} />
       <LibraryModal
         open={themesModal}
         onClose={() => setThemesModal(false)}

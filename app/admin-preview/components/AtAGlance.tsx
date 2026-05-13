@@ -6,6 +6,56 @@ const ACCENT = '#7C5CFF';
 const ACCENT_SOFT = 'rgba(124, 92, 255, 0.14)';
 const NEUTRAL = '#C4C6CC';
 
+const CARD_STYLE: React.CSSProperties = {
+  background: '#fff',
+  border: '1px solid #dcdcde',
+  borderRadius: 14,
+  padding: '16px 16px 14px',
+  boxShadow: '0 1px 2px rgba(15, 15, 25, 0.03)',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 4,
+  minWidth: 0,
+  textDecoration: 'none',
+  color: 'inherit',
+  cursor: 'pointer',
+  transition: 'border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease',
+};
+
+const LABEL_STYLE: React.CSSProperties = {
+  fontSize: 12.5,
+  color: '#6b6b73',
+  fontWeight: 500,
+  letterSpacing: '-0.005em',
+  marginBottom: 8,
+};
+
+const HEADLINE_STYLE: React.CSSProperties = {
+  fontSize: 24,
+  fontWeight: 700,
+  color: '#111',
+  lineHeight: 1.1,
+  letterSpacing: '-0.015em',
+};
+
+const SECONDARY_STYLE: React.CSSProperties = {
+  fontSize: 12.5,
+  color: '#6b6b73',
+  lineHeight: 1.4,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  flexWrap: 'wrap',
+  marginTop: 4,
+};
+
+const VIZ_STYLE: React.CSSProperties = {
+  marginTop: 12,
+  height: 38,
+  display: 'flex',
+  alignItems: 'flex-end',
+};
+
 type CardProps = {
   href: string;
   label: string;
@@ -16,65 +66,11 @@ type CardProps = {
 
 function GlanceCard({ href, label, headline, secondary, viz }: CardProps) {
   return (
-    <Link href={href} className="glance-card">
-      <div className="glance-top">
-        <div className="glance-label">{label}</div>
-      </div>
-      <div className="glance-headline">{headline}</div>
-      <div className="glance-secondary">{secondary}</div>
-      <div className="glance-viz">{viz}</div>
-      <style jsx>{`
-        .glance-card {
-          background: #fff;
-          border: 1px solid #dcdcde;
-          border-radius: 14px;
-          padding: 16px 16px 14px;
-          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          min-width: 0;
-          text-decoration: none;
-          color: inherit;
-          transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
-          cursor: pointer;
-        }
-        .glance-card:hover {
-          border-color: #c4c4ca;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px -8px rgba(15, 15, 25, 0.12);
-        }
-        .glance-label {
-          font-size: 12.5px;
-          color: #6b6b73;
-          font-weight: 500;
-          letter-spacing: -0.005em;
-          margin-bottom: 8px;
-        }
-        .glance-headline {
-          font-size: 24px;
-          font-weight: 700;
-          color: #111;
-          line-height: 1.1;
-          letter-spacing: -0.015em;
-        }
-        .glance-secondary {
-          font-size: 12.5px;
-          color: #6b6b73;
-          line-height: 1.4;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          flex-wrap: wrap;
-          margin-top: 4px;
-        }
-        .glance-viz {
-          margin-top: 12px;
-          height: 38px;
-          display: flex;
-          align-items: flex-end;
-        }
-      `}</style>
+    <Link href={href} style={CARD_STYLE} className="glance-card">
+      <div style={LABEL_STYLE}>{label}</div>
+      <div style={HEADLINE_STYLE}>{headline}</div>
+      <div style={SECONDARY_STYLE}>{secondary}</div>
+      <div style={VIZ_STYLE}>{viz}</div>
     </Link>
   );
 }
@@ -119,7 +115,7 @@ function Sparkline({ data, height = 38 }: { data: number[]; height?: number }) {
   const pointStr = points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
   const areaStr = `M 0,${h} L ${pointStr.replaceAll(' ', ' L ')} L ${w},${h} Z`;
   return (
-    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden>
+    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
       <path d={areaStr} fill={ACCENT_SOFT} />
       <polyline
         fill="none"
@@ -150,7 +146,7 @@ function DualSparkline({ primary, secondary, height = 38 }: { primary: number[];
       })
       .join(' ');
   return (
-    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden>
+    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
       <polyline
         fill="none"
         stroke={NEUTRAL}
@@ -180,7 +176,7 @@ function VerticalBars({ values, height = 38 }: { values: number[]; height?: numb
   const gap = 4;
   const barW = (w - gap * (values.length - 1)) / values.length;
   return (
-    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden>
+    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
       {values.map((v, i) => {
         const barH = Math.max(2, (v / max) * (h - 2));
         const x = i * (barW + gap);
@@ -208,7 +204,7 @@ function FunnelBars({ values, height = 38 }: { values: number[]; height?: number
   const max = Math.max(...values) || 1;
   const rowH = (h - (values.length - 1) * 2) / values.length;
   return (
-    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden>
+    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
       {values.map((v, i) => {
         const barW = (v / max) * w;
         const y = i * (rowH + 2);
@@ -239,7 +235,7 @@ function CompareBars({ target, actual, height = 38 }: { target: number; actual: 
   const actualW = (actual / max) * w;
   const better = actual <= target;
   return (
-    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden>
+    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
       <rect x={0} y={0} width={targetW} height={rowH} rx={2} fill={NEUTRAL} />
       <rect
         x={0}
@@ -260,7 +256,7 @@ function Donut({ percent, height = 38 }: { percent: number; height?: number }) {
   const c = 2 * Math.PI * r;
   const filled = (percent / 100) * c;
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden style={{ overflow: 'visible' }}>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden style={{ overflow: 'visible', display: 'block' }}>
       <circle
         cx={size / 2}
         cy={size / 2}
@@ -289,10 +285,25 @@ function Donut({ percent, height = 38 }: { percent: number; height?: number }) {
 
 export function AtAGlance() {
   return (
-    <section className="aag">
-      <div className="aag-header">
-        <h2 className="aag-title">At a glance</h2>
-        <Link href="/admin-preview/reports" className="aag-link">View all reports →</Link>
+    <section style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h2 style={{
+          fontSize: 17,
+          fontWeight: 600,
+          color: '#111',
+          margin: 0,
+          letterSpacing: '-0.005em',
+        }}>
+          At a glance
+        </h2>
+        <Link href="/admin-preview/reports" style={{
+          fontSize: 12.5,
+          color: '#5c4dff',
+          fontWeight: 500,
+          textDecoration: 'none',
+        }}>
+          View all reports →
+        </Link>
       </div>
 
       <div className="aag-grid">
@@ -349,30 +360,6 @@ export function AtAGlance() {
       </div>
 
       <style jsx>{`
-        .aag {
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-        }
-        .aag-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-        .aag-title {
-          font-size: 17px;
-          font-weight: 600;
-          color: #111;
-          margin: 0;
-          letter-spacing: -0.005em;
-        }
-        .aag-link {
-          font-size: 12.5px;
-          color: #5c4dff;
-          font-weight: 500;
-          text-decoration: none;
-        }
-        .aag-link:hover { text-decoration: underline; }
         .aag-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -380,6 +367,11 @@ export function AtAGlance() {
         }
         @media (max-width: 1080px) { .aag-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 540px)  { .aag-grid { grid-template-columns: 1fr; } }
+        :global(.glance-card:hover) {
+          border-color: #c4c4ca !important;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px -8px rgba(15, 15, 25, 0.12) !important;
+        }
       `}</style>
     </section>
   );

@@ -122,8 +122,43 @@ export function AnnouncementCard() {
           display: flex;
           gap: 32px;
           align-items: flex-start;
-          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
           border: 1px solid #dcdcde;
+          box-shadow:
+            0 1px 2px rgba(15, 15, 25, 0.03),
+            0 0 80px -10px rgba(124, 92, 255, 0.28),
+            0 12px 30px -16px rgba(124, 92, 255, 0.22);
+          position: relative;
+          overflow: hidden;
+          isolation: isolate;
+        }
+        .ann-card::before,
+        .ann-card::after {
+          content: '';
+          position: absolute;
+          top: -50%;
+          width: 22%;
+          height: 220%;
+          pointer-events: none;
+          filter: blur(3px);
+          z-index: -1;
+          opacity: 0;
+          animation: ann-beam-sweep 1800ms cubic-bezier(0.22, 0.61, 0.36, 1) 200ms forwards;
+        }
+        .ann-card::before {
+          left: 12%;
+          transform: rotate(-14deg);
+          background: linear-gradient(105deg, transparent 38%, rgba(124, 92, 255, 0.28) 50%, transparent 62%);
+        }
+        .ann-card::after {
+          right: 12%;
+          transform: rotate(14deg);
+          animation-delay: 380ms;
+          background: linear-gradient(-105deg, transparent 38%, rgba(168, 85, 247, 0.22) 50%, transparent 62%);
+        }
+        @keyframes ann-beam-sweep {
+          0%   { opacity: 0; }
+          35%  { opacity: 1; }
+          100% { opacity: 0; }
         }
         .ann-illustration {
           flex-shrink: 0;

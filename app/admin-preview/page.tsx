@@ -6,14 +6,11 @@ import {
   GiftCardIcon,
   GiftCardFilledIcon,
   ChartLineIcon,
-  ChartVerticalIcon,
   EmailIcon,
   EmailNewsletterIcon,
   CashDollarIcon,
   DeliveryIcon,
   PackageFulfilledIcon,
-  ViewIcon,
-  ShareIcon,
 } from '@shopify/polaris-icons';
 import { InlineSetupCard } from './components/InlineSetupCard';
 import { AnnouncementCard } from './components/AnnouncementCard';
@@ -85,13 +82,6 @@ function Sparkline({ data }: { data: number[] }) {
 
 export default function DashboardPage() {
   const [setupComplete, setSetupComplete] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  const handleShare = () => {
-    void navigator.clipboard?.writeText('https://giftwell.app/g/acme-store').catch(() => {});
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
 
   return (
     <>
@@ -203,35 +193,6 @@ export default function DashboardPage() {
               })}
             </ul>
           </section>
-        </div>
-
-        <div className="quick-actions">
-          <Link href="/demo" className="action-tile">
-            <span className="action-icon" aria-hidden><ViewIcon /></span>
-            <span className="action-body">
-              <strong>View gift page</strong>
-              <span>See how recipients experience your gift</span>
-            </span>
-            <span className="action-arrow" aria-hidden>→</span>
-          </Link>
-
-          <button type="button" className="action-tile" onClick={handleShare}>
-            <span className="action-icon" aria-hidden><ShareIcon /></span>
-            <span className="action-body">
-              <strong>{copied ? 'Copied!' : 'Share link'}</strong>
-              <span>Copy your gift page URL to clipboard</span>
-            </span>
-            <span className="action-arrow" aria-hidden>→</span>
-          </button>
-
-          <Link href="/admin-preview/reports" className="action-tile">
-            <span className="action-icon" aria-hidden><ChartVerticalIcon /></span>
-            <span className="action-body">
-              <strong>Open Reports</strong>
-              <span>Drill into revenue, funnel, and more</span>
-            </span>
-            <span className="action-arrow" aria-hidden>→</span>
-          </Link>
         </div>
 
       </div>
@@ -468,74 +429,6 @@ export default function DashboardPage() {
         }
         .activity-text { flex: 1; font-size: 13px; color: #111; min-width: 0; }
         .activity-time { font-size: 12px; color: #8a8a93; flex-shrink: 0; }
-
-        .quick-actions {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-        }
-        @media (max-width: 900px) { .quick-actions { grid-template-columns: 1fr; } }
-
-        .action-tile {
-          background: #fff;
-          border: 1px solid #dcdcde;
-          border-radius: 14px;
-          padding: 14px 16px;
-          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          text-decoration: none;
-          color: inherit;
-          cursor: pointer;
-          font: inherit;
-          text-align: left;
-          width: 100%;
-          transition: background 120ms ease, border-color 120ms ease;
-        }
-        .action-tile:hover {
-          background: #f9f9fb;
-          border-color: #cbcbd1;
-        }
-        .action-icon {
-          width: 36px;
-          height: 36px;
-          border-radius: 9px;
-          background: #f5f5f7;
-          color: #4a4a52;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-        .action-icon :global(svg) {
-          width: 18px;
-          height: 18px;
-          fill: currentColor;
-        }
-        .action-body {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          min-width: 0;
-        }
-        .action-body strong {
-          font-size: 13.5px;
-          font-weight: 600;
-          color: #111;
-          letter-spacing: -0.005em;
-        }
-        .action-body span {
-          font-size: 12px;
-          color: #6b6b73;
-          margin-top: 2px;
-          line-height: 1.3;
-        }
-        .action-arrow {
-          color: #8a8a93;
-          font-size: 16px;
-          flex-shrink: 0;
-        }
 
         @media (max-width: 720px) {
           .dash-section-header { flex-direction: column; align-items: flex-start; }
