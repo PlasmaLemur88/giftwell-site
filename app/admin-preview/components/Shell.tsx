@@ -30,7 +30,10 @@ const APPS = [
 const GIFTWELL_SUB = [
   { href: '/admin-preview/reports', label: 'Reports' },
   { href: '/admin-preview/emails', label: 'Emails' },
+  { href: '/admin-preview/products', label: 'Products' },
   { href: '/admin-preview/design', label: 'Design' },
+  { href: '/admin-preview/landing', label: 'Landing page' },
+  { href: '/admin-preview/settings', label: 'Settings' },
 ];
 
 export function Shell({ children }: { children: React.ReactNode }) {

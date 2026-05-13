@@ -8,12 +8,8 @@ const DEFAULT_ANSWERS: FrameAnswers = {
   goals: ['revenue', 'customers'],
   buyerStatus: 'waiting',
   volume: '50-200',
-  catalogApproach: 'curated',
   feeHandling: 'pass',
   enableVolumeDiscounts: true,
-  enableConcierge: true,
-  addToNav: true,
-  addToFooter: true,
 };
 
 export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
