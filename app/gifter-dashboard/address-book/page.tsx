@@ -98,10 +98,16 @@ export default function AddressBook() {
       </div>
 
       <style jsx>{`
-        .gd-ab { display: flex; flex-direction: column; gap: 16px; }
+        .gd-ab { display: flex; flex-direction: column; gap: 18px; }
 
-        .gd-page-header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 4px; }
-        .gd-page-header p { font-size: 14px; color: #5a5a62; margin: 0; }
+        .gd-page-header { padding: 4px 8px 8px; color: #fff; }
+        .gd-page-header h1 {
+          font-family: 'Georgia', 'Times New Roman', serif;
+          font-size: 38px; font-weight: 400; font-style: italic;
+          letter-spacing: -0.02em; margin: 0 0 4px;
+          color: #fff;
+        }
+        .gd-page-header p { font-size: 14.5px; color: rgba(255, 255, 255, 0.85); margin: 0; }
         .gd-page-header-row {
           display: flex; justify-content: space-between; align-items: flex-end; gap: 12px;
         }

@@ -3,7 +3,7 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BRAND, GIFTER } from './data';
+import { BRAND, BRAND_DARK, GIFTER } from './data';
 
 const NAV = [
   { href: '/gifter-dashboard',                label: 'Home',         icon: HomeIcon },
@@ -74,6 +74,19 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
           color: #1a1a1f;
           min-height: 100vh;
+          background:
+            radial-gradient(ellipse 70% 35% at 15% 0%, ${BRAND_DARK} 0%, transparent 60%) no-repeat,
+            radial-gradient(ellipse 80% 40% at 85% 4%, rgba(255, 214, 194, 0.55) 0%, transparent 65%) no-repeat,
+            linear-gradient(180deg,
+              ${BRAND} 0%,
+              #B59DEC 6%,
+              #D6C2EE 16%,
+              #EDE2F4 28%,
+              #F7F2FA 40%,
+              #fafafb 55%
+            ) no-repeat;
+          background-size: 100% 720px, 100% 720px, 100% 100%;
+          background-color: #fafafb;
         }
         .gd-notice {
           background: #1a1a1f; color: #fff;
@@ -88,8 +101,10 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
 
         /* ─── Sidebar (desktop only) ─── */
         .gd-sidebar {
-          background: #fff;
-          border-right: 1px solid #ececef;
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-right: 1px solid rgba(255, 255, 255, 0.4);
           padding: 20px 12px 16px;
           display: flex;
           flex-direction: column;

@@ -32,7 +32,7 @@ export default function GifterHome() {
       </section>
 
       {/* Primary CTA — standalone, unmissable */}
-      <Link href="#" className="gd-primary-cta">
+      <Link href="/landing-preview" className="gd-primary-cta">
         <span className="gd-primary-cta-glow" aria-hidden />
         <span className="gd-primary-cta-icon" aria-hidden><PlusIcon /></span>
         <span className="gd-primary-cta-text">
@@ -141,18 +141,11 @@ export default function GifterHome() {
           to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ─── Hero ─── */
+        /* ─── Hero — no card, just content on the body atmosphere ─── */
         .gd-hero {
           position: relative;
-          overflow: hidden;
-          background:
-            radial-gradient(circle at 100% 95%, ${PEACH_SOFT} 0%, transparent 45%),
-            radial-gradient(circle at 105% 100%, #ffffff 0%, transparent 38%),
-            radial-gradient(circle at -10% -10%, ${BRAND_DARK} 0%, transparent 55%),
-            linear-gradient(135deg, ${BRAND_DARK} 0%, ${BRAND} 30%, #C5ADF5 60%, #F4E9FB 100%);
           color: #fff;
-          border-radius: 20px;
-          padding: 38px 40px 32px;
+          padding: 8px 8px 24px;
         }
         .gd-hero-content { position: relative; z-index: 2; }
         .gd-hero-name {
