@@ -62,6 +62,46 @@ const CADENCE_OPTIONS = [
   { label: 'Off',                value: 'off' },
 ];
 
+/* ─── Merchant brand (in production these come from merchant settings) ─── */
+
+const BRAND_COLOR = '#5B6CFF';
+const MERCHANT_NAME = 'Acme';
+
+function lighten(hex: string, amount = 0.3): string {
+  const cleaned = hex.replace('#', '');
+  const r = parseInt(cleaned.slice(0, 2), 16);
+  const g = parseInt(cleaned.slice(2, 4), 16);
+  const b = parseInt(cleaned.slice(4, 6), 16);
+  const mix = (c: number) => Math.round(c + (255 - c) * amount);
+  return `#${[mix(r), mix(g), mix(b)].map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function MerchantLogo({ size = 44, radius = 8 }: { size?: number; radius?: number }) {
+  return (
+    <span
+      style={{
+        width: size,
+        height: size,
+        borderRadius: radius,
+        background: '#1a1a1f',
+        color: '#fff',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+        fontFamily: 'Georgia, "Times New Roman", serif',
+        fontWeight: 700,
+        fontStyle: 'italic',
+        fontSize: Math.round(size * 0.5),
+        letterSpacing: '-0.04em',
+      }}
+      aria-label={MERCHANT_NAME}
+    >
+      {MERCHANT_NAME.charAt(0)}
+    </span>
+  );
+}
+
 /* ─── Per-email mockup content ─── */
 
 type EmailContent = {
@@ -377,6 +417,7 @@ function CadenceSelect() {
 
 function EmailMockup({ content }: { content: EmailContent }) {
   const isGifter = content.audience === 'gifter';
+  const brandLight = lighten(BRAND_COLOR, 0.25);
   return (
     <div
       style={{
@@ -397,24 +438,31 @@ function EmailMockup({ content }: { content: EmailContent }) {
           gap: 12,
         }}
       >
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: '50%',
-            background: isGifter
-              ? 'linear-gradient(135deg, #1a1a1f, #4a4a52)'
-              : 'linear-gradient(135deg, #7C5CFF, #A855F7)',
-            color: '#fff',
-            fontWeight: 700,
-            fontSize: 14,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {isGifter ? 'G' : 'A'}
-        </div>
+        {isGifter ? (
+          // Service emails from Giftwell — keep Giftwell mark in the From strip
+          <span
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #1a1a1f, #4a4a52)',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: 14,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              fontFamily: 'Georgia, serif',
+              fontStyle: 'italic',
+            }}
+          >
+            G
+          </span>
+        ) : (
+          // Recipient emails are from the merchant — show their logo
+          <MerchantLogo size={36} radius={18} />
+        )}
         <div style={{ lineHeight: 1.3 }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#111' }}>{content.fromName}</div>
           <div style={{ fontSize: 12, color: '#6b6b73' }}>{content.fromEmail}</div>
@@ -426,7 +474,7 @@ function EmailMockup({ content }: { content: EmailContent }) {
         style={{
           padding: '44px 28px 36px',
           background:
-            'radial-gradient(120% 80% at 50% 0%, #f5edff 0%, #fbf8ff 60%, #ffffff 100%)',
+            'radial-gradient(120% 80% at 50% 0%, #f5f7ff 0%, #fbfcff 60%, #ffffff 100%)',
           textAlign: 'center',
           position: 'relative',
           overflow: 'hidden',
@@ -437,18 +485,18 @@ function EmailMockup({ content }: { content: EmailContent }) {
         <Sparkle bottom={28} left={36} size={10} />
         <Sparkle bottom={48} right={20} size={8} />
 
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/g-black-bold.png"
-          alt=""
-          style={{ width: 44, height: 44, margin: '0 auto 16px', display: 'block' }}
-        />
+        {/* Merchant logo as the hero brand mark on every email type
+            (recipients see their gift's brand; gifters see the brand of
+            the program they're running). */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+          <MerchantLogo size={48} radius={10} />
+        </div>
 
         <div
           style={{
             fontSize: 11,
             fontWeight: 600,
-            color: '#7C5CFF',
+            color: BRAND_COLOR,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
             marginBottom: 10,
@@ -498,13 +546,13 @@ function EmailMockup({ content }: { content: EmailContent }) {
             style={{
               all: 'unset',
               cursor: 'pointer',
-              background: 'linear-gradient(135deg, #7C5CFF, #A855F7)',
+              background: `linear-gradient(135deg, ${BRAND_COLOR}, ${brandLight})`,
               color: '#fff',
               padding: '12px 26px',
               borderRadius: 999,
               fontSize: 14,
               fontWeight: 600,
-              boxShadow: '0 6px 16px rgba(124, 92, 255, 0.25)',
+              boxShadow: `0 6px 16px ${BRAND_COLOR}40`,
             }}
           >
             {content.primaryCta}
@@ -586,7 +634,7 @@ function ProgressBar({ percent }: { percent: number }) {
     <div style={{ maxWidth: 280, margin: '0 auto 4px' }}>
       <div
         style={{
-          background: '#f0e7ff',
+          background: lighten(BRAND_COLOR, 0.85),
           height: 8,
           borderRadius: 999,
           overflow: 'hidden',
@@ -596,7 +644,7 @@ function ProgressBar({ percent }: { percent: number }) {
           style={{
             width: `${percent}%`,
             height: '100%',
-            background: 'linear-gradient(90deg, #7C5CFF, #A855F7)',
+            background: `linear-gradient(90deg, ${BRAND_COLOR}, ${lighten(BRAND_COLOR, 0.25)})`,
             borderRadius: 999,
           }}
         />
