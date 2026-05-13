@@ -75,7 +75,24 @@ export default function GifterHome() {
               ? getRecipients(o).slice(0, 5)
               : [];
             return (
-              <Link key={o.id} href={`/gifter-dashboard/orders/${o.id}`} className="gd-order-card">
+              <Link
+                key={o.id}
+                href={`/gifter-dashboard/orders/${o.id}`}
+                className="gd-order-card"
+                style={{
+                  background: '#fff',
+                  border: '1px solid rgba(15, 15, 25, 0.06)',
+                  borderRadius: 16,
+                  padding: '20px 22px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 14,
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  boxShadow: '0 6px 18px -10px rgba(20, 14, 50, 0.18)',
+                  transition: 'border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease',
+                }}
+              >
                 <div className="gd-order-card-top">
                   <div>
                     <div className="gd-order-name">{o.name}</div>
@@ -276,21 +293,11 @@ export default function GifterHome() {
         }
 
         /* ─── Order list ─── */
-        .gd-orders-list { display: flex; flex-direction: column; gap: 10px; }
-        .gd-order-card {
-          background: #fff;
-          border: 1px solid rgba(15, 15, 25, 0.06);
-          border-radius: 14px;
-          padding: 18px 20px;
-          display: flex; flex-direction: column; gap: 12px;
-          text-decoration: none; color: inherit;
-          box-shadow: 0 4px 14px -8px rgba(20, 14, 50, 0.15);
-          transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
-        }
-        .gd-order-card:hover {
-          border-color: rgba(15, 15, 25, 0.18);
+        .gd-orders-list { display: flex; flex-direction: column; gap: 14px; }
+        :global(.gd-order-card:hover) {
+          border-color: rgba(15, 15, 25, 0.18) !important;
           transform: translateY(-1px);
-          box-shadow: 0 10px 24px -10px rgba(20, 14, 50, 0.25);
+          box-shadow: 0 12px 28px -10px rgba(20, 14, 50, 0.25) !important;
         }
         .gd-order-card-top {
           display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
