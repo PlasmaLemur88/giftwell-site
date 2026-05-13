@@ -1,8 +1,8 @@
-# Giftwell — Merchant Admin Prototype
+# Giftwell: Merchant Admin Prototype
 
 A clickable Next.js prototype of the Giftwell Shopify app's merchant admin and the gifting model behind it. Frontend-only, no backend, no real Shopify integration.
 
-**Start here:** [`HANDOFF.md`](./HANDOFF.md) — full developer handoff (product model, what's done, what's not, decision log).
+**Start here:** [`HANDOFF.md`](./HANDOFF.md). Full developer handoff (product model, what's done, what's not, decision log).
 
 **Live preview:** [admin-preview](https://giftwell-site-git-claude-g-99430e-brandon-theplaybooks-projects.vercel.app/admin-preview)
 
