@@ -103,10 +103,9 @@ export default function GifterHome() {
         /* ─── Hero ─── */
         .gd-hero {
           background:
-            radial-gradient(ellipse 65% 70% at 12% 18%, rgba(92, 63, 224, 0.85) 0%, transparent 60%),
-            radial-gradient(ellipse 55% 60% at 88% 88%, rgba(255, 255, 255, 0.55) 0%, transparent 60%),
-            radial-gradient(ellipse 70% 60% at 80% 20%, rgba(255, 220, 245, 0.4) 0%, transparent 55%),
-            linear-gradient(135deg, ${BRAND} 0%, #A68DF0 45%, #DDC8F0 80%, #F4E9FB 100%);
+            radial-gradient(circle at 100% 100%, #ffffff 0%, transparent 40%),
+            radial-gradient(circle at 0% 0%, ${BRAND_DARK} 0%, transparent 55%),
+            linear-gradient(135deg, ${BRAND_DARK} 0%, ${BRAND} 30%, #C5ADF5 65%, #F4E9FB 100%);
           color: #fff;
           border-radius: 18px;
           padding: 36px 36px 32px;
@@ -217,15 +216,16 @@ export default function GifterHome() {
 function StatTile({ label, value }: { label: string; value: string }) {
   return (
     <div style={{
-      background: 'rgba(30, 20, 60, 0.22)',
-      border: '1px solid rgba(255, 255, 255, 0.25)',
+      background: 'rgba(255, 255, 255, 0.92)',
+      border: '1px solid rgba(255, 255, 255, 0.7)',
       borderRadius: 12,
-      padding: '14px 14px 12px',
-      backdropFilter: 'blur(8px)',
-      WebkitBackdropFilter: 'blur(8px)',
+      padding: '14px 16px 12px',
+      backdropFilter: 'blur(10px)',
+      WebkitBackdropFilter: 'blur(10px)',
+      boxShadow: '0 4px 18px -6px rgba(20, 14, 50, 0.18)',
     }}>
-      <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.015em', color: '#fff' }}>{value}</div>
-      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', marginTop: 2 }}>{label}</div>
+      <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.015em', color: '#1a1a1f' }}>{value}</div>
+      <div style={{ fontSize: 12, color: '#6b6b73', marginTop: 3 }}>{label}</div>
     </div>
   );
 }

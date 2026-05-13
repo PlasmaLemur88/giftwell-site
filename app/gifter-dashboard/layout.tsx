@@ -24,7 +24,8 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
         {/* Desktop sidebar */}
         <aside className="gd-sidebar">
           <div className="gd-sidebar-logo">
-            <span className="gd-mark">G</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/g-black-bold.png" alt="" className="gd-mark" />
             <span className="gd-wordmark">Giftwell</span>
           </div>
           <nav className="gd-sidebar-nav">
@@ -47,7 +48,8 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
             {/* Mobile header */}
             <header className="gd-mobile-header">
               <div className="gd-sidebar-logo" style={{ padding: 0 }}>
-                <span className="gd-mark">G</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/g-black-bold.png" alt="" className="gd-mark" />
                 <span className="gd-wordmark">Giftwell</span>
               </div>
               <div className="gd-avatar gd-avatar-sm">{GIFTER.fullName.split(' ').map((n) => n[0]).join('')}</div>
@@ -99,11 +101,8 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
         }
         .gd-mark {
           width: 28px; height: 28px;
-          background: ${BRAND}; color: #fff;
-          border-radius: 8px;
-          display: inline-flex; align-items: center; justify-content: center;
-          font-family: Georgia, serif; font-style: italic; font-weight: 700; font-size: 17px;
-          letter-spacing: -0.02em;
+          display: inline-block;
+          object-fit: contain;
         }
         .gd-wordmark { font-size: 16px; font-weight: 700; letter-spacing: -0.005em; }
 
