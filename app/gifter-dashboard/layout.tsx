@@ -61,12 +61,17 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
             </header>
 
             {children}
+
+            <footer className="gd-footer-sig">
+              Crafted with <em>✦</em> by Giftwell
+            </footer>
           </div>
         </main>
       </div>
 
       {/* Floating chat (placeholder for Intercom) */}
       <button className="gd-chat-fab" aria-label="Chat with support" type="button">
+        <span className="gd-chat-fab-pulse" aria-hidden />
         <ChatIcon />
       </button>
 
@@ -238,9 +243,37 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
           transform: translateY(-2px) scale(1.04);
           box-shadow: 0 16px 32px -10px rgba(124, 92, 255, 0.65), 0 4px 10px rgba(0, 0, 0, 0.12);
         }
-        .gd-chat-fab :global(svg) { width: 22px; height: 22px; }
+        .gd-chat-fab :global(svg) { width: 22px; height: 22px; position: relative; z-index: 1; }
+        .gd-chat-fab-pulse {
+          position: absolute; inset: 0;
+          border-radius: 50%;
+          border: 2px solid rgba(124, 92, 255, 0.6);
+          animation: gd-fab-pulse 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          pointer-events: none;
+        }
+        @keyframes gd-fab-pulse {
+          0%   { transform: scale(1);   opacity: 0.8; }
+          70%  { transform: scale(1.6); opacity: 0;   }
+          100% { transform: scale(1.6); opacity: 0;   }
+        }
         @media (max-width: 900px) {
           .gd-chat-fab { bottom: 78px; right: 16px; width: 50px; height: 50px; }
+        }
+
+        /* ─── Footer signature ─── */
+        .gd-footer-sig {
+          text-align: center;
+          font-size: 12px;
+          color: #5a5a62;
+          padding: 32px 16px 16px;
+          letter-spacing: 0.02em;
+          opacity: 0.7;
+        }
+        .gd-footer-sig em {
+          font-family: 'Georgia', serif;
+          font-style: italic;
+          color: ${BRAND_DARK};
+          margin: 0 4px;
         }
       `}</style>
     </div>

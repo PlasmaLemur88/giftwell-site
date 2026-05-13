@@ -1,9 +1,28 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BRAND, GIFTER, STATS, ORDERS, ORDER_STATUS_COLORS, getRecipients } from './data';
+import { BRAND, GIFTER, STATS, ORDERS, ORDER_STATUS_COLORS, getRecipients, avatarGradient } from './data';
 
 const PEACH = '#FFD6C2';
+
+function useCountUp(target: number, duration = 1200): number {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const start = performance.now();
+    const tick = () => {
+      const elapsed = performance.now() - start;
+      const t = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(target * eased);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return value;
+}
 
 export default function GifterHome() {
   return (
@@ -20,9 +39,9 @@ export default function GifterHome() {
           </p>
 
           <div className="gd-hero-stats">
-            <StatTile big={STATS.giftsSent}   sub="gifts sent" />
-            <StatTile big={STATS.claimRate}   sub="claimed and counting" />
-            <StatTile big={STATS.totalSpent}  sub="in generosity" />
+            <StatTile target={STATS.giftsSent.value}  format={STATS.giftsSent.format}  sub="gifts sent" />
+            <StatTile target={STATS.claimRate.value}  format={STATS.claimRate.format}  sub="claimed and counting" />
+            <StatTile target={STATS.totalSpent.value} format={STATS.totalSpent.format} sub="in generosity" />
           </div>
         </div>
 
@@ -33,7 +52,7 @@ export default function GifterHome() {
       {/* Recent orders */}
       <section className="gd-section">
         <div className="gd-section-header">
-          <h2 className="gd-section-title">Recent</h2>
+          <h2 className="gd-section-title">Recently sent</h2>
           <Link href="/gifter-dashboard/orders" className="gd-section-link">See all →</Link>
         </div>
         <div className="gd-orders-list">
@@ -44,6 +63,8 @@ export default function GifterHome() {
             const previewRecipients = o.status !== 'Scheduled' && o.status !== 'Draft'
               ? getRecipients(o).slice(0, 5)
               : [];
+            const allClaimed = pct === 100 && previewRecipients.length > 0;
+            const ribbonColor = allClaimed ? '#D4A640' : (tone.fg);
             return (
               <Link
                 key={o.id}
@@ -53,16 +74,28 @@ export default function GifterHome() {
                   background: '#fff',
                   border: '1px solid rgba(15, 15, 25, 0.06)',
                   borderRadius: 16,
-                  padding: '20px 22px',
+                  padding: '20px 22px 20px 24px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 14,
                   textDecoration: 'none',
                   color: 'inherit',
-                  boxShadow: '0 6px 18px -10px rgba(20, 14, 50, 0.18)',
+                  boxShadow: allClaimed
+                    ? '0 6px 18px -10px rgba(212, 166, 64, 0.45), 0 0 0 1px rgba(212, 166, 64, 0.25)'
+                    : '0 6px 18px -10px rgba(20, 14, 50, 0.18)',
+                  position: 'relative',
+                  overflow: 'hidden',
                   transition: 'border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease',
                 }}
               >
+                {/* Status ribbon on the left edge */}
+                <span style={{
+                  position: 'absolute', left: 0, top: 0, bottom: 0,
+                  width: 4,
+                  background: ribbonColor,
+                  opacity: 0.85,
+                }} aria-hidden />
+
                 <div className="gd-order-card-top">
                   <div>
                     <div className="gd-order-name">{o.name}</div>
@@ -70,9 +103,15 @@ export default function GifterHome() {
                       {o.recipients} recipients · {o.budgetPerRecipient}/person
                     </div>
                   </div>
-                  <span className="gd-order-status" style={{ background: tone.bg, color: tone.fg }}>
-                    {o.status}
-                  </span>
+                  {allClaimed ? (
+                    <span className="gd-celebration">
+                      <span aria-hidden>🎉</span> All claimed
+                    </span>
+                  ) : (
+                    <span className="gd-order-status" style={{ background: tone.bg, color: tone.fg }}>
+                      {o.status}
+                    </span>
+                  )}
                 </div>
 
                 {previewRecipients.length > 0 && (
@@ -83,7 +122,7 @@ export default function GifterHome() {
                           key={r.id}
                           className="gd-avatar-mini"
                           style={{
-                            background: `hsl(${(r.initials.charCodeAt(0) * 7) % 360}, 60%, 55%)`,
+                            background: avatarGradient(r.initials),
                             zIndex: 5 - i,
                           }}
                         >{r.initials}</span>
@@ -100,7 +139,12 @@ export default function GifterHome() {
 
                 {o.status !== 'Scheduled' && o.status !== 'Draft' && (
                   <div className="gd-progress">
-                    <div className="gd-progress-fill" style={{ width: `${pct}%` }} />
+                    <div className="gd-progress-fill" style={{
+                      width: `${pct}%`,
+                      background: allClaimed
+                        ? 'linear-gradient(90deg, #D4A640, #F4C76C)'
+                        : 'linear-gradient(90deg, #1F8A4C, #34B561)',
+                    }} />
                   </div>
                 )}
 
@@ -217,6 +261,16 @@ export default function GifterHome() {
           border-radius: 999px;
           white-space: nowrap;
         }
+        .gd-celebration {
+          font-size: 11.5px; font-weight: 600;
+          padding: 4px 10px;
+          border-radius: 999px;
+          background: linear-gradient(135deg, #F4C76C, #D4A640);
+          color: #5a3d00;
+          white-space: nowrap;
+          box-shadow: 0 4px 12px -4px rgba(212, 166, 64, 0.55);
+          display: inline-flex; align-items: center; gap: 4px;
+        }
 
         /* Recipient avatars */
         .gd-recipients-row {
@@ -265,7 +319,8 @@ export default function GifterHome() {
 
 /* ─── Components ─── */
 
-function StatTile({ big, sub }: { big: string; sub: string }) {
+function StatTile({ target, format, sub }: { target: number; format: (n: number) => string; sub: string }) {
+  const animated = useCountUp(target);
   return (
     <div style={{
       background: 'rgba(255, 255, 255, 0.92)',
@@ -283,7 +338,8 @@ function StatTile({ big, sub }: { big: string; sub: string }) {
         letterSpacing: '-0.02em',
         color: '#1a1a1f',
         lineHeight: 1.1,
-      }}>{big}</div>
+        fontVariantNumeric: 'tabular-nums',
+      }}>{format(animated)}</div>
       <div style={{ fontSize: 12, color: '#6b6b73', marginTop: 4 }}>{sub}</div>
     </div>
   );

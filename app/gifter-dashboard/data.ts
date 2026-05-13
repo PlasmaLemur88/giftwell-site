@@ -9,10 +9,17 @@ export const GIFTER = {
 };
 
 export const STATS = {
-  giftsSent: '247',
-  claimRate: '89%',
-  totalSpent: '$21K',
+  giftsSent:  { value: 247, format: (n: number) => Math.round(n).toLocaleString() },
+  claimRate:  { value: 89,  format: (n: number) => `${Math.round(n)}%` },
+  totalSpent: { value: 21,  format: (n: number) => `$${Math.round(n)}K` },
 };
+
+export function avatarGradient(seed: string): string {
+  const code = seed.charCodeAt(0) || 100;
+  const h1 = (code * 7) % 360;
+  const h2 = (h1 + 42) % 360;
+  return `linear-gradient(135deg, hsl(${h1}, 70%, 58%), hsl(${h2}, 70%, 48%))`;
+}
 
 export type GifterOrderStatus = 'Sent' | 'Scheduled' | 'Draft' | 'Completed';
 

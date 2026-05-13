@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { BRAND } from '../data';
+import { BRAND, avatarGradient } from '../data';
 
 type Contact = {
   id: string;
@@ -78,7 +78,7 @@ export default function PeoplePage() {
       {/* Lists — primary, copy-out */}
       <section className="gd-lists-section">
         <div className="gd-lists-head">
-          <h2 className="gd-section-title">Lists</h2>
+          <h2 className="gd-section-title">Your circles</h2>
           <button className="gd-add-link" onClick={() => setAddOpen(!addOpen)}>
             {addOpen ? '× Close' : '+ Add or import people'}
           </button>
@@ -146,7 +146,7 @@ export default function PeoplePage() {
             return (
               <div key={c.id} className="gd-contact-row">
                 <span className="gd-contact-avatar" style={{
-                  background: `hsl(${(c.name.charCodeAt(0) * 7) % 360}, 60%, 55%)`,
+                  background: avatarGradient(c.name),
                 }}>{initialsOf(c.name)}</span>
                 <div className="gd-contact-meta">
                   <div className="gd-contact-name">{c.name}</div>
@@ -381,7 +381,7 @@ function ListCard({
             title={c.name}
             style={{
               width: 28, height: 28, borderRadius: '50%',
-              background: `hsl(${(c.name.charCodeAt(0) * 7) % 360}, 60%, 55%)`,
+              background: avatarGradient(c.name),
               color: '#fff', fontSize: 10.5, fontWeight: 600,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               border: '2px solid #fff',

@@ -2,7 +2,7 @@
 
 import { use, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { BRAND, BRAND_DARK, ORDERS, getRecipients, STATUS_COLORS, type RecipientStatus } from '../../data';
+import { BRAND, BRAND_DARK, ORDERS, getRecipients, STATUS_COLORS, avatarGradient, type RecipientStatus } from '../../data';
 
 const FILTERS: ('All' | RecipientStatus)[] = ['All', 'Claimed', 'Delivered', 'Pending', 'Bounced'];
 
@@ -132,7 +132,7 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
             return (
               <div key={r.id} className="gd-recipient-row">
                 <span className="gd-recipient-avatar" style={{
-                  background: `hsl(${(r.initials.charCodeAt(0) * 7) % 360}, 60%, 55%)`,
+                  background: avatarGradient(r.initials),
                 }}>{r.initials}</span>
                 <div className="gd-recipient-meta">
                   <div className="gd-recipient-name">{r.name}</div>
