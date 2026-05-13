@@ -4,7 +4,9 @@ import Link from 'next/link';
 
 const ACCENT = '#7C5CFF';
 const ACCENT_SOFT = 'rgba(124, 92, 255, 0.14)';
+const ACCENT_MID = 'rgba(124, 92, 255, 0.55)';
 const NEUTRAL = '#C4C6CC';
+const WARNING = '#E0A23E';
 
 const CARD_STYLE: React.CSSProperties = {
   background: '#fff',
@@ -75,11 +77,12 @@ function GlanceCard({ href, label, headline, secondary, viz }: CardProps) {
   );
 }
 
-function DeltaBadge({ tone, children }: { tone: 'success' | 'critical' | 'neutral'; children: React.ReactNode }) {
+function DeltaBadge({ tone, children }: { tone: 'success' | 'critical' | 'attention' | 'neutral'; children: React.ReactNode }) {
   const colors = {
-    success:  { bg: '#ECFDF5', fg: '#047857' },
-    critical: { bg: '#FEF2F2', fg: '#B91C1C' },
-    neutral:  { bg: '#F3F3F5', fg: '#5a5a62' },
+    success:   { bg: '#ECFDF5', fg: '#047857' },
+    critical:  { bg: '#FEF2F2', fg: '#B91C1C' },
+    attention: { bg: '#FFF7E6', fg: '#92590B' },
+    neutral:   { bg: '#F3F3F5', fg: '#5a5a62' },
   }[tone];
   return (
     <span style={{
@@ -130,46 +133,7 @@ function Sparkline({ data, height = 38 }: { data: number[]; height?: number }) {
   );
 }
 
-function DualSparkline({ primary, secondary, height = 38 }: { primary: number[]; secondary: number[]; height?: number }) {
-  const w = 220;
-  const h = height;
-  const all = [...primary, ...secondary];
-  const min = Math.min(...all);
-  const max = Math.max(...all);
-  const range = max - min || 1;
-  const toPts = (data: number[]) =>
-    data
-      .map((v, i) => {
-        const x = (i / (data.length - 1)) * w;
-        const y = h - 2 - ((v - min) / range) * (h - 4);
-        return `${x.toFixed(1)},${y.toFixed(1)}`;
-      })
-      .join(' ');
-  return (
-    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
-      <polyline
-        fill="none"
-        stroke={NEUTRAL}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-        points={toPts(secondary)}
-      />
-      <polyline
-        fill="none"
-        stroke={ACCENT}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-        points={toPts(primary)}
-      />
-    </svg>
-  );
-}
-
-function VerticalBars({ values, height = 38 }: { values: number[]; height?: number }) {
+function VerticalBars({ values, highlightIndex, height = 38 }: { values: number[]; highlightIndex?: number; height?: number }) {
   const w = 220;
   const h = height;
   const max = Math.max(...values) || 1;
@@ -181,7 +145,7 @@ function VerticalBars({ values, height = 38 }: { values: number[]; height?: numb
         const barH = Math.max(2, (v / max) * (h - 2));
         const x = i * (barW + gap);
         const y = h - barH;
-        const isMax = v === max;
+        const hi = highlightIndex !== undefined ? i === highlightIndex : v === max;
         return (
           <rect
             key={i}
@@ -190,7 +154,7 @@ function VerticalBars({ values, height = 38 }: { values: number[]; height?: numb
             width={barW}
             height={barH}
             rx={2}
-            fill={isMax ? ACCENT : ACCENT_SOFT}
+            fill={hi ? ACCENT : ACCENT_SOFT}
           />
         );
       })}
@@ -198,16 +162,16 @@ function VerticalBars({ values, height = 38 }: { values: number[]; height?: numb
   );
 }
 
-function FunnelBars({ values, height = 38 }: { values: number[]; height?: number }) {
+function LabeledFunnel({ stages, height = 38 }: { stages: { label: string; value: number }[]; height?: number }) {
   const w = 220;
   const h = height;
-  const max = Math.max(...values) || 1;
-  const rowH = (h - (values.length - 1) * 2) / values.length;
+  const max = Math.max(...stages.map((s) => s.value)) || 1;
+  const rowH = (h - (stages.length - 1) * 1.5) / stages.length;
   return (
     <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
-      {values.map((v, i) => {
-        const barW = (v / max) * w;
-        const y = i * (rowH + 2);
+      {stages.map((s, i) => {
+        const barW = (s.value / max) * w;
+        const y = i * (rowH + 1.5);
         const alpha = 1 - i * 0.15;
         return (
           <rect
@@ -216,7 +180,7 @@ function FunnelBars({ values, height = 38 }: { values: number[]; height?: number
             y={y}
             width={barW}
             height={rowH}
-            rx={2}
+            rx={1.5}
             fill={ACCENT}
             opacity={alpha}
           />
@@ -226,58 +190,120 @@ function FunnelBars({ values, height = 38 }: { values: number[]; height?: number
   );
 }
 
-function CompareBars({ target, actual, height = 38 }: { target: number; actual: number; height?: number }) {
+function ComparePair({ prior, current, height = 38 }: { prior: number; current: number; height?: number }) {
   const w = 220;
   const h = height;
-  const max = Math.max(target, actual);
-  const rowH = (h - 8) / 2;
-  const targetW = (target / max) * w;
-  const actualW = (actual / max) * w;
-  const better = actual <= target;
+  const max = Math.max(prior, current);
+  const barW = (w - 14) / 2;
+  const priorH = (prior / max) * (h - 2);
+  const currentH = (current / max) * (h - 2);
   return (
     <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
-      <rect x={0} y={0} width={targetW} height={rowH} rx={2} fill={NEUTRAL} />
-      <rect
-        x={0}
-        y={rowH + 8}
-        width={actualW}
-        height={rowH}
-        rx={2}
-        fill={better ? '#1F8A4C' : '#E04F4F'}
-      />
+      <rect x={0} y={h - priorH} width={barW} height={priorH} rx={2} fill={ACCENT_SOFT} />
+      <rect x={barW + 14} y={h - currentH} width={barW} height={currentH} rx={2} fill={ACCENT} />
     </svg>
   );
 }
 
-function Donut({ percent, height = 38 }: { percent: number; height?: number }) {
-  const size = height;
-  const stroke = 6;
+function StuckBar({ claimedPct, inFlightPct, stuckPct, height = 38 }: {
+  claimedPct: number;
+  inFlightPct: number;
+  stuckPct: number;
+  height?: number;
+}) {
+  const w = 220;
+  const h = 10;
+  const yOffset = (height - h) / 2;
+  const claimedW = (claimedPct / 100) * w;
+  const inFlightW = (inFlightPct / 100) * w;
+  const stuckW = (stuckPct / 100) * w;
+  return (
+    <svg width="100%" height={height} viewBox={`0 0 ${w} ${height}`} preserveAspectRatio="none" aria-hidden style={{ display: 'block' }}>
+      <rect x={0}                       y={yOffset} width={claimedW}  height={h} rx={3} ry={3} fill={ACCENT_SOFT} />
+      <rect x={claimedW}                y={yOffset} width={inFlightW} height={h}             fill={NEUTRAL}    opacity={0.35} />
+      <rect x={claimedW + inFlightW}    y={yOffset} width={stuckW}    height={h} rx={3} ry={3} fill={WARNING} />
+    </svg>
+  );
+}
+
+function BigDonut({ percent, size = 80 }: { percent: number; size?: number }) {
+  const stroke = 9;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const filled = (percent / 100) * c;
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden style={{ overflow: 'visible', display: 'block' }}>
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill="none"
-        stroke={ACCENT_SOFT}
-        strokeWidth={stroke}
-      />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill="none"
-        stroke={ACCENT}
-        strokeWidth={stroke}
-        strokeDasharray={`${filled} ${c}`}
-        strokeDashoffset={c / 4}
-        strokeLinecap="round"
-        transform={`rotate(-90 ${size / 2} ${size / 2})`}
-      />
-    </svg>
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden style={{ display: 'block' }}>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke={ACCENT_SOFT}
+          strokeWidth={stroke}
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke={ACCENT}
+          strokeWidth={stroke}
+          strokeDasharray={`${filled} ${c}`}
+          strokeDashoffset={c / 4}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        />
+      </svg>
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 19,
+        fontWeight: 700,
+        color: '#111',
+        letterSpacing: '-0.015em',
+      }}>
+        {percent}%
+      </div>
+    </div>
+  );
+}
+
+/* ─── Recipients-who-buy card with hero donut ─── */
+
+function RecipientsCard() {
+  return (
+    <Link href="/admin-preview/reports/recipients" style={CARD_STYLE} className="glance-card">
+      <div style={LABEL_STYLE}>Recipients who buy</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 4, flex: 1 }}>
+        <BigDonut percent={23} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#111' }}>
+            187 of 812 became customers
+          </div>
+          <div style={{ fontSize: 11.5, color: '#8a8a93', lineHeight: 1.4 }}>
+            within 30 days of claiming
+          </div>
+          <div style={{ marginTop: 2 }}>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '2px 7px',
+              borderRadius: 999,
+              fontSize: 11.5,
+              fontWeight: 600,
+              background: '#ECFDF5',
+              color: '#047857',
+            }}>
+              +2.4pp
+            </span>
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }
 
@@ -308,54 +334,53 @@ export function AtAGlance() {
 
       <div className="aag-grid">
         <GlanceCard
-          href="/admin-preview/reports/revenue"
-          label="Money from gifting"
-          headline="$24,180"
-          secondary={<><DeltaBadge tone="success">+18%</DeltaBadge> vs last 30 days</>}
-          viz={<Sparkline data={[420, 480, 460, 540, 580, 620, 680, 740, 720, 820, 880, 960]} />}
+          href="/admin-preview/reports/funnel"
+          label="Recipient claim rate"
+          headline="63%"
+          secondary={<>812 of 1,284 claimed within 30 days</>}
+          viz={
+            <LabeledFunnel stages={[
+              { label: 'Sent',       value: 1284 },
+              { label: 'Opened',     value: 1130 },
+              { label: 'Picked',     value: 938 },
+              { label: 'Delivered',  value: 812 },
+              { label: 'Subscribed', value: 526 },
+            ]} />
+          }
         />
 
         <GlanceCard
-          href="/admin-preview/reports/funnel"
-          label="Recipient claim rate"
-          headline="64%"
-          secondary={<>412 of 645 gifts claimed</>}
-          viz={<FunnelBars values={[100, 88, 64, 60, 41]} />}
+          href="/admin-preview/reports/gifters"
+          label="Repeat gifter rate"
+          headline="38%"
+          secondary={<><DeltaBadge tone="success">+6pp</DeltaBadge> 35 of 92 ordered again in 90 days</>}
+          viz={<ComparePair prior={32} current={38} />}
         />
 
         <GlanceCard
           href="/admin-preview/reports/campaigns"
-          label="Top campaign"
+          label="Top campaign by revenue"
           headline="Mother's Day '26"
           secondary={<>$8,420 · 72% claim rate</>}
-          viz={<VerticalBars values={[42, 58, 84, 36, 48, 22]} />}
+          viz={<VerticalBars values={[42, 58, 84, 36, 48, 22]} highlightIndex={2} />}
         />
 
-        <GlanceCard
-          href="/admin-preview/reports/cac"
-          label="Cost per customer"
-          headline="$11.40"
-          secondary={<><DeltaBadge tone="success">$3.20 under target</DeltaBadge></>}
-          viz={<CompareBars target={14.6} actual={11.4} />}
-        />
-
-        <GlanceCard
-          href="/admin-preview/reports/recipients"
-          label="Recipients who buy"
-          headline="23%"
-          secondary={<>94 of 412 became customers</>}
-          viz={<Donut percent={23} />}
-        />
+        <RecipientsCard />
 
         <GlanceCard
           href="/admin-preview/reports/email"
-          label="Email engagement"
-          headline="52% open rate"
-          secondary={<>28% click-to-claim</>}
-          viz={<DualSparkline
-            primary={[28, 30, 32, 30, 34, 33, 36, 35, 38, 40, 38, 42]}
-            secondary={[48, 50, 51, 50, 52, 52, 53, 52, 54, 53, 54, 55]}
-          />}
+          label="Email open rate"
+          headline="52%"
+          secondary={<><DeltaBadge tone="success">+4pp</DeltaBadge> across all 9 emails</>}
+          viz={<Sparkline data={[44, 46, 45, 47, 48, 49, 49, 50, 51, 51, 52, 52]} />}
+        />
+
+        <GlanceCard
+          href="/admin-preview/reports/operations"
+          label="Unclaimed gifts"
+          headline="$2,486 stuck"
+          secondary={<><DeltaBadge tone="attention">132 gifts</DeltaBadge> expired or near expiry</>}
+          viz={<StuckBar claimedPct={63} inFlightPct={27} stuckPct={10} />}
         />
       </div>
 

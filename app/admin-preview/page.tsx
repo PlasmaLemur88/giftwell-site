@@ -5,8 +5,8 @@ import Link from 'next/link';
 import {
   GiftCardIcon,
   GiftCardFilledIcon,
-  ChartLineIcon,
-  EmailIcon,
+  PersonIcon,
+  CheckCircleIcon,
   EmailNewsletterIcon,
   CashDollarIcon,
   DeliveryIcon,
@@ -27,10 +27,10 @@ type Metric = {
 };
 
 const METRICS: Metric[] = [
-  { label: 'Gifts sent',      value: '1,284',   delta: '+18.2%', positive: true, Icon: GiftCardIcon,  spark: [12, 18, 14, 22, 20, 28, 26, 34, 30, 38, 42, 48] },
-  { label: 'Opt-in rate',     value: '64.8%',   delta: '+3.1pp', positive: true, Icon: ChartLineIcon, spark: [55, 58, 56, 60, 59, 62, 63, 64, 63, 65, 66, 65] },
-  { label: 'New subscribers', value: '612',     delta: '+28.5%', positive: true, Icon: EmailIcon,     spark: [8, 12, 10, 18, 22, 28, 32, 40, 38, 48, 52, 60] },
-  { label: 'Revenue',         value: '$84,210', delta: '+12.7%', positive: true, Icon: CashDollarIcon, spark: [400, 520, 480, 600, 580, 720, 760, 820, 800, 880, 940, 1020] },
+  { label: 'Gifts ordered',       value: '1,284',   delta: '+18.2%', positive: true, Icon: GiftCardIcon,    spark: [62, 68, 70, 78, 84, 92, 96, 104, 110, 118, 124, 132] },
+  { label: 'Active gifters',      value: '92',      delta: '+12.5%', positive: true, Icon: PersonIcon,      spark: [70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92] },
+  { label: 'Recipients claimed',  value: '812',     delta: '+14.8%', positive: true, Icon: CheckCircleIcon, spark: [38, 44, 48, 52, 58, 62, 66, 72, 76, 82, 88, 94] },
+  { label: 'Gift revenue',        value: '$24,180', delta: '+18.0%', positive: true, Icon: CashDollarIcon,  spark: [1100, 1240, 1280, 1420, 1540, 1680, 1820, 1980, 2120, 2280, 2380, 2510] },
 ];
 
 type OrderStatus = 'Delivered' | 'Shipped' | 'Claimed' | 'Pending';
