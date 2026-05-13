@@ -165,6 +165,19 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
         }
         .setup-frame {
           margin: 16px 0 20px;
+          height: 400px;
+          overflow-y: auto;
+          padding-right: 4px;
+        }
+        .setup-frame::-webkit-scrollbar {
+          width: 6px;
+        }
+        .setup-frame::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.12);
+          border-radius: 3px;
+        }
+        .setup-frame::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 0, 0, 0.2);
         }
         .setup-actions {
           display: flex;
