@@ -127,7 +127,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             </a>
           ))}
 
-          {/* Giftwell — active app, expanded */}
+          {/* Giftwell active app, expanded */}
           <a
             className={`${styles.navItem} ${giftwellActive ? styles.navItemActive : ''}`}
             href="/admin-preview"

@@ -117,7 +117,7 @@ export default function DesignPage() {
         onToggleOn={() => setThemesOn((v) => !v)}
         selectedCount={themesSelected.size}
         totalCount={THEMES.length + themeUploads.length}
-        emptyLabel="No themes selected — gifters won't be able to pick a background."
+        emptyLabel="No themes selected. Gifters won't be able to pick a background."
         editLabel="Edit themes"
         onEdit={() => setThemesModal(true)}
         preview={selectedThemes.map((t) => (
@@ -133,7 +133,7 @@ export default function DesignPage() {
         onToggleOn={() => setPostersOn((v) => !v)}
         selectedCount={postersSelected.size}
         totalCount={POSTERS.length + posterUploads.length}
-        emptyLabel="No posters selected — gifters won't see the poster picker."
+        emptyLabel="No posters selected. Gifters won't see the poster picker."
         editLabel="Edit posters"
         onEdit={() => setPostersModal(true)}
         preview={selectedPosters.map((p) => (
@@ -316,7 +316,7 @@ function GifsSection({
   if (allowGiphy && uploadCount > 0) summary = `Giphy library + ${uploadCount} custom upload${uploadCount === 1 ? '' : 's'}`;
   else if (allowGiphy) summary = 'Giphy library';
   else if (uploadCount > 0) summary = `${uploadCount} custom upload${uploadCount === 1 ? '' : 's'}`;
-  else summary = 'No source enabled — gifters won’t see the GIF picker.';
+  else summary = 'No source enabled. Gifters won’t see the GIF picker.';
 
   return (
     <Card padding="500">

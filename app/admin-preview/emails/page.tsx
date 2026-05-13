@@ -48,10 +48,10 @@ const RECIPIENT_EMAILS: EmailRow[] = [
 ];
 
 const GIFTER_EMAILS: EmailRow[] = [
-  { id: 'g1', Icon: ReceiptDollarIcon, name: 'Order confirmation', trigger: 'Sent on purchase — includes Dashboard + FAQ links', status: { kind: 'always' } },
+  { id: 'g1', Icon: ReceiptDollarIcon, name: 'Order confirmation', trigger: 'Sent on purchase · includes Dashboard + FAQ links', status: { kind: 'always' } },
   { id: 'g2', Icon: ConfettiIcon,      name: 'Campaign live',      trigger: 'Sent when first recipient claims',                  status: { kind: 'toggle', defaultOn: true } },
-  { id: 'g3', Icon: ChartLineIcon,     name: 'Milestone updates',  trigger: 'Aggregated progress — replaces per-claim emails',   status: { kind: 'cadence' } },
-  { id: 'g4', Icon: FlagIcon,          name: 'Campaign wrap-up',   trigger: '100% claimed or expired — final report attached',   status: { kind: 'always' } },
+  { id: 'g3', Icon: ChartLineIcon,     name: 'Milestone updates',  trigger: 'Aggregated progress · replaces per-claim emails',   status: { kind: 'cadence' } },
+  { id: 'g4', Icon: FlagIcon,          name: 'Campaign wrap-up',   trigger: '100% claimed or expired · final report attached',   status: { kind: 'always' } },
 ];
 
 const CADENCE_OPTIONS = [
@@ -94,7 +94,7 @@ const EMAIL_CONTENT: Record<string, EmailContent> = {
     audience: 'recipient',
     eyebrow: 'DON’T MISS OUT',
     headline: 'Your gift is waiting',
-    body: <>Sarah sent you a gift 7 days ago — it expires in <strong>23 days</strong>. Take a moment to unwrap it.</>,
+    body: <>Sarah sent you a gift 7 days ago. It expires in <strong>23 days</strong>. Take a moment to unwrap it.</>,
     primaryCta: 'Unwrap Your Gift',
     footer: 'Sent 7 days after the original gift',
   },
@@ -134,7 +134,7 @@ const EMAIL_CONTENT: Record<string, EmailContent> = {
     audience: 'gifter',
     eyebrow: 'ORDER #G-1248',
     headline: 'Your 50 gifts are scheduled',
-    body: <>Recipients will be notified tomorrow at 9am ET. Track redemption in real-time from your dashboard — and our FAQ covers the common questions.</>,
+    body: <>Recipients will be notified tomorrow at 9am ET. Track redemption in real-time from your dashboard. Our FAQ covers the common questions.</>,
     primaryCta: 'View Dashboard',
     secondaryCta: 'View FAQ',
     footer: 'You can cancel or reschedule until 9am tomorrow.',
@@ -145,7 +145,7 @@ const EMAIL_CONTENT: Record<string, EmailContent> = {
     audience: 'gifter',
     eyebrow: 'FIRST CLAIM',
     headline: 'Your campaign is live!',
-    body: <><strong>Marcus Liu</strong> just claimed his gift — 49 more recipients to go. We’ll only ping you at major milestones from here, no spam.</>,
+    body: <><strong>Marcus Liu</strong> just claimed his gift. 49 more recipients to go. We’ll only ping you at major milestones from here, no spam.</>,
     primaryCta: 'View Dashboard',
     footer: 'Campaign: Q4 Customer Appreciation',
   },
@@ -166,7 +166,7 @@ const EMAIL_CONTENT: Record<string, EmailContent> = {
     audience: 'gifter',
     eyebrow: 'CAMPAIGN COMPLETE',
     headline: 'All 50 gifts delivered 🎉',
-    body: <><strong>42</strong> claimed · <strong>8</strong> expired. Final stats and the full report are in your dashboard — ready when you are.</>,
+    body: <><strong>42</strong> claimed · <strong>8</strong> expired. Final stats and the full report are in your dashboard, ready when you are.</>,
     primaryCta: 'View Full Report',
     secondaryCta: 'Reorder Campaign',
     footer: 'Q4 Customer Appreciation · Ran Oct 1 – Nov 30',
@@ -188,7 +188,7 @@ export default function EmailsPage() {
           <BlockStack gap="100">
             <Text as="h1" variant="headingXl">Emails</Text>
             <Text as="p" variant="bodyMd" tone="subdued">
-              Every email Giftwell sends on your behalf — to your gifters and their recipients.
+              Every email Giftwell sends on your behalf, to your gifters and their recipients.
             </Text>
           </BlockStack>
           <Button>Send test email</Button>
@@ -203,7 +203,7 @@ export default function EmailsPage() {
 
         <EmailGroup
           title="Gifter"
-          subtitle="What the corporate buyer gets — designed for low-noise updates"
+          subtitle="What the corporate buyer gets. Designed for low-noise updates"
           rows={GIFTER_EMAILS}
           onPreview={setPreviewId}
         />

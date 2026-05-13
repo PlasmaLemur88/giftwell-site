@@ -48,7 +48,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ slug: s
         <div className="rd-placeholder-icon">📊</div>
         <div className="rd-placeholder-title">Report layout coming next</div>
         <div className="rd-placeholder-text">
-          This page will host the {meta.title.toLowerCase()} drill-down — chart cards,
+          This page will host the {meta.title.toLowerCase()} drill-down. Chart cards,
           breakdown tables, and slicers in the Alia/Shopify-native style we agreed on.
         </div>
         <Link href="/admin-preview/reports" className="rd-placeholder-link">

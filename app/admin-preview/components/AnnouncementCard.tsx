@@ -18,7 +18,7 @@ const SLIDES: Slide[] = [
     eyebrow: 'Introducing AI recipient parsing',
     title: 'Paste any list. We handle the rest.',
     body:
-      "Messy names and addresses get cleaned automatically. Anything we can't resolve routes into the claim flow — no more loading screens or row-by-row error fixes.",
+      "Messy names and addresses get cleaned automatically. Anything we can't resolve routes into the claim flow. No more loading screens or row-by-row error fixes.",
     primaryLabel: 'View report',
     primaryHref: '/admin-preview/reports/recipients',
     secondaryLabel: 'Learn more',

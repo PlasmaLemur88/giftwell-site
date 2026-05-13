@@ -1,4 +1,4 @@
-/* Reports landing — Polaris does all the styling.
+/* Reports landing. Polaris does all the styling.
    This module only resets the next/link wrapper around each <Card>
    so the whole card is clickable without underline / inherited color. */
 

@@ -297,7 +297,7 @@ function BillingTab() {
         <Card padding="0">
           <Box padding="600">
             <Text as="p" variant="bodySm" tone="subdued" alignment="center">
-              No invoices yet — your first charge will be on June 5, 2026.
+              No invoices yet. Your first charge will be on June 5, 2026.
             </Text>
           </Box>
         </Card>

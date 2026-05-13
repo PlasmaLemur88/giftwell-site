@@ -18,7 +18,6 @@ import {
 import {
   CheckIcon,
   CheckCircleIcon,
-  LockIcon,
   DeleteIcon,
   PlusIcon,
 } from '@shopify/polaris-icons';
@@ -60,7 +59,7 @@ export const FRAMES: FrameDef[] = [
   // Landing page
   { id: 'landing-url',       phase: 'Landing Page', title: 'Pick your gift page URL' },
   // Review + Launch
-  { id: 'review',   phase: 'Review',  title: 'Almost there — review your setup' },
+  { id: 'review',   phase: 'Review',  title: 'Review your setup' },
   { id: 'launched', phase: 'Launch',  title: "You're live" },
 ];
 
@@ -271,12 +270,9 @@ function FramePaymentMethod({ answers }: FrameProps) {
         </BlockStack>
       </Box>
       <StripeCardField />
-      <InlineStack gap="100" blockAlign="center">
-        <Icon source={LockIcon} tone="subdued" />
-        <Text as="span" variant="bodySm" tone="subdued">
-          Encrypted by Stripe. No charge for 30 days.
-        </Text>
-      </InlineStack>
+      <Text as="p" variant="bodySm" tone="subdued">
+        Encrypted by Stripe. No charge for 30 days.
+      </Text>
     </BlockStack>
   );
 }
@@ -365,22 +361,22 @@ function FrameCatalogProducts(_: FrameProps) {
           <TextField label="" labelHidden placeholder="Search catalog…" autoComplete="off" onChange={() => {}} />
         </Box>
         <Text as="span" variant="bodySm" tone="subdued">
-          {totalCount} of {totalCount} giftable
+          {totalCount} giftable · manage in Products
         </Text>
       </InlineStack>
       <InlineGrid gap="200" columns={6}>
         {products.map((p) => (
           <Box
             key={p.id}
-            padding="150"
+            padding="100"
             borderRadius="200"
             borderWidth="025"
             borderColor={p.sel ? 'border-emphasis' : 'border'}
             background={p.sel ? 'bg-surface-selected' : 'bg-surface'}
             position="relative"
           >
-            <BlockStack gap="100">
-              <div style={{ width: '100%', aspectRatio: '1 / 1', borderRadius: 6, background: p.bg }} />
+            <BlockStack gap="050">
+              <div style={{ width: '100%', aspectRatio: '4 / 3', borderRadius: 4, background: p.bg }} />
               <Text as="p" variant="bodySm" fontWeight="semibold" truncate>{p.name}</Text>
               <Text as="p" tone="subdued" variant="bodySm">{p.price}</Text>
             </BlockStack>
@@ -392,9 +388,6 @@ function FrameCatalogProducts(_: FrameProps) {
           </Box>
         ))}
       </InlineGrid>
-      <Text as="p" variant="bodySm" tone="subdued">
-        Showing 6 — manage the full list in Products admin after launch.
-      </Text>
     </BlockStack>
   );
 }
