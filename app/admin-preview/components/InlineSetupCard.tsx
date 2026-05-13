@@ -60,7 +60,6 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
           ))}
         </div>
         <h2 className="setup-title">{frame.title}</h2>
-        {frame.helper && <p className="setup-helper">{frame.helper}</p>}
 
         <div className="setup-frame">
           <Frame
@@ -94,9 +93,9 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
           background: #fff;
           border: 1px solid #dcdcde;
           border-radius: 14px;
-          padding: 26px 28px;
+          padding: 18px 24px;
           display: flex;
-          gap: 28px;
+          gap: 24px;
           align-items: flex-start;
           box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
         }
@@ -130,13 +129,13 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
           font-size: 12.5px;
           font-weight: 500;
           color: #5c4dff;
-          margin-bottom: 8px;
+          margin-bottom: 4px;
           text-transform: capitalize;
         }
         .setup-dots {
           display: flex;
           gap: 3px;
-          margin-bottom: 14px;
+          margin-bottom: 8px;
         }
         .setup-dot {
           flex: 1;
@@ -164,8 +163,8 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
           margin: 0 0 16px;
         }
         .setup-frame {
-          margin: 16px 0 20px;
-          height: 220px;
+          margin: 12px 0 12px;
+          height: 160px;
           overflow-y: auto;
           padding-right: 4px;
         }
@@ -184,8 +183,7 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
           align-items: center;
           justify-content: space-between;
           gap: 12px;
-          padding-top: 16px;
-          border-top: 1px solid #f1f1f3;
+          padding-top: 8px;
         }
         .setup-actions-right {
           display: flex;
