@@ -9,123 +9,166 @@ type Contact = {
   email: string;
   company: string;
   tag: 'Clients' | 'Team' | 'Vendors' | 'Personal';
-  giftsSent: number;
 };
 
 const CONTACTS: Contact[] = [
-  { id: '1',  name: 'John Doe',         email: 'john@acme.com',          company: 'Acme Corp',         tag: 'Clients', giftsSent: 4 },
-  { id: '2',  name: 'Jane Smith',       email: 'jane@corp.com',          company: 'Corp Industries',   tag: 'Clients', giftsSent: 2 },
-  { id: '3',  name: 'Sarah Jones',      email: 'sarah@company.com',      company: 'Company Inc',       tag: 'Team',    giftsSent: 6 },
-  { id: '4',  name: 'Mike Wilson',      email: 'mike@example.com',       company: 'Example LLC',       tag: 'Clients', giftsSent: 1 },
-  { id: '5',  name: 'Lisa Chen',        email: 'lisa@startup.io',        company: 'Startup IO',        tag: 'Team',    giftsSent: 3 },
-  { id: '6',  name: 'Tom Davis',        email: 'tom@truebay.co',         company: 'Truebay',           tag: 'Vendors', giftsSent: 2 },
-  { id: '7',  name: 'Maya Greene',      email: 'maya@northglobe.com',    company: 'NorthGlobe',        tag: 'Clients', giftsSent: 5 },
-  { id: '8',  name: 'Diego Rivera',     email: 'd.rivera@coppermint.co', company: 'Coppermint',        tag: 'Team',    giftsSent: 1 },
+  { id: '1', name: 'John Doe',     email: 'john@acme.com',          company: 'Acme Corp',       tag: 'Clients' },
+  { id: '2', name: 'Jane Smith',   email: 'jane@corp.com',          company: 'Corp Industries', tag: 'Clients' },
+  { id: '3', name: 'Maya Greene',  email: 'maya@northglobe.com',    company: 'NorthGlobe',      tag: 'Clients' },
+  { id: '4', name: 'Mike Wilson',  email: 'mike@example.com',       company: 'Example LLC',     tag: 'Clients' },
+  { id: '5', name: 'Sarah Jones',  email: 'sarah@company.com',      company: 'Company Inc',     tag: 'Team' },
+  { id: '6', name: 'Lisa Chen',    email: 'lisa@startup.io',        company: 'Startup IO',      tag: 'Team' },
+  { id: '7', name: 'Diego Rivera', email: 'd.rivera@coppermint.co', company: 'Coppermint',      tag: 'Team' },
+  { id: '8', name: 'Tom Davis',    email: 'tom@truebay.co',         company: 'Truebay',         tag: 'Vendors' },
 ];
 
-const TAGS: (Contact['tag'] | 'All')[] = ['All', 'Clients', 'Team', 'Vendors', 'Personal'];
+const TAGS = ['Clients', 'Team', 'Vendors', 'Personal'] as const;
+type Tag = typeof TAGS[number];
 
-const TAG_COLORS: Record<Contact['tag'], { bg: string; fg: string }> = {
-  Clients:  { bg: '#EEF0FF', fg: '#4036A8' },
-  Team:     { bg: '#ECFDF5', fg: '#047857' },
-  Vendors:  { bg: '#FFF7E6', fg: '#92590B' },
-  Personal: { bg: '#FEF2F2', fg: '#B91C1C' },
+const TAG_COLORS: Record<Tag, { bg: string; fg: string; ring: string }> = {
+  Clients:  { bg: '#EEF0FF', fg: '#4036A8', ring: '#7C5CFF' },
+  Team:     { bg: '#ECFDF5', fg: '#047857', ring: '#1F8A4C' },
+  Vendors:  { bg: '#FFF7E6', fg: '#92590B', ring: '#E0A23E' },
+  Personal: { bg: '#FEF2F2', fg: '#B91C1C', ring: '#E04F4F' },
 };
 
-export default function PeoplePage() {
-  const [filter, setFilter] = useState<typeof TAGS[number]>('All');
-  const [search, setSearch] = useState('');
-  const [pasteOpen, setPasteOpen] = useState(false);
+function formatForCopy(contacts: Contact[]): string {
+  return contacts.map((c) => `${c.name} <${c.email}>`).join('\n');
+}
 
-  const filtered = CONTACTS.filter((c) => {
-    if (filter !== 'All' && c.tag !== filter) return false;
-    if (!search.trim()) return true;
-    const q = search.toLowerCase();
-    return c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.company.toLowerCase().includes(q);
-  });
+function initialsOf(name: string): string {
+  return name.split(' ').map((s) => s[0]).join('').slice(0, 2).toUpperCase();
+}
+
+export default function PeoplePage() {
+  const [search, setSearch] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+
+  const handleCopy = (id: string, contacts: Contact[]) => {
+    const text = formatForCopy(contacts);
+    void navigator.clipboard?.writeText(text).catch(() => {});
+    setCopiedId(id);
+    setTimeout(() => setCopiedId((curr) => (curr === id ? null : curr)), 1800);
+  };
+
+  const grouped: Record<Tag, Contact[]> = {
+    Clients:  CONTACTS.filter((c) => c.tag === 'Clients'),
+    Team:     CONTACTS.filter((c) => c.tag === 'Team'),
+    Vendors:  CONTACTS.filter((c) => c.tag === 'Vendors'),
+    Personal: CONTACTS.filter((c) => c.tag === 'Personal'),
+  };
+
+  const filteredDirectory = !search.trim()
+    ? CONTACTS
+    : CONTACTS.filter((c) => {
+        const q = search.toLowerCase();
+        return c.name.toLowerCase().includes(q) ||
+               c.email.toLowerCase().includes(q) ||
+               c.company.toLowerCase().includes(q);
+      });
 
   return (
-    <div className="gd-ab">
+    <div className="gd-people">
       <header className="gd-page-header">
-        <div className="gd-page-header-row">
-          <div>
-            <h1>People</h1>
-            <p>Everyone you've gifted before. Send to them again in a tap, or build a fresh list.</p>
-          </div>
-          <div className="gd-page-actions">
-            <button className="gd-secondary" onClick={() => setPasteOpen(true)}>
-              <ClipboardIcon /> Paste a list
-            </button>
-            <button className="gd-add">+ Add one</button>
-          </div>
-        </div>
+        <h1>People</h1>
+        <p>Your saved lists. Copy any group and paste it into a Giftwell gifting flow on any merchant's store.</p>
       </header>
 
-      {pasteOpen && (
-        <div className="gd-paste-card">
-          <div className="gd-paste-head">
-            <div>
-              <div className="gd-paste-title">Paste your recipients</div>
-              <div className="gd-paste-sub">One per line. We'll auto-detect <code>Name &lt;email&gt;</code> or <code>name, email</code>.</div>
-            </div>
-            <button onClick={() => setPasteOpen(false)} className="gd-paste-close" aria-label="Close">×</button>
-          </div>
-          <textarea
-            placeholder={`Avery Stone, avery@maplecourt.io\nMaya Greene <maya@northglobe.com>\nDiego Rivera, d.rivera@coppermint.co`}
-            rows={6}
-          />
-          <div className="gd-paste-actions">
-            <button onClick={() => setPasteOpen(false)} className="gd-paste-secondary">Cancel</button>
-            <button className="gd-paste-primary">Add to People</button>
-          </div>
+      {/* Lists — primary, copy-out */}
+      <section className="gd-lists-section">
+        <div className="gd-lists-head">
+          <h2 className="gd-section-title">Lists</h2>
+          <button className="gd-add-link" onClick={() => setAddOpen(!addOpen)}>
+            {addOpen ? '× Close' : '+ Add or import people'}
+          </button>
         </div>
-      )}
 
-      <div className="gd-ab-search">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name, email, or company"
-        />
-      </div>
-
-      <div className="gd-ab-tags">
-        {TAGS.map((t) => (
-          <button
-            key={t}
-            onClick={() => setFilter(t)}
-            className={`gd-tag-chip ${filter === t ? 'gd-tag-chip-active' : ''}`}
-          >{t}</button>
-        ))}
-      </div>
-
-      <div className="gd-ab-list">
-        {filtered.length === 0 ? (
-          <div className="gd-empty">No one matches that search.</div>
-        ) : filtered.map((c) => {
-          const tone = TAG_COLORS[c.tag];
-          const initials = c.name.split(' ').map((s) => s[0]).join('').slice(0, 2);
-          return (
-            <div key={c.id} className="gd-contact-row">
-              <span className="gd-contact-avatar" style={{
-                background: `hsl(${(c.name.charCodeAt(0) * 7) % 360}, 60%, 55%)`,
-              }}>{initials}</span>
-              <div className="gd-contact-meta">
-                <div className="gd-contact-name">{c.name}</div>
-                <div className="gd-contact-sub">{c.email} · {c.company}</div>
-              </div>
-              <span className="gd-contact-tag" style={{ background: tone.bg, color: tone.fg }}>{c.tag}</span>
-              <div className="gd-contact-stats">{c.giftsSent} {c.giftsSent === 1 ? 'gift' : 'gifts'}</div>
-              <button className="gd-contact-send">Send gift →</button>
+        {addOpen && (
+          <div className="gd-add-card">
+            <div className="gd-add-title">Add to your saved people</div>
+            <textarea
+              placeholder={`Avery Stone, avery@maplecourt.io\nMaya Greene <maya@northglobe.com>`}
+              rows={3}
+            />
+            <div className="gd-add-actions">
+              <button className="gd-add-secondary" onClick={() => setAddOpen(false)}>Cancel</button>
+              <button className="gd-add-primary">Save to list</button>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        )}
+
+        <div className="gd-lists-grid">
+          <ListCard
+            id="everyone"
+            label="Everyone"
+            sublabel={`${CONTACTS.length} people across all lists`}
+            contacts={CONTACTS}
+            primary
+            copied={copiedId === 'everyone'}
+            onCopy={() => handleCopy('everyone', CONTACTS)}
+          />
+          {TAGS.map((tag) => grouped[tag].length > 0 && (
+            <ListCard
+              key={tag}
+              id={tag}
+              label={tag}
+              sublabel={`${grouped[tag].length} ${grouped[tag].length === 1 ? 'person' : 'people'}`}
+              contacts={grouped[tag]}
+              tagColor={TAG_COLORS[tag]}
+              copied={copiedId === tag}
+              onCopy={() => handleCopy(tag, grouped[tag])}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Directory — secondary, individual lookup + copy */}
+      <section className="gd-directory">
+        <div className="gd-directory-head">
+          <h2 className="gd-section-title">Everyone</h2>
+        </div>
+
+        <div className="gd-search">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name, email, or company"
+          />
+        </div>
+
+        <div className="gd-directory-list">
+          {filteredDirectory.length === 0 ? (
+            <div className="gd-empty">No one matches that search.</div>
+          ) : filteredDirectory.map((c) => {
+            const tone = TAG_COLORS[c.tag];
+            return (
+              <div key={c.id} className="gd-contact-row">
+                <span className="gd-contact-avatar" style={{
+                  background: `hsl(${(c.name.charCodeAt(0) * 7) % 360}, 60%, 55%)`,
+                }}>{initialsOf(c.name)}</span>
+                <div className="gd-contact-meta">
+                  <div className="gd-contact-name">{c.name}</div>
+                  <div className="gd-contact-sub">{c.email} · {c.company}</div>
+                </div>
+                <span className="gd-contact-tag" style={{ background: tone.bg, color: tone.fg }}>{c.tag}</span>
+                <button
+                  className={`gd-row-copy ${copiedId === c.id ? 'gd-row-copy-done' : ''}`}
+                  onClick={() => handleCopy(c.id, [c])}
+                >
+                  {copiedId === c.id ? '✓ Copied' : <><CopyIcon /> Copy</>}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       <style jsx>{`
-        .gd-ab { display: flex; flex-direction: column; gap: 18px; }
+        .gd-people { display: flex; flex-direction: column; gap: 26px; }
 
+        /* Header */
         .gd-page-header { padding: 4px 8px 8px; color: #fff; }
         .gd-page-header h1 {
           font-family: 'Georgia', 'Times New Roman', serif;
@@ -134,129 +177,105 @@ export default function PeoplePage() {
           color: #fff;
         }
         .gd-page-header p {
-          font-size: 14.5px; color: rgba(255, 255, 255, 0.92);
-          margin: 0; max-width: 540px; line-height: 1.5;
-          text-shadow: 0 1px 2px rgba(20, 14, 50, 0.2);
+          font-size: 14.5px; color: #fff;
+          margin: 0; max-width: 580px; line-height: 1.5;
+          font-weight: 500;
+          text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
         }
-        .gd-page-header-row {
-          display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap;
-        }
-        .gd-page-actions { display: flex; gap: 8px; }
-        .gd-secondary {
-          all: unset; cursor: pointer;
-          display: inline-flex; align-items: center; gap: 6px;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(10px);
-          color: #1a1a1f;
-          padding: 9px 14px; border-radius: 10px;
-          font-size: 13px; font-weight: 600;
-          border: 1px solid rgba(255, 255, 255, 0.7);
-          transition: transform 120ms ease, background 120ms ease;
-        }
-        .gd-secondary:hover { background: #fff; transform: translateY(-1px); }
-        .gd-secondary :global(svg) { width: 14px; height: 14px; }
-        .gd-add {
-          all: unset; cursor: pointer;
-          background: #15151a; color: #fff;
-          padding: 10px 18px; border-radius: 10px;
-          font-size: 13px; font-weight: 600;
-          box-shadow: 0 8px 20px -8px rgba(20, 14, 50, 0.45);
-          transition: transform 120ms ease;
-        }
-        .gd-add:hover { transform: translateY(-1px); }
 
-        /* Paste card */
-        .gd-paste-card {
-          background: #fff;
-          border: 1px solid rgba(15, 15, 25, 0.08);
-          border-radius: 14px;
-          padding: 18px;
-          display: flex; flex-direction: column; gap: 14px;
-          box-shadow: 0 10px 28px -10px rgba(20, 14, 50, 0.25);
+        .gd-section-title {
+          font-family: 'Georgia', 'Times New Roman', serif;
+          font-size: 22px; font-weight: 400; font-style: italic;
+          color: #1a1a1f; margin: 0; letter-spacing: -0.015em;
         }
-        .gd-paste-head {
-          display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+
+        /* Lists section */
+        .gd-lists-section { display: flex; flex-direction: column; gap: 14px; }
+        .gd-lists-head {
+          display: flex; justify-content: space-between; align-items: baseline;
+          padding: 0 4px;
         }
-        .gd-paste-title { font-size: 15px; font-weight: 600; color: #1a1a1f; }
-        .gd-paste-sub { font-size: 13px; color: #5a5a62; margin-top: 4px; }
-        .gd-paste-sub code {
-          font-family: ui-monospace, monospace; font-size: 12px;
-          background: #f3f3f5; padding: 1px 5px; border-radius: 4px; color: #1a1a1f;
-        }
-        .gd-paste-close {
+        .gd-add-link {
           all: unset; cursor: pointer;
-          width: 28px; height: 28px; border-radius: 999px;
-          display: inline-flex; align-items: center; justify-content: center;
-          background: #f3f3f5; color: #5a5a62;
-          font-size: 18px; font-weight: 400;
+          font-size: 13px; font-weight: 600;
+          color: #1a1a1f;
+          padding: 6px 12px;
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.7);
           transition: background 120ms ease;
         }
-        .gd-paste-close:hover { background: #ececef; color: #1a1a1f; }
-        .gd-paste-card textarea {
+        .gd-add-link:hover { background: #fff; }
+
+        /* Add card (collapsible) */
+        .gd-add-card {
+          background: #fff;
+          border: 1px solid rgba(15, 15, 25, 0.06);
+          border-radius: 14px;
+          padding: 16px 18px;
+          display: flex; flex-direction: column; gap: 12px;
+          box-shadow: 0 6px 18px -8px rgba(20, 14, 50, 0.18);
+        }
+        .gd-add-title { font-size: 14px; font-weight: 600; color: #1a1a1f; }
+        .gd-add-card textarea {
           width: 100%; box-sizing: border-box;
-          padding: 12px 14px; border-radius: 10px;
-          border: 1px solid #dcdcde; background: #fafafb;
+          padding: 11px 14px; border-radius: 10px;
+          border: 1px solid #ececef; background: #fafafb;
           font-family: ui-monospace, monospace; font-size: 13px;
           outline: none; color: #1a1a1f; resize: vertical;
-          min-height: 110px;
+          line-height: 1.6;
         }
-        .gd-paste-card textarea:focus { border-color: ${BRAND}; background: #fff; }
-        .gd-paste-actions {
-          display: flex; justify-content: flex-end; gap: 8px;
-        }
-        .gd-paste-secondary {
+        .gd-add-card textarea:focus { border-color: ${BRAND}; background: #fff; }
+        .gd-add-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .gd-add-secondary {
           all: unset; cursor: pointer;
-          padding: 9px 16px; border-radius: 8px;
-          font-size: 13px; font-weight: 500;
-          color: #43434b;
+          padding: 8px 14px; border-radius: 8px;
+          font-size: 13px; font-weight: 500; color: #5a5a62;
         }
-        .gd-paste-secondary:hover { background: #f3f3f5; }
-        .gd-paste-primary {
+        .gd-add-secondary:hover { background: #f3f3f5; }
+        .gd-add-primary {
           all: unset; cursor: pointer;
           background: ${BRAND}; color: #fff;
-          padding: 9px 18px; border-radius: 8px;
+          padding: 8px 16px; border-radius: 8px;
           font-size: 13px; font-weight: 600;
         }
-        .gd-paste-primary:hover { background: #6A4DE8; }
 
-        /* Search */
-        .gd-ab-search input {
+        /* Lists grid */
+        .gd-lists-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+          gap: 12px;
+        }
+
+        /* Directory */
+        .gd-directory { display: flex; flex-direction: column; gap: 12px; }
+        .gd-directory-head { padding: 0 4px; }
+
+        .gd-search input {
           width: 100%; box-sizing: border-box;
           padding: 12px 16px; border-radius: 12px;
           border: 1px solid rgba(15, 15, 25, 0.08);
           background: rgba(255, 255, 255, 0.95);
           font-size: 14px; outline: none; font-family: inherit; color: #1a1a1f;
-          box-shadow: 0 4px 14px -8px rgba(20, 14, 50, 0.15);
+          box-shadow: 0 4px 14px -8px rgba(20, 14, 50, 0.12);
         }
-        .gd-ab-search input::placeholder { color: #8a8a93; }
-        .gd-ab-search input:focus { border-color: ${BRAND}; background: #fff; }
+        .gd-search input::placeholder { color: #8a8a93; }
+        .gd-search input:focus { border-color: ${BRAND}; background: #fff; }
 
-        .gd-ab-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-        .gd-tag-chip {
-          all: unset; cursor: pointer;
-          padding: 7px 14px; border-radius: 999px;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(8px);
-          color: #1a1a1f;
-          border: 1px solid rgba(255, 255, 255, 0.7);
-          font-size: 12.5px; font-weight: 500;
-          transition: background 120ms ease, color 120ms ease;
-        }
-        .gd-tag-chip-active { background: #15151a; color: #fff; border-color: #15151a; }
-
-        .gd-ab-list {
+        .gd-directory-list {
           background: #fff;
           border: 1px solid rgba(15, 15, 25, 0.06);
           border-radius: 14px;
           overflow: hidden;
-          box-shadow: 0 4px 14px -8px rgba(20, 14, 50, 0.15);
+          box-shadow: 0 4px 14px -8px rgba(20, 14, 50, 0.12);
         }
         .gd-contact-row {
           display: grid;
-          grid-template-columns: 44px 1fr auto auto auto;
+          grid-template-columns: 44px 1fr auto auto;
           align-items: center;
           gap: 14px;
-          padding: 14px 18px;
+          padding: 13px 18px;
           border-bottom: 1px solid #f0f0f2;
           transition: background 120ms ease;
         }
@@ -277,42 +296,138 @@ export default function PeoplePage() {
           font-size: 11px; font-weight: 600;
           padding: 3px 9px; border-radius: 999px;
         }
-        .gd-contact-stats {
-          font-size: 12.5px; color: #5a5a62;
-          white-space: nowrap;
-        }
-        .gd-contact-send {
+        .gd-row-copy {
           all: unset; cursor: pointer;
+          display: inline-flex; align-items: center; gap: 5px;
+          padding: 7px 12px; border-radius: 8px;
           font-size: 12.5px; font-weight: 600;
-          color: ${BRAND};
-          padding: 4px 0;
+          color: #1a1a1f;
+          border: 1px solid #ececef;
+          background: #fff;
+          transition: all 120ms ease;
         }
-        .gd-contact-send:hover { text-decoration: underline; }
+        .gd-row-copy:hover { background: #1a1a1f; color: #fff; border-color: #1a1a1f; }
+        .gd-row-copy-done {
+          background: #ECFDF5 !important;
+          color: #047857 !important;
+          border-color: #ECFDF5 !important;
+        }
+        .gd-row-copy :global(svg) { width: 13px; height: 13px; }
 
         .gd-empty { padding: 40px; text-align: center; color: #5a5a62; font-size: 14px; }
 
         @media (max-width: 640px) {
           .gd-contact-row {
             grid-template-columns: 44px 1fr auto;
-            grid-template-areas: 'avatar meta send' 'avatar tag tag';
+            grid-template-areas: 'avatar meta copy' 'avatar tag tag';
             row-gap: 6px;
           }
           .gd-contact-row > :nth-child(1) { grid-area: avatar; }
           .gd-contact-meta { grid-area: meta; }
           .gd-contact-tag { grid-area: tag; justify-self: start; }
-          .gd-contact-send { grid-area: send; }
-          .gd-contact-stats { display: none; }
+          .gd-row-copy { grid-area: copy; }
         }
       `}</style>
     </div>
   );
 }
 
-function ClipboardIcon() {
+/* ─── List card ─── */
+
+function ListCard({
+  id, label, sublabel, contacts, tagColor, primary, copied, onCopy,
+}: {
+  id: string;
+  label: string;
+  sublabel: string;
+  contacts: Contact[];
+  tagColor?: { bg: string; fg: string; ring: string };
+  primary?: boolean;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  const previewCount = Math.min(4, contacts.length);
+  const remainder = contacts.length - previewCount;
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <rect x="9" y="2" width="6" height="4" rx="1" />
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+    <div style={{
+      background: '#fff',
+      border: '1px solid rgba(15, 15, 25, 0.06)',
+      borderRadius: 14,
+      padding: '16px 18px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 12,
+      boxShadow: primary
+        ? '0 10px 28px -10px rgba(124, 92, 255, 0.35)'
+        : '0 6px 18px -10px rgba(20, 14, 50, 0.18)',
+      ...(primary ? { borderColor: 'rgba(124, 92, 255, 0.35)' } : null),
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <div style={{
+            fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
+            color: tagColor?.fg ?? '#5C3FE0', marginBottom: 4,
+          }}>
+            {label}
+          </div>
+          <div style={{ fontSize: 13, color: '#5a5a62' }}>{sublabel}</div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        {contacts.slice(0, previewCount).map((c, i) => (
+          <span
+            key={c.id}
+            title={c.name}
+            style={{
+              width: 28, height: 28, borderRadius: '50%',
+              background: `hsl(${(c.name.charCodeAt(0) * 7) % 360}, 60%, 55%)`,
+              color: '#fff', fontSize: 10.5, fontWeight: 600,
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              border: '2px solid #fff',
+              marginLeft: i === 0 ? 0 : -8,
+              zIndex: previewCount - i,
+            }}
+          >{initialsOf(c.name)}</span>
+        ))}
+        {remainder > 0 && (
+          <span style={{
+            width: 28, height: 28, borderRadius: '50%',
+            background: '#f0f0f2', color: '#5a5a62',
+            fontSize: 10.5, fontWeight: 500,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            border: '2px solid #fff', marginLeft: -8,
+          }}>+{remainder}</span>
+        )}
+      </div>
+
+      <button
+        onClick={onCopy}
+        style={{
+          all: 'unset', cursor: 'pointer',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          padding: '10px 14px', borderRadius: 10,
+          background: copied ? '#1F8A4C' : (primary ? BRAND : '#15151a'),
+          color: '#fff',
+          fontSize: 13, fontWeight: 600,
+          transition: 'background 160ms ease, transform 120ms ease',
+        }}
+        onMouseEnter={(e) => { if (!copied) (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'none'; }}
+      >
+        {copied ? '✓ Copied to clipboard' : <><CopyIcon /> Copy {contacts.length} {contacts.length === 1 ? 'person' : 'people'}</>}
+      </button>
+    </div>
+  );
+}
+
+/* ─── Icon ─── */
+
+function CopyIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="9" y="9" width="13" height="13" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
     </svg>
   );
 }
