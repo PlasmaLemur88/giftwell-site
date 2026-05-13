@@ -1,55 +1,79 @@
 'use client';
 
 import Link from 'next/link';
-import { BRAND, BRAND_DARK, GIFTER, STATS, ORDERS, ORDER_STATUS_COLORS } from './data';
+import { BRAND, BRAND_DARK, GIFTER, STATS, ORDERS, ORDER_STATUS_COLORS, getRecipients } from './data';
+
+const PEACH = '#FFD6C2';
+const PEACH_SOFT = 'rgba(255, 214, 194, 0.5)';
 
 export default function GifterHome() {
-  const urgentCount = ORDERS.find((o) => o.id === 'holiday-2025')?.pending ?? 0;
-
   return (
     <div className="gd-home">
       {/* Hero */}
       <section className="gd-hero">
         <div className="gd-hero-content">
-          <div className="gd-hero-greet">Welcome back</div>
-          <h1 className="gd-hero-name">{GIFTER.name} <span aria-hidden>👋</span></h1>
+          <h1 className="gd-hero-name">
+            <span className="gd-hero-name-italic">{GIFTER.name}</span>
+            <span className="gd-hero-name-stop">.</span>
+          </h1>
+          <p className="gd-hero-tagline">
+            You've made <strong>220 people</strong> smile this year. <span className="gd-sparkle" aria-hidden>✦</span>
+          </p>
+
           <div className="gd-hero-stats">
-            <StatTile label="Gifts sent"   value={STATS.giftsSent} />
-            <StatTile label="Claim rate"   value={STATS.claimRate} />
-            <StatTile label="Total spent"  value={STATS.totalSpent} />
+            <StatTile big={STATS.giftsSent}   sub="gifts sent" />
+            <StatTile big={STATS.claimRate}   sub="claimed and counting" />
+            <StatTile big={STATS.totalSpent}  sub="in generosity" />
           </div>
         </div>
+
+        {/* Decorative gift box illustration, corner */}
+        <GiftBoxIllustration />
       </section>
 
-      {/* Attention banner — only if there's something to do */}
-      {urgentCount > 0 && (
-        <Link href="/gifter-dashboard/orders/holiday-2025" className="gd-alert">
-          <div className="gd-alert-dot" />
-          <div className="gd-alert-text">
-            <strong>{urgentCount} recipients haven't claimed yet.</strong> Holiday Gifts 2025 expires in 5 days.
-          </div>
-          <span className="gd-alert-cta">Review →</span>
-        </Link>
-      )}
+      {/* Primary CTA — standalone, unmissable */}
+      <Link href="#" className="gd-primary-cta">
+        <span className="gd-primary-cta-glow" aria-hidden />
+        <span className="gd-primary-cta-icon" aria-hidden><PlusIcon /></span>
+        <span className="gd-primary-cta-text">
+          <span className="gd-primary-cta-label">Send something thoughtful</span>
+          <span className="gd-primary-cta-sub">Pick a budget. We do the rest.</span>
+        </span>
+        <span className="gd-primary-cta-arrow" aria-hidden>→</span>
+      </Link>
 
-      {/* Quick actions — 3-col on desktop, stacks on mobile */}
+      {/* Two secondary actions */}
       <section className="gd-quick-grid">
-        <PrimaryAction href="#"                              label="Send a new gift" sub="Start a new order"   icon={<PlusIcon />} />
-        <QuickAction   href="/gifter-dashboard/address-book" label="Address book"    sub="Saved recipients"    icon={<PeopleIcon />} />
-        <QuickAction   href="/gifter-dashboard/help"         label="Receipts"        sub="Download invoices"   icon={<ReceiptIcon />} />
+        <QuickAction
+          href="/gifter-dashboard/address-book"
+          label="People"
+          sub="Friends & favorites"
+          icon={<PeopleIcon />}
+          accent={BRAND}
+        />
+        <QuickAction
+          href="#"
+          label="Browse gifts"
+          sub="Inspiration for what to send"
+          icon={<SparklesIcon />}
+          accent={'#E07A5F'}
+        />
       </section>
 
       {/* Recent orders */}
       <section className="gd-section">
         <div className="gd-section-header">
-          <h2 className="gd-section-title">Recent orders</h2>
-          <Link href="/gifter-dashboard/orders" className="gd-section-link">View all →</Link>
+          <h2 className="gd-section-title">Recent</h2>
+          <Link href="/gifter-dashboard/orders" className="gd-section-link">See all →</Link>
         </div>
         <div className="gd-orders-list">
           {ORDERS.slice(0, 3).map((o) => {
             const claimedTotal = o.claimed + o.delivered;
             const pct = o.recipients > 0 ? Math.round((claimedTotal / o.recipients) * 100) : 0;
             const tone = ORDER_STATUS_COLORS[o.status];
+            const previewRecipients = o.status !== 'Scheduled' && o.status !== 'Draft'
+              ? getRecipients(o).slice(0, 5)
+              : [];
             return (
               <Link key={o.id} href={`/gifter-dashboard/orders/${o.id}`} className="gd-order-card">
                 <div className="gd-order-card-top">
@@ -66,21 +90,33 @@ export default function GifterHome() {
                   </span>
                 </div>
 
+                {previewRecipients.length > 0 && (
+                  <div className="gd-recipients-row">
+                    <div className="gd-avatars">
+                      {previewRecipients.map((r, i) => (
+                        <span
+                          key={r.id}
+                          className="gd-avatar-mini"
+                          style={{
+                            background: `hsl(${(r.initials.charCodeAt(0) * 7) % 360}, 60%, 55%)`,
+                            zIndex: 5 - i,
+                          }}
+                        >{r.initials}</span>
+                      ))}
+                      {o.recipients > previewRecipients.length && (
+                        <span className="gd-avatar-more" style={{ zIndex: 0 }}>
+                          +{o.recipients - previewRecipients.length}
+                        </span>
+                      )}
+                    </div>
+                    <span className="gd-recipients-pct">{pct}% have unwrapped</span>
+                  </div>
+                )}
+
                 {o.status !== 'Scheduled' && o.status !== 'Draft' && (
-                  <>
-                    <div className="gd-order-numbers">
-                      <span><strong>{o.recipients}</strong> Total</span>
-                      <span style={{ color: '#047857' }}><strong>{claimedTotal}</strong> Claimed</span>
-                      {o.pending > 0 && <span style={{ color: '#92590B' }}><strong>{o.pending}</strong> Pending</span>}
-                    </div>
-                    <div className="gd-progress">
-                      <div className="gd-progress-fill" style={{ width: `${pct}%` }} />
-                    </div>
-                    <div className="gd-order-footer">
-                      <span>{pct}% claimed</span>
-                      <span style={{ color: BRAND, fontWeight: 600 }}>View details →</span>
-                    </div>
-                  </>
+                  <div className="gd-progress">
+                    <div className="gd-progress-fill" style={{ width: `${pct}%` }} />
+                  </div>
                 )}
 
                 {o.status === 'Scheduled' && (
@@ -97,113 +133,222 @@ export default function GifterHome() {
 
       <style jsx>{`
         .gd-home {
-          display: flex; flex-direction: column; gap: 32px;
+          display: flex; flex-direction: column; gap: 28px;
+          animation: gd-fadeup 360ms cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        @keyframes gd-fadeup {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
 
         /* ─── Hero ─── */
         .gd-hero {
+          position: relative;
+          overflow: hidden;
           background:
-            radial-gradient(circle at 100% 100%, #ffffff 0%, transparent 40%),
-            radial-gradient(circle at 0% 0%, ${BRAND_DARK} 0%, transparent 55%),
-            linear-gradient(135deg, ${BRAND_DARK} 0%, ${BRAND} 30%, #C5ADF5 65%, #F4E9FB 100%);
+            radial-gradient(circle at 100% 95%, ${PEACH_SOFT} 0%, transparent 45%),
+            radial-gradient(circle at 105% 100%, #ffffff 0%, transparent 38%),
+            radial-gradient(circle at -10% -10%, ${BRAND_DARK} 0%, transparent 55%),
+            linear-gradient(135deg, ${BRAND_DARK} 0%, ${BRAND} 30%, #C5ADF5 60%, #F4E9FB 100%);
           color: #fff;
-          border-radius: 18px;
-          padding: 36px 36px 32px;
+          border-radius: 20px;
+          padding: 38px 40px 32px;
         }
-        .gd-hero-greet { font-size: 13px; opacity: 0.85; letter-spacing: 0.02em; margin-bottom: 4px; }
+        .gd-hero-content { position: relative; z-index: 2; }
         .gd-hero-name {
-          font-size: 30px; font-weight: 700; letter-spacing: -0.015em;
-          margin: 0 0 22px;
+          font-size: 44px;
+          font-weight: 600;
+          letter-spacing: -0.02em;
+          line-height: 1;
+          margin: 0 0 8px;
+          color: #fff;
+        }
+        .gd-hero-name-italic {
+          font-family: 'Georgia', 'Times New Roman', serif;
+          font-style: italic;
+          font-weight: 400;
+          letter-spacing: -0.015em;
+        }
+        .gd-hero-name-stop {
+          color: rgba(255, 255, 255, 0.5);
+        }
+        .gd-hero-tagline {
+          font-size: 15px;
+          color: rgba(255, 255, 255, 0.92);
+          margin: 0 0 28px;
+          font-weight: 400;
+        }
+        .gd-hero-tagline strong { font-weight: 600; color: #fff; }
+        .gd-sparkle {
+          display: inline-block;
+          margin-left: 4px;
+          color: ${PEACH};
+          font-size: 13px;
+          animation: gd-shimmer 2.4s ease-in-out infinite;
+        }
+        @keyframes gd-shimmer {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50%      { opacity: 1;   transform: scale(1.15); }
         }
         .gd-hero-stats {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 10px;
         }
-
-        /* ─── Alert banner ─── */
-        .gd-alert {
-          display: flex; align-items: center; gap: 12px;
-          padding: 14px 18px; border-radius: 12px;
-          background: #FFF7E6; border: 1px solid #FFEAB5;
-          color: #5a3d00; text-decoration: none;
-          transition: background 120ms ease;
+        @media (max-width: 640px) {
+          .gd-hero { padding: 28px 22px 24px; }
+          .gd-hero-name { font-size: 36px; }
+          .gd-hero-stats { gap: 8px; }
         }
-        .gd-alert:hover { background: #FFF3D6; }
-        .gd-alert-dot {
-          width: 8px; height: 8px; border-radius: 999px;
-          background: #E0A23E;
+
+        /* ─── Primary CTA — standalone, big, unmissable ─── */
+        .gd-primary-cta {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          padding: 22px 26px;
+          background: linear-gradient(135deg, #1a1a1f 0%, #2a2a32 100%);
+          color: #fff;
+          border-radius: 16px;
+          text-decoration: none;
+          overflow: hidden;
+          transition: transform 160ms cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 160ms ease;
+          box-shadow: 0 8px 24px -10px rgba(20, 14, 50, 0.4);
+        }
+        .gd-primary-cta:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 16px 36px -12px rgba(20, 14, 50, 0.55);
+        }
+        .gd-primary-cta-glow {
+          position: absolute;
+          inset: 0;
+          background:
+            radial-gradient(circle at 0% 100%, rgba(124, 92, 255, 0.45) 0%, transparent 40%),
+            radial-gradient(circle at 100% 0%, ${PEACH_SOFT} 0%, transparent 45%);
+          pointer-events: none;
+        }
+        .gd-primary-cta > * { position: relative; z-index: 1; }
+        .gd-primary-cta-icon {
+          width: 44px; height: 44px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, ${BRAND}, ${BRAND_DARK});
+          display: inline-flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+          box-shadow: 0 4px 12px -2px rgba(124, 92, 255, 0.6);
+        }
+        .gd-primary-cta-text {
+          display: flex; flex-direction: column; gap: 2px;
+          flex: 1; min-width: 0;
+        }
+        .gd-primary-cta-label {
+          font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
+        }
+        .gd-primary-cta-sub {
+          font-size: 13px; color: rgba(255, 255, 255, 0.65);
+        }
+        .gd-primary-cta-arrow {
+          font-size: 22px; color: rgba(255, 255, 255, 0.55);
+          transition: transform 160ms ease, color 160ms ease;
           flex-shrink: 0;
         }
-        .gd-alert-text { flex: 1; font-size: 14px; line-height: 1.45; }
-        .gd-alert-cta { color: #92590B; font-size: 13px; font-weight: 600; flex-shrink: 0; }
-
-        /* ─── Section ─── */
-        .gd-section {
-          display: flex; flex-direction: column; gap: 12px;
-        }
-        .gd-section-header {
-          display: flex; justify-content: space-between; align-items: center;
-        }
-        .gd-section-title {
-          font-size: 16px; font-weight: 700; letter-spacing: -0.005em;
-          margin: 0;
-        }
-        .gd-section-link {
-          font-size: 13px; font-weight: 600; color: ${BRAND};
-          text-decoration: none;
+        .gd-primary-cta:hover .gd-primary-cta-arrow {
+          transform: translateX(4px);
+          color: #fff;
         }
 
-        /* ─── Quick action grid ─── */
+        /* ─── Secondary actions ─── */
         .gd-quick-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 10px;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
         }
-        @media (max-width: 640px) {
+        @media (max-width: 540px) {
           .gd-quick-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ─── Section ─── */
+        .gd-section { display: flex; flex-direction: column; gap: 14px; }
+        .gd-section-header {
+          display: flex; justify-content: space-between; align-items: baseline;
+        }
+        .gd-section-title {
+          font-family: 'Georgia', 'Times New Roman', serif;
+          font-size: 22px;
+          font-weight: 400;
+          font-style: italic;
+          color: #1a1a1f;
+          margin: 0;
+          letter-spacing: -0.015em;
+        }
+        .gd-section-link {
+          font-size: 13px; font-weight: 500;
+          color: ${BRAND}; text-decoration: none;
         }
 
         /* ─── Order list ─── */
         .gd-orders-list { display: flex; flex-direction: column; gap: 10px; }
-
         .gd-order-card {
           background: #fff;
           border: 1px solid #ececef;
           border-radius: 14px;
           padding: 16px 18px;
-          display: flex; flex-direction: column; gap: 10px;
+          display: flex; flex-direction: column; gap: 12px;
           text-decoration: none; color: inherit;
-          transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+          transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
         }
         .gd-order-card:hover {
           border-color: #c4c4ca;
-          box-shadow: 0 6px 16px -8px rgba(15, 15, 25, 0.1);
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px -8px rgba(15, 15, 25, 0.1);
         }
         .gd-order-card-top {
           display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
         }
-        .gd-order-name { font-size: 15.5px; font-weight: 600; }
+        .gd-order-name { font-size: 16px; font-weight: 600; letter-spacing: -0.005em; }
         .gd-order-sub { font-size: 12.5px; color: #8a8a93; margin-top: 2px; }
         .gd-order-status {
           font-size: 11.5px; font-weight: 600; padding: 3px 9px;
-          border-radius: 999px; letter-spacing: -0.005em;
+          border-radius: 999px;
           white-space: nowrap;
         }
-        .gd-order-numbers {
-          display: flex; gap: 14px;
-          font-size: 13px; color: #43434b;
+
+        /* Recipient avatars */
+        .gd-recipients-row {
+          display: flex; align-items: center; gap: 12px;
         }
-        .gd-order-numbers strong { font-size: 15px; font-weight: 700; }
+        .gd-avatars { display: flex; }
+        .gd-avatar-mini, .gd-avatar-more {
+          width: 30px; height: 30px;
+          border-radius: 50%;
+          border: 2px solid #fff;
+          color: #fff;
+          font-size: 11px; font-weight: 600;
+          display: inline-flex; align-items: center; justify-content: center;
+          margin-left: -8px;
+        }
+        .gd-avatar-mini:first-child { margin-left: 0; }
+        .gd-avatar-more {
+          background: #f0f0f2; color: #5a5a62;
+          font-weight: 500;
+          font-size: 10.5px;
+        }
+        .gd-recipients-pct {
+          font-size: 12.5px; color: #6b6b73;
+          font-family: 'Georgia', serif; font-style: italic;
+        }
+
+        /* Progress bar */
         .gd-progress {
-          height: 6px; border-radius: 999px;
+          height: 4px; border-radius: 999px;
           background: #f0f0f2; overflow: hidden;
         }
         .gd-progress-fill {
           height: 100%;
-          background: #1F8A4C;
-          transition: width 220ms ease;
+          background: linear-gradient(90deg, #1F8A4C, #34B561);
+          transition: width 240ms ease;
         }
+
         .gd-order-footer {
           display: flex; justify-content: space-between; align-items: center;
           font-size: 12.5px; color: #8a8a93;
@@ -213,88 +358,137 @@ export default function GifterHome() {
   );
 }
 
-function StatTile({ label, value }: { label: string; value: string }) {
+/* ─── Components ─── */
+
+function StatTile({ big, sub }: { big: string; sub: string }) {
   return (
     <div style={{
       background: 'rgba(255, 255, 255, 0.92)',
       border: '1px solid rgba(255, 255, 255, 0.7)',
-      borderRadius: 12,
+      borderRadius: 14,
       padding: '14px 16px 12px',
       backdropFilter: 'blur(10px)',
       WebkitBackdropFilter: 'blur(10px)',
       boxShadow: '0 4px 18px -6px rgba(20, 14, 50, 0.18)',
     }}>
-      <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.015em', color: '#1a1a1f' }}>{value}</div>
-      <div style={{ fontSize: 12, color: '#6b6b73', marginTop: 3 }}>{label}</div>
+      <div style={{
+        fontFamily: '"Georgia", "Times New Roman", serif',
+        fontSize: 26,
+        fontWeight: 500,
+        letterSpacing: '-0.02em',
+        color: '#1a1a1f',
+        lineHeight: 1.1,
+      }}>{big}</div>
+      <div style={{ fontSize: 12, color: '#6b6b73', marginTop: 4 }}>{sub}</div>
     </div>
   );
 }
 
-function PrimaryAction({ href, label, sub, icon }: { href: string; label: string; sub: string; icon: React.ReactNode }) {
-  return (
-    <Link href={href} style={{
-      background: `linear-gradient(135deg, ${BRAND_DARK}, ${BRAND})`,
-      borderRadius: 12,
-      padding: '14px 14px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 12,
-      textDecoration: 'none',
-      color: '#fff',
-      transition: 'transform 120ms ease, box-shadow 120ms ease',
-      boxShadow: '0 6px 16px -6px rgba(124, 92, 255, 0.4)',
-    }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'none'; }}
-    >
-      <span style={{
-        width: 36, height: 36, borderRadius: 10,
-        background: 'rgba(255,255,255,0.18)',
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        color: '#fff', flexShrink: 0,
-      }}>{icon}</span>
-      <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 600 }}>{label}</div>
-        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)', marginTop: 1 }}>{sub}</div>
-      </div>
-    </Link>
-  );
-}
-
-function QuickAction({ href, label, sub, icon }: { href: string; label: string; sub: string; icon: React.ReactNode }) {
+function QuickAction({ href, label, sub, icon, accent }: {
+  href: string; label: string; sub: string; icon: React.ReactNode; accent: string;
+}) {
   return (
     <Link href={href} style={{
       background: '#fff',
       border: '1px solid #ececef',
-      borderRadius: 12,
-      padding: '14px 14px',
+      borderRadius: 14,
+      padding: '16px 18px',
       display: 'flex',
       alignItems: 'center',
-      gap: 12,
+      gap: 14,
       textDecoration: 'none',
       color: 'inherit',
-      transition: 'border-color 120ms ease, box-shadow 120ms ease',
+      transition: 'border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease',
     }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#c4c4ca'; }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#ececef'; }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = '#c4c4ca';
+        el.style.transform = 'translateY(-1px)';
+        el.style.boxShadow = '0 6px 18px -8px rgba(15, 15, 25, 0.1)';
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = '#ececef';
+        el.style.transform = 'none';
+        el.style.boxShadow = 'none';
+      }}
     >
       <span style={{
-        width: 36, height: 36, borderRadius: 10,
-        background: '#f5f5f7',
+        width: 40, height: 40, borderRadius: 12,
+        background: `${accent}15`,
+        color: accent,
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        color: '#1a1a1f', flexShrink: 0,
+        flexShrink: 0,
       }}>{icon}</span>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 13.5, fontWeight: 600 }}>{label}</div>
-        <div style={{ fontSize: 12, color: '#8a8a93', marginTop: 1 }}>{sub}</div>
+        <div style={{ fontSize: 14.5, fontWeight: 600, letterSpacing: '-0.005em' }}>{label}</div>
+        <div style={{ fontSize: 12, color: '#8a8a93', marginTop: 2 }}>{sub}</div>
       </div>
     </Link>
   );
 }
 
+/* ─── Decorative gift-box SVG, floats in hero corner ─── */
+
+function GiftBoxIllustration() {
+  return (
+    <div style={{
+      position: 'absolute',
+      top: 18, right: 22,
+      pointerEvents: 'none',
+      animation: 'gd-float 5s ease-in-out infinite',
+      zIndex: 1,
+    }}>
+      <style jsx>{`
+        @keyframes gd-float {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50%      { transform: translateY(-6px) rotate(2deg); }
+        }
+        @media (max-width: 640px) {
+          div { display: none !important; }
+        }
+      `}</style>
+      <svg width="110" height="120" viewBox="0 0 110 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+        {/* Box shadow */}
+        <ellipse cx="55" cy="112" rx="32" ry="3" fill="rgba(20, 14, 50, 0.18)" />
+
+        {/* Box body */}
+        <rect x="14" y="48" width="82" height="62" rx="6" fill="rgba(255, 255, 255, 0.92)" />
+
+        {/* Box lid */}
+        <rect x="10" y="44" width="90" height="14" rx="3" fill="#fff" />
+
+        {/* Vertical ribbon */}
+        <rect x="50" y="44" width="10" height="66" fill={PEACH} />
+
+        {/* Horizontal ribbon */}
+        <rect x="10" y="48" width="90" height="10" fill={PEACH} />
+
+        {/* Bow left loop */}
+        <ellipse cx="42" cy="42" rx="14" ry="11" fill={PEACH} />
+        <ellipse cx="42" cy="42" rx="6" ry="5" fill="rgba(255, 255, 255, 0.55)" />
+
+        {/* Bow right loop */}
+        <ellipse cx="68" cy="42" rx="14" ry="11" fill={PEACH} />
+        <ellipse cx="68" cy="42" rx="6" ry="5" fill="rgba(255, 255, 255, 0.55)" />
+
+        {/* Bow center knot */}
+        <rect x="50" y="36" width="10" height="14" rx="2" fill="#FFB89D" />
+
+        {/* Sparkles */}
+        <text x="2" y="14" fill="#fff" fontSize="14" opacity="0.9">✦</text>
+        <text x="92" y="22" fill={PEACH} fontSize="11" opacity="0.95">✦</text>
+        <text x="100" y="78" fill="#fff" fontSize="10" opacity="0.85">✦</text>
+      </svg>
+    </div>
+  );
+}
+
+/* ─── Icons ─── */
+
 function PlusIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <line x1="12" y1="5" x2="12" y2="19" />
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
@@ -312,13 +506,11 @@ function PeopleIcon() {
   );
 }
 
-function ReceiptIcon() {
+function SparklesIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M5 2v20l3-2 3 2 3-2 3 2 3-2V2l-3 2-3-2-3 2-3-2z" />
-      <line x1="8" y1="8" x2="16" y2="8" />
-      <line x1="8" y1="12" x2="16" y2="12" />
-      <line x1="8" y1="16" x2="13" y2="16" />
+      <path d="M12 3l2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5z" />
+      <path d="M19 3l1 2 2 1-2 1-1 2-1-2-2-1 2-1z" opacity="0.7" />
     </svg>
   );
 }
