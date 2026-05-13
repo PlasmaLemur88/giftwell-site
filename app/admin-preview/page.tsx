@@ -17,6 +17,7 @@ import {
 } from '@shopify/polaris-icons';
 import { InlineSetupCard } from './components/InlineSetupCard';
 import { AnnouncementCard } from './components/AnnouncementCard';
+import { AtAGlance } from './components/AtAGlance';
 
 type IconComp = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 type Metric = {
@@ -159,6 +160,8 @@ export default function DashboardPage() {
             })}
           </div>
         </div>
+
+        <AtAGlance />
 
         <div className="dash-grid-2col">
           <section className="panel">

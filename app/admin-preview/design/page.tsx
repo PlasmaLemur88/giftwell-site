@@ -13,6 +13,8 @@ import {
   Divider,
 } from '@shopify/polaris';
 import { PlusIcon, DeleteIcon } from '@shopify/polaris-icons';
+import { Toggle } from '../components/Toggle';
+import { ModalBloom } from '../components/ModalBloom';
 
 /* ─── Data ─── */
 
@@ -178,6 +180,7 @@ export default function DesignPage() {
       </Card>
 
       {/* Modals */}
+      <ModalBloom open={themesModal || postersModal || gifsModal} />
       <LibraryModal
         open={themesModal}
         onClose={() => setThemesModal(false)}
@@ -269,7 +272,7 @@ function LibrarySection({
             <Text as="h3" variant="headingMd">{title}</Text>
             <Text as="p" variant="bodySm" tone="subdued">{subtitle}</Text>
           </BlockStack>
-          <Toggle on={on} onToggle={onToggleOn} />
+          <Toggle on={on} onToggle={onToggleOn} showLabel />
         </InlineStack>
 
         {on ? (
@@ -328,7 +331,7 @@ function GifsSection({
               Animated GIFs gifters can add to a gift.
             </Text>
           </BlockStack>
-          <Toggle on={on} onToggle={onToggleOn} />
+          <Toggle on={on} onToggle={onToggleOn} showLabel />
         </InlineStack>
 
         {on ? (
@@ -624,7 +627,7 @@ function GifsModal({
                       Let gifters search Giphy and add an animated GIF.
                     </Text>
                   </BlockStack>
-                  <Toggle on={allowGiphy} onToggle={() => setAllowGiphy(!allowGiphy)} />
+                  <Toggle on={allowGiphy} onToggle={() => setAllowGiphy(!allowGiphy)} showLabel />
                 </InlineStack>
               </Box>
               <Divider />
@@ -636,7 +639,7 @@ function GifsModal({
                       Let gifters use the GIFs you upload below.
                     </Text>
                   </BlockStack>
-                  <Toggle on={allowUploads} onToggle={() => setAllowUploads(!allowUploads)} />
+                  <Toggle on={allowUploads} onToggle={() => setAllowUploads(!allowUploads)} showLabel />
                 </InlineStack>
               </Box>
             </Card>
@@ -834,58 +837,6 @@ function CheckBadge() {
   );
 }
 
-function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-pressed={on}
-      style={{
-        all: 'unset',
-        cursor: 'pointer',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 8,
-      }}
-    >
-      <span
-        style={{
-          width: 32,
-          height: 18,
-          background: on ? '#1a1a1f' : '#e1e3e5',
-          borderRadius: 999,
-          position: 'relative',
-          transition: 'background 120ms ease',
-          flexShrink: 0,
-        }}
-      >
-        <span
-          style={{
-            position: 'absolute',
-            top: 2,
-            left: on ? 16 : 2,
-            width: 14,
-            height: 14,
-            background: '#fff',
-            borderRadius: '50%',
-            transition: 'left 120ms ease',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
-          }}
-        />
-      </span>
-      <span
-        style={{
-          fontSize: 13,
-          fontWeight: 500,
-          color: on ? '#111' : '#8a8a93',
-          minWidth: 22,
-        }}
-      >
-        {on ? 'On' : 'Off'}
-      </span>
-    </button>
-  );
-}
 
 function toggleSet(
   set: Set<string>,

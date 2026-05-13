@@ -16,6 +16,7 @@ import {
   Divider,
   Icon,
 } from '@shopify/polaris';
+import { Toggle } from '../components/Toggle';
 import {
   LockIcon,
   DeleteIcon,
@@ -306,45 +307,3 @@ function BillingTab() {
   );
 }
 
-function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-pressed={on}
-      style={{
-        all: 'unset',
-        cursor: 'pointer',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 8,
-      }}
-    >
-      <span
-        style={{
-          width: 32,
-          height: 18,
-          background: on ? '#1a1a1f' : '#e1e3e5',
-          borderRadius: 999,
-          position: 'relative',
-          transition: 'background 120ms ease',
-          flexShrink: 0,
-        }}
-      >
-        <span
-          style={{
-            position: 'absolute',
-            top: 2,
-            left: on ? 16 : 2,
-            width: 14,
-            height: 14,
-            background: '#fff',
-            borderRadius: '50%',
-            transition: 'left 120ms ease',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
-          }}
-        />
-      </span>
-    </button>
-  );
-}

@@ -30,6 +30,8 @@ import {
   ChartLineIcon,
   FlagIcon,
 } from '@shopify/polaris-icons';
+import { Toggle } from '../components/Toggle';
+import { ModalBloom } from '../components/ModalBloom';
 
 type IconSrc = React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
 type Status =
@@ -322,6 +324,7 @@ export default function EmailsPage() {
         />
       </BlockStack>
 
+      <ModalBloom open={previewRow !== null || colorModalOpen} color={brandColor} />
       <Modal
         open={previewRow !== null}
         onClose={() => setPreviewId(null)}
@@ -555,56 +558,7 @@ function StatusControl({ status }: { status: Status }) {
 
 function ToggleBadge({ defaultOn }: { defaultOn: boolean }) {
   const [on, setOn] = useState(defaultOn);
-  return (
-    <button
-      type="button"
-      onClick={() => setOn((v) => !v)}
-      aria-pressed={on}
-      style={{
-        all: 'unset',
-        cursor: 'pointer',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 8,
-      }}
-    >
-      <span
-        style={{
-          width: 32,
-          height: 18,
-          background: on ? '#1a1a1f' : '#e1e3e5',
-          borderRadius: 999,
-          position: 'relative',
-          transition: 'background 120ms ease',
-          flexShrink: 0,
-        }}
-      >
-        <span
-          style={{
-            position: 'absolute',
-            top: 2,
-            left: on ? 16 : 2,
-            width: 14,
-            height: 14,
-            background: '#fff',
-            borderRadius: '50%',
-            transition: 'left 120ms ease',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
-          }}
-        />
-      </span>
-      <span
-        style={{
-          fontSize: 13,
-          fontWeight: 500,
-          color: on ? '#111' : '#8a8a93',
-          minWidth: 22,
-        }}
-      >
-        {on ? 'On' : 'Off'}
-      </span>
-    </button>
-  );
+  return <Toggle on={on} onToggle={() => setOn((v) => !v)} showLabel />;
 }
 
 function CadenceSelect() {
