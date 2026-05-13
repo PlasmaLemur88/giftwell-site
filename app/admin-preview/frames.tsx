@@ -194,32 +194,18 @@ function FrameVolume({ answers, onChange }: FrameProps) {
 
 function FramePricingFee({ answers, onChange }: FrameProps) {
   const handling = answers.feeHandling ?? 'pass';
-  const subtotal = 4005.00;
-  const fee = 400.50;
-  const revenue =
-    handling === 'pass'   ? subtotal
-  : handling === 'absorb' ? subtotal - fee
-  :                          subtotal - fee / 2;
   return (
-    <BlockStack gap="300">
-      <TilePicker
-        mode="single"
-        columns={3}
-        value={handling}
-        onChange={(v) => onChange({ feeHandling: v as 'pass' | 'absorb' | 'split' })}
-        options={[
-          { id: 'pass',   title: 'Pass to Gifter',   description: '10% added at checkout', badge: 'Recommended' },
-          { id: 'absorb', title: 'Absorb in Margin', description: '10% from your revenue' },
-          { id: 'split',  title: 'Split 50/50',      description: '5% gifter, 5% margin' },
-        ]}
-      />
-      <Box padding="300" borderRadius="200" background="bg-surface-secondary">
-        <InlineStack align="space-between" blockAlign="center">
-          <Text as="span" variant="bodySm" tone="subdued">Your net on a 50-gift order</Text>
-          <Text as="span" variant="bodyMd" fontWeight="semibold">${revenue.toFixed(2)}</Text>
-        </InlineStack>
-      </Box>
-    </BlockStack>
+    <TilePicker
+      mode="single"
+      columns={3}
+      value={handling}
+      onChange={(v) => onChange({ feeHandling: v as 'pass' | 'absorb' | 'split' })}
+      options={[
+        { id: 'pass',   title: 'Pass to Gifter',   description: '10% added at checkout', badge: 'Recommended' },
+        { id: 'absorb', title: 'Absorb in Margin', description: '10% from your revenue' },
+        { id: 'split',  title: 'Split 50/50',      description: '5% gifter, 5% margin' },
+      ]}
+    />
   );
 }
 
@@ -284,13 +270,7 @@ function FramePaymentMethod({ answers }: FrameProps) {
           </Text>
         </BlockStack>
       </Box>
-      <TextField
-        label="Card details"
-        labelHidden
-        placeholder="1234 1234 1234 1234   MM / YY   CVC"
-        autoComplete="cc-number"
-        onChange={() => {}}
-      />
+      <StripeCardField />
       <InlineStack gap="100" blockAlign="center">
         <Icon source={LockIcon} tone="subdued" />
         <Text as="span" variant="bodySm" tone="subdued">
@@ -301,72 +281,120 @@ function FramePaymentMethod({ answers }: FrameProps) {
   );
 }
 
+/* ─── Compound card field (visual mock of Stripe Elements) ─── */
+
+function StripeCardField() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'stretch',
+        border: '1px solid var(--p-color-border)',
+        borderRadius: 8,
+        background: '#fff',
+        overflow: 'hidden',
+        height: 40,
+      }}
+    >
+      <input
+        type="text"
+        inputMode="numeric"
+        placeholder="Card number"
+        defaultValue=""
+        style={{
+          flex: 1,
+          minWidth: 0,
+          border: 0,
+          outline: 0,
+          padding: '0 12px',
+          fontSize: 14,
+          background: 'transparent',
+          fontFamily: 'inherit',
+        }}
+      />
+      <div style={{ width: 1, background: 'var(--p-color-border)' }} />
+      <input
+        type="text"
+        inputMode="numeric"
+        placeholder="MM / YY"
+        defaultValue=""
+        style={{
+          width: 84,
+          border: 0,
+          outline: 0,
+          padding: '0 12px',
+          fontSize: 14,
+          background: 'transparent',
+          fontFamily: 'inherit',
+        }}
+      />
+      <div style={{ width: 1, background: 'var(--p-color-border)' }} />
+      <input
+        type="text"
+        inputMode="numeric"
+        placeholder="CVC"
+        defaultValue=""
+        style={{
+          width: 64,
+          border: 0,
+          outline: 0,
+          padding: '0 12px',
+          fontSize: 14,
+          background: 'transparent',
+          fontFamily: 'inherit',
+        }}
+      />
+    </div>
+  );
+}
+
 function FrameCatalogProducts(_: FrameProps) {
   const products = [
-    { id: '1',  name: 'Signature Candle', price: '$34.00', sel: true, bg: 'linear-gradient(135deg, #F4ECD8, #E8D8B8)' },
-    { id: '2',  name: 'Bath Salts',       price: '$28.00', sel: true, bg: 'linear-gradient(135deg, #DCDCFF, #B8B8E8)' },
-    { id: '3',  name: 'Artisan Tea Set',  price: '$32.00', sel: true, bg: 'linear-gradient(135deg, #A8E5C5, #6FCBA0)' },
-    { id: '4',  name: 'Cashmere Gloves',  price: '$65.00', sel: true, bg: 'linear-gradient(135deg, #2a2a2a, #4a4a4a)' },
-    { id: '5',  name: 'Leather Journal',  price: '$45.00', sel: true, bg: 'linear-gradient(135deg, #8B4513, #654321)' },
-    { id: '6',  name: 'Ceramic Mug',      price: '$24.00', sel: true, bg: 'linear-gradient(135deg, #FFC9D5, #F58CA8)' },
-    { id: '7',  name: 'Chocolate Box',    price: '$38.00', sel: true, bg: 'linear-gradient(135deg, #5D4037, #3E2723)' },
-    { id: '8',  name: 'Wool Scarf',       price: '$55.00', sel: true, bg: 'linear-gradient(135deg, #B0BEC5, #78909C)' },
-    { id: '9',  name: 'Hand Cream',       price: '$22.00', sel: true, bg: 'linear-gradient(135deg, #FFE9A0, #FFD060)' },
-    { id: '10', name: 'Wine Tumbler',     price: '$48.00', sel: true, bg: 'linear-gradient(135deg, #1F3A5F, #0F1A2E)' },
-    { id: '11', name: 'Cookie Tin',       price: '$36.00', sel: true, bg: 'linear-gradient(135deg, #E8B4B8, #D08A8E)' },
-    { id: '12', name: 'Espresso Beans',   price: '$30.00', sel: true, bg: 'linear-gradient(135deg, #3E2723, #1B0A06)' },
+    { id: '1', name: 'Candle',     price: '$34', sel: true, bg: 'linear-gradient(135deg, #F4ECD8, #E8D8B8)' },
+    { id: '2', name: 'Bath Salts', price: '$28', sel: true, bg: 'linear-gradient(135deg, #DCDCFF, #B8B8E8)' },
+    { id: '3', name: 'Tea Set',    price: '$32', sel: true, bg: 'linear-gradient(135deg, #A8E5C5, #6FCBA0)' },
+    { id: '4', name: 'Gloves',     price: '$65', sel: true, bg: 'linear-gradient(135deg, #2a2a2a, #4a4a4a)' },
+    { id: '5', name: 'Journal',    price: '$45', sel: true, bg: 'linear-gradient(135deg, #8B4513, #654321)' },
+    { id: '6', name: 'Mug',        price: '$24', sel: true, bg: 'linear-gradient(135deg, #FFC9D5, #F58CA8)' },
   ];
-  const selectedCount = products.filter((p) => p.sel).length;
+  const totalCount = 84;
   return (
     <BlockStack gap="200">
       <InlineStack align="space-between" blockAlign="center" gap="200" wrap={false}>
         <Box minWidth="200px">
           <TextField label="" labelHidden placeholder="Search catalog…" autoComplete="off" onChange={() => {}} />
         </Box>
-        <InlineStack gap="200" blockAlign="center" wrap={false}>
-          <Text as="span" variant="bodySm" tone="subdued">{selectedCount} of {products.length}</Text>
-          <Button variant="plain" size="micro">Deselect all</Button>
-        </InlineStack>
+        <Text as="span" variant="bodySm" tone="subdued">
+          {totalCount} of {totalCount} giftable
+        </Text>
       </InlineStack>
-      <Text as="p" variant="bodySm" tone="subdued">
-        💡 Custom bundles? Add them as products in your Shopify store and they&apos;ll appear here.
-      </Text>
-      <div
-        style={{
-          display: 'flex',
-          gap: 10,
-          overflowX: 'auto',
-          paddingBottom: 4,
-          scrollSnapType: 'x mandatory',
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
+      <InlineGrid gap="200" columns={6}>
         {products.map((p) => (
-          <div key={p.id} style={{ flexShrink: 0, width: 108, scrollSnapAlign: 'start' }}>
-            <Box
-              padding="150"
-              borderRadius="200"
-              borderWidth="025"
-              borderColor={p.sel ? 'border-emphasis' : 'border'}
-              background={p.sel ? 'bg-surface-selected' : 'bg-surface'}
-              position="relative"
-            >
-              <BlockStack gap="150">
-                <div style={{ width: '100%', aspectRatio: '1 / 1', borderRadius: 6, background: p.bg }} />
-                <BlockStack gap="050">
-                  <Text as="p" variant="bodySm" fontWeight="semibold" truncate>{p.name}</Text>
-                  <Text as="p" tone="subdued" variant="bodySm">{p.price}</Text>
-                </BlockStack>
-              </BlockStack>
-              {p.sel && (
-                <Box position="absolute" insetBlockStart="100" insetInlineEnd="100">
-                  <Icon source={CheckIcon} tone="emphasis" />
-                </Box>
-              )}
-            </Box>
-          </div>
+          <Box
+            key={p.id}
+            padding="150"
+            borderRadius="200"
+            borderWidth="025"
+            borderColor={p.sel ? 'border-emphasis' : 'border'}
+            background={p.sel ? 'bg-surface-selected' : 'bg-surface'}
+            position="relative"
+          >
+            <BlockStack gap="100">
+              <div style={{ width: '100%', aspectRatio: '1 / 1', borderRadius: 6, background: p.bg }} />
+              <Text as="p" variant="bodySm" fontWeight="semibold" truncate>{p.name}</Text>
+              <Text as="p" tone="subdued" variant="bodySm">{p.price}</Text>
+            </BlockStack>
+            {p.sel && (
+              <Box position="absolute" insetBlockStart="050" insetInlineEnd="050">
+                <Icon source={CheckIcon} tone="emphasis" />
+              </Box>
+            )}
+          </Box>
         ))}
-      </div>
+      </InlineGrid>
+      <Text as="p" variant="bodySm" tone="subdued">
+        Showing 6 — manage the full list in Products admin after launch.
+      </Text>
     </BlockStack>
   );
 }

@@ -47,13 +47,17 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
         <div className="setup-eyebrow">
           {frame.phase} · Step {step + 1} of {FRAMES.length}
         </div>
-        <div className="setup-dots" role="progressbar" aria-valuenow={step + 1} aria-valuemin={1} aria-valuemax={FRAMES.length}>
-          {FRAMES.map((_, i) => (
-            <span
-              key={i}
-              className={`setup-dot ${i <= step ? 'setup-dot-active' : ''}`}
-            />
-          ))}
+        <div
+          className="setup-progress"
+          role="progressbar"
+          aria-valuenow={step + 1}
+          aria-valuemin={1}
+          aria-valuemax={FRAMES.length}
+        >
+          <div
+            className="setup-progress-fill"
+            style={{ width: `${((step + 1) / FRAMES.length) * 100}%` }}
+          />
         </div>
         <h2 className="setup-title">{frame.title}</h2>
 
@@ -128,21 +132,19 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
           margin-bottom: 4px;
           text-transform: capitalize;
         }
-        .setup-dots {
-          display: flex;
-          gap: 3px;
-          margin-bottom: 8px;
-        }
-        .setup-dot {
-          flex: 1;
+        .setup-progress {
           height: 3px;
-          border-radius: 2px;
           background: #ececef;
-          max-width: 32px;
-          transition: background 160ms ease;
+          border-radius: 2px;
+          margin-bottom: 8px;
+          overflow: hidden;
+          max-width: 320px;
         }
-        .setup-dot-active {
+        .setup-progress-fill {
+          height: 100%;
           background: #111;
+          border-radius: 2px;
+          transition: width 220ms ease;
         }
         .setup-title {
           font-size: 22px;
