@@ -376,7 +376,7 @@ function FrameCatalogProducts(_: FrameProps) {
             position="relative"
           >
             <BlockStack gap="050">
-              <div style={{ width: '100%', aspectRatio: '4 / 3', borderRadius: 4, background: p.bg }} />
+              <div style={{ width: '100%', aspectRatio: '2 / 1', borderRadius: 4, background: p.bg }} />
               <Text as="p" variant="bodySm" fontWeight="semibold" truncate>{p.name}</Text>
               <Text as="p" tone="subdued" variant="bodySm">{p.price}</Text>
             </BlockStack>
@@ -429,7 +429,7 @@ function FrameReview({ answers }: FrameProps) {
       {items.map((item, i) => (
         <div key={item.title}>
           {i > 0 && <Divider />}
-          <Box paddingInline="300" paddingBlock="150">
+          <Box paddingInline="300" paddingBlock="050">
             <InlineStack align="space-between" blockAlign="center" gap="200" wrap={false}>
               <InlineStack gap="200" blockAlign="center" wrap={false}>
                 <Icon source={CheckCircleIcon} tone="success" />
