@@ -99,7 +99,7 @@ export default function DesignPage() {
   const selectedPosters = POSTERS.filter((p) => postersSelected.has(p.id)).slice(0, 4);
 
   return (
-    <BlockStack gap="800">
+    <BlockStack gap="400">
       <InlineStack align="space-between" blockAlign="center" gap="500">
         <BlockStack gap="100">
           <Text as="h1" variant="headingXl">Design</Text>
