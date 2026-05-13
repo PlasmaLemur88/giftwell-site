@@ -45,7 +45,7 @@ export default function GifterHome() {
       {/* Two secondary actions */}
       <section className="gd-quick-grid">
         <QuickAction
-          href="/gifter-dashboard/address-book"
+          href="/gifter-dashboard/people"
           label="People"
           sub="Friends & favorites"
           icon={<PeopleIcon />}
@@ -279,23 +279,24 @@ export default function GifterHome() {
         .gd-orders-list { display: flex; flex-direction: column; gap: 10px; }
         .gd-order-card {
           background: #fff;
-          border: 1px solid #ececef;
+          border: 1px solid rgba(15, 15, 25, 0.06);
           border-radius: 14px;
-          padding: 16px 18px;
+          padding: 18px 20px;
           display: flex; flex-direction: column; gap: 12px;
           text-decoration: none; color: inherit;
+          box-shadow: 0 4px 14px -8px rgba(20, 14, 50, 0.15);
           transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
         }
         .gd-order-card:hover {
-          border-color: #c4c4ca;
+          border-color: rgba(15, 15, 25, 0.18);
           transform: translateY(-1px);
-          box-shadow: 0 6px 18px -8px rgba(15, 15, 25, 0.1);
+          box-shadow: 0 10px 24px -10px rgba(20, 14, 50, 0.25);
         }
         .gd-order-card-top {
           display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
         }
-        .gd-order-name { font-size: 16px; font-weight: 600; letter-spacing: -0.005em; }
-        .gd-order-sub { font-size: 12.5px; color: #8a8a93; margin-top: 2px; }
+        .gd-order-name { font-size: 16px; font-weight: 600; letter-spacing: -0.005em; color: #1a1a1f; }
+        .gd-order-sub { font-size: 13px; color: #43434b; margin-top: 3px; }
         .gd-order-status {
           font-size: 11.5px; font-weight: 600; padding: 3px 9px;
           border-radius: 999px;

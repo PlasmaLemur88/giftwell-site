@@ -8,7 +8,7 @@ import { BRAND, BRAND_DARK, GIFTER } from './data';
 const NAV = [
   { href: '/gifter-dashboard',                label: 'Home',         icon: HomeIcon },
   { href: '/gifter-dashboard/orders',         label: 'Orders',       icon: PackageIcon },
-  { href: '/gifter-dashboard/address-book',   label: 'Address book', icon: PeopleIcon },
+  { href: '/gifter-dashboard/people',         label: 'People',       icon: PeopleIcon },
   { href: '/gifter-dashboard/help',           label: 'Help',         icon: HelpIcon },
 ];
 

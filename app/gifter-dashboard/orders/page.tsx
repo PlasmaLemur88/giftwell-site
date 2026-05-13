@@ -57,26 +57,28 @@ export default function GifterOrders() {
         }
         .gd-page-header p { font-size: 14.5px; color: rgba(255, 255, 255, 0.85); margin: 0; }
 
-        .gd-orders-list { display: flex; flex-direction: column; gap: 8px; }
+        .gd-orders-list { display: flex; flex-direction: column; gap: 10px; }
         .gd-order-row {
           background: #fff;
-          border: 1px solid #ececef;
-          border-radius: 12px;
-          padding: 14px 16px;
+          border: 1px solid rgba(15, 15, 25, 0.06);
+          border-radius: 14px;
+          padding: 16px 20px;
           display: grid;
           grid-template-columns: 1fr 200px auto 16px;
           align-items: center;
           gap: 16px;
           text-decoration: none; color: inherit;
-          transition: border-color 120ms ease, box-shadow 120ms ease;
+          box-shadow: 0 4px 14px -8px rgba(20, 14, 50, 0.15);
+          transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
         }
         .gd-order-row:hover {
-          border-color: #c4c4ca;
-          box-shadow: 0 6px 14px -8px rgba(15,15,25,0.1);
+          border-color: rgba(15, 15, 25, 0.18);
+          transform: translateY(-1px);
+          box-shadow: 0 10px 24px -10px rgba(20, 14, 50, 0.25);
         }
-        .gd-order-row-name { font-size: 14.5px; font-weight: 600; }
-        .gd-order-row-sub { font-size: 12.5px; color: #8a8a93; margin-top: 2px; }
-        .gd-order-row-pct { font-size: 11.5px; color: #5a5a62; margin-bottom: 4px; }
+        .gd-order-row-name { font-size: 15px; font-weight: 600; color: #1a1a1f; }
+        .gd-order-row-sub { font-size: 13px; color: #43434b; margin-top: 3px; }
+        .gd-order-row-pct { font-size: 12px; color: #43434b; margin-bottom: 5px; font-weight: 500; }
         .gd-progress { height: 4px; border-radius: 999px; background: #f0f0f2; overflow: hidden; }
         .gd-progress-fill { height: 100%; background: #1F8A4C; }
         .gd-order-row-status {
