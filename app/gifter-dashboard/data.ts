@@ -32,8 +32,8 @@ export type GifterOrder = {
 
 export const ORDERS: GifterOrder[] = [
   {
-    id: 'holiday-2025',
-    name: 'Holiday Gifts 2025',
+    id: 'jan-15-2025',
+    name: 'January 15, 2025',
     status: 'Sent',
     sentDate: 'Jan 15, 2025',
     recipients: 124,
@@ -44,8 +44,8 @@ export const ORDERS: GifterOrder[] = [
     budgetPerRecipient: '$100',
   },
   {
-    id: 'q1-thanks',
-    name: 'Q1 Client Thanks',
+    id: 'feb-1-2025',
+    name: 'February 1, 2025',
     status: 'Scheduled',
     sentDate: null,
     scheduledDate: 'Feb 1, 2025',
@@ -57,8 +57,8 @@ export const ORDERS: GifterOrder[] = [
     budgetPerRecipient: '$150',
   },
   {
-    id: 'new-hire-batch',
-    name: 'New Hire Welcome Q4',
+    id: 'oct-12-2024',
+    name: 'October 12, 2024',
     status: 'Completed',
     sentDate: 'Oct 12, 2024',
     recipients: 18,

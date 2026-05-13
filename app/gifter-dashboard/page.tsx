@@ -67,9 +67,7 @@ export default function GifterHome() {
                   <div>
                     <div className="gd-order-name">{o.name}</div>
                     <div className="gd-order-sub">
-                      {o.status === 'Scheduled' && o.scheduledDate
-                        ? `Scheduled ${o.scheduledDate}`
-                        : o.sentDate ? `Sent ${o.sentDate}` : 'Draft'}
+                      {o.recipients} recipients · {o.budgetPerRecipient}/person
                     </div>
                   </div>
                   <span className="gd-order-status" style={{ background: tone.bg, color: tone.fg }}>

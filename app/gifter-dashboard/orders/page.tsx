@@ -41,10 +41,7 @@ export default function GifterOrders() {
               <div>
                 <div style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1f' }}>{o.name}</div>
                 <div style={{ fontSize: 13, color: '#43434b', marginTop: 3 }}>
-                  {o.status === 'Scheduled' && o.scheduledDate
-                    ? `Scheduled ${o.scheduledDate}`
-                    : o.sentDate ? `Sent ${o.sentDate}` : 'Draft'}
-                  {' · '}{o.recipients} recipients · {o.budgetPerRecipient}/person
+                  {o.recipients} recipients · {o.budgetPerRecipient}/person
                 </div>
               </div>
               <div>

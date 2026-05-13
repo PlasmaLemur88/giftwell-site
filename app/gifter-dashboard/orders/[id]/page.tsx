@@ -55,7 +55,7 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
         <Link href="/gifter-dashboard" className="gd-order-back">← Back</Link>
         <h1 className="gd-order-title">{order.name}</h1>
         <div className="gd-order-meta">
-          {order.recipients} recipients · {order.sentDate ? `Sent ${order.sentDate}` : `Scheduled ${order.scheduledDate}`}
+          {order.recipients} recipients · {order.budgetPerRecipient}/person · {order.status}
         </div>
       </section>
 
