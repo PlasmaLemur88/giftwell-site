@@ -84,13 +84,64 @@ const BRAND_SWATCHES: { id: string; value: string; label: string }[] = [
   { id: 'black',   value: '#1a1a1a', label: 'Black' },
 ];
 
-function lighten(hex: string, amount = 0.3): string {
-  const cleaned = hex.replace('#', '');
-  const r = parseInt(cleaned.slice(0, 2), 16);
-  const g = parseInt(cleaned.slice(2, 4), 16);
-  const b = parseInt(cleaned.slice(4, 6), 16);
-  const mix = (c: number) => Math.round(c + (255 - c) * amount);
-  return `#${[mix(r), mix(g), mix(b)].map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+function hexToHsl(hex: string): { h: number; s: number; l: number } {
+  const v = hex.replace('#', '');
+  const r = parseInt(v.slice(0, 2), 16) / 255;
+  const g = parseInt(v.slice(2, 4), 16) / 255;
+  const b = parseInt(v.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0));
+    else if (max === g) h = ((b - r) / d + 2);
+    else h = ((r - g) / d + 4);
+    h /= 6;
+  }
+  return { h: h * 360, s: s * 100, l: l * 100 };
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const sNorm = Math.max(0, Math.min(100, s)) / 100;
+  const lNorm = Math.max(0, Math.min(100, l)) / 100;
+  const c = (1 - Math.abs(2 * lNorm - 1)) * sNorm;
+  const hue = ((h % 360) + 360) % 360;
+  const hp = hue / 60;
+  const x = c * (1 - Math.abs((hp % 2) - 1));
+  let r1 = 0;
+  let g1 = 0;
+  let b1 = 0;
+  if (hp < 1)      { r1 = c; g1 = x; }
+  else if (hp < 2) { r1 = x; g1 = c; }
+  else if (hp < 3) { g1 = c; b1 = x; }
+  else if (hp < 4) { g1 = x; b1 = c; }
+  else if (hp < 5) { r1 = x; b1 = c; }
+  else             { r1 = c; b1 = x; }
+  const m = lNorm - c / 2;
+  const toHex = (v: number) =>
+    Math.round((v + m) * 255).toString(16).padStart(2, '0');
+  return `#${toHex(r1)}${toHex(g1)}${toHex(b1)}`;
+}
+
+/* Build a multi-stop, hue-rotated gradient that stays artful for any picked
+   color. Two linear bands (deep -> base -> hue-shifted bright) layered under
+   two radial highlights for an iridescent "spotlight" feel. */
+function artfulGradient(hex: string): string {
+  const { h, s, l } = hexToHsl(hex);
+  const deep      = hslToHex(h - 12, s + 6, l - 10);
+  const base      = hex;
+  const shiftedLt = hslToHex(h + 34, Math.max(45, s - 8), Math.min(82, l + 22));
+  const glowTop   = hslToHex(h + 52, Math.max(40, s - 18), Math.min(90, l + 32));
+  const glowBot   = hslToHex(h - 28, Math.min(100, s + 4),  Math.max(20, l - 6));
+  return [
+    `radial-gradient(ellipse 70% 55% at 18% 12%, ${glowTop} 0%, transparent 55%)`,
+    `radial-gradient(ellipse 60% 50% at 88% 95%, ${glowBot} 0%, transparent 60%)`,
+    `linear-gradient(135deg, ${deep} 0%, ${base} 45%, ${shiftedLt} 100%)`,
+  ].join(', ');
 }
 
 function MerchantLogo({
@@ -465,7 +516,7 @@ function BrandColorModal({
                   style={{
                     height: 40,
                     borderRadius: 8,
-                    background: `linear-gradient(135deg, ${liveHex}, ${lighten(liveHex, 0.25)})`,
+                    background: artfulGradient(liveHex),
                   }}
                 />
               </BlockStack>
@@ -578,7 +629,6 @@ function CadenceSelect() {
 
 function EmailMockup({ content, brandColor }: { content: EmailContent; brandColor: string }) {
   const isGifter = content.audience === 'gifter';
-  const brandLight = lighten(brandColor, 0.25);
   return (
     <div
       style={{
@@ -634,7 +684,7 @@ function EmailMockup({ content, brandColor }: { content: EmailContent; brandColo
       <div
         style={{
           padding: '44px 28px 36px',
-          background: `linear-gradient(135deg, ${brandColor} 0%, ${brandLight} 100%)`,
+          background: artfulGradient(brandColor),
           textAlign: 'center',
           position: 'relative',
           overflow: 'hidden',
