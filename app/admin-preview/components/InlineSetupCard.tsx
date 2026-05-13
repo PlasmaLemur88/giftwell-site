@@ -165,7 +165,7 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
         }
         .setup-frame {
           margin: 16px 0 20px;
-          height: 400px;
+          height: 220px;
           overflow-y: auto;
           padding-right: 4px;
         }

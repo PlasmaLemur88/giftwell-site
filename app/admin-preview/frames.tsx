@@ -215,55 +215,24 @@ function FramePaymentMethod({ answers }: FrameProps) {
     handling === 'pass'   ? '10% experience fee added at gifter’s checkout'
   : handling === 'absorb' ? '10% experience fee deducted from your revenue'
   :                          '5% added at checkout, 5% from your margin';
-  const summary = `${feeLine}${volumeOn ? ', with volume discounts active' : ''}.`;
+  const summary = `${feeLine}${volumeOn ? ', with volume discounts active' : ''}. Charged only when gifts send.`;
 
   return (
-    <BlockStack gap="500">
-      <Card padding="400">
-        <BlockStack gap="200">
-          <Text as="p" variant="bodyMd" fontWeight="semibold">Based on your choices</Text>
-          <Text as="p" variant="bodySm" tone="subdued">{summary}</Text>
-          <Text as="p" variant="bodySm" tone="subdued">
-            Your card is only charged when gifts go out — never up front. Product costs are
-            still billed through your Shopify checkout.
-          </Text>
-        </BlockStack>
-      </Card>
-
-      <BlockStack gap="300">
-        <TextField
-          label="Cardholder name"
-          value="Brandon Sims"
-          autoComplete="cc-name"
-          onChange={() => {}}
-        />
-        <TextField
-          label="Card number"
-          placeholder="•••• •••• •••• ••••"
-          autoComplete="cc-number"
-          onChange={() => {}}
-        />
-        <InlineGrid gap="300" columns={2}>
-          <TextField
-            label="Expires"
-            placeholder="MM / YY"
-            autoComplete="cc-exp"
-            onChange={() => {}}
-          />
-          <TextField
-            label="CVC"
-            placeholder="•••"
-            autoComplete="cc-csc"
-            onChange={() => {}}
-          />
-        </InlineGrid>
-        <InlineStack gap="100" blockAlign="center">
-          <Icon source={LockIcon} tone="subdued" />
-          <Text as="span" variant="bodySm" tone="subdued">
-            Card details are encrypted and stored by Stripe. We never see your card number.
-          </Text>
-        </InlineStack>
-      </BlockStack>
+    <BlockStack gap="300">
+      <Text as="p" variant="bodySm" tone="subdued">{summary}</Text>
+      <TextField
+        label="Card details"
+        labelHidden
+        placeholder="1234 1234 1234 1234   MM / YY   CVC"
+        autoComplete="cc-number"
+        onChange={() => {}}
+      />
+      <InlineStack gap="100" blockAlign="center">
+        <Icon source={LockIcon} tone="subdued" />
+        <Text as="span" variant="bodySm" tone="subdued">
+          Encrypted by Stripe. We never see your card number.
+        </Text>
+      </InlineStack>
     </BlockStack>
   );
 }
@@ -272,62 +241,31 @@ function FramePricingFee({ answers, onChange }: FrameProps) {
   const handling = answers.feeHandling ?? 'pass';
   const subtotal = 4005.00;
   const fee = 400.50;
-  let revenue = subtotal;
-  let note = '';
-  if (handling === 'pass') {
-    revenue = subtotal;
-    note = 'Fee is added at the gifter’s checkout. Your margin stays whole.';
-  } else if (handling === 'absorb') {
-    revenue = subtotal - fee;
-    note = 'Fee is deducted from your revenue.';
-  } else {
-    revenue = subtotal - fee / 2;
-    note = '5% added at checkout, 5% deducted from your revenue.';
-  }
+  const revenue =
+    handling === 'pass'   ? subtotal
+  : handling === 'absorb' ? subtotal - fee
+  :                          subtotal - fee / 2;
 
   return (
-    <BlockStack gap="400">
+    <BlockStack gap="300">
       <TilePicker
         mode="single"
         columns={3}
         value={handling}
         onChange={(v) => onChange({ feeHandling: v as 'pass' | 'absorb' | 'split' })}
         options={[
-          { id: 'pass',   title: 'Pass to Gifter',   description: '10% added at checkout. Margin stays intact.', badge: 'Recommended for DTC' },
-          { id: 'absorb', title: 'Absorb in Margin', description: 'Cleaner pricing for buyers. 10% deducted from revenue.' },
-          { id: 'split',  title: 'Split 50/50',      description: '5% added at checkout, 5% from margin.' },
+          { id: 'pass',   title: 'Pass to Gifter',   description: '10% added at checkout', badge: 'Recommended' },
+          { id: 'absorb', title: 'Absorb in Margin', description: '10% from your revenue' },
+          { id: 'split',  title: 'Split 50/50',      description: '5% gifter, 5% margin' },
         ]}
       />
-      <Card padding="400">
-        <BlockStack gap="300">
-          <Text as="p" variant="bodySm" tone="subdued" fontWeight="semibold">
-            EXAMPLE · 50-GIFT CAMPAIGN
-          </Text>
-          <BlockStack gap="150">
-            <CalcRow label="Bundle revenue (50 × $89)" value="$4,450.00" />
-            <CalcRow label="Volume discount (10%)" value="−$445.00" />
-            <CalcRow label="Experience fee (10%)" value={`−$${fee.toFixed(2)}`} />
-          </BlockStack>
-          <Divider />
-          <InlineStack align="space-between" blockAlign="center">
-            <BlockStack gap="050">
-              <Text as="span" variant="bodyMd" fontWeight="semibold">Your net revenue</Text>
-              <Text as="span" variant="bodySm" tone="subdued">{note}</Text>
-            </BlockStack>
-            <Text as="span" variant="headingLg">${revenue.toFixed(2)}</Text>
-          </InlineStack>
-        </BlockStack>
-      </Card>
+      <Box padding="300" borderRadius="200" background="bg-surface-secondary">
+        <InlineStack align="space-between" blockAlign="center">
+          <Text as="span" variant="bodySm" tone="subdued">Your net on a 50-gift order</Text>
+          <Text as="span" variant="bodyMd" fontWeight="semibold">${revenue.toFixed(2)}</Text>
+        </InlineStack>
+      </Box>
     </BlockStack>
-  );
-}
-
-function CalcRow({ label, value }: { label: string; value: string }) {
-  return (
-    <InlineStack align="space-between">
-      <Text as="span" tone="subdued" variant="bodySm">{label}</Text>
-      <Text as="span" variant="bodySm">{value}</Text>
-    </InlineStack>
   );
 }
 
@@ -340,76 +278,45 @@ function FramePricingVolume({ answers, onChange }: FrameProps) {
   const enabled = answers.enableVolumeDiscounts ?? true;
 
   return (
-    <BlockStack gap="400">
+    <BlockStack gap="300">
       <Checkbox
         label="Enable volume discounts"
-        helpText="Automatically apply discounts based on order size."
         checked={enabled}
         onChange={(v) => onChange({ enableVolumeDiscounts: v })}
       />
       {enabled && (
-        <Card padding="0">
-          <Box
-            paddingInline="400"
-            paddingBlock="300"
-            background="bg-surface-secondary"
-            borderColor="border"
-            borderBlockEndWidth="025"
-          >
-            <InlineStack align="space-between" gap="400">
-              <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
-                When the order is at least
-              </Text>
-              <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
-                Discount
-              </Text>
-            </InlineStack>
-          </Box>
-          {tiers.map((row, i) => (
-            <div key={row.gifts}>
-              {i > 0 && <Divider />}
-              <Box paddingInline="400" paddingBlock="300">
-                <InlineStack align="space-between" blockAlign="center" gap="200" wrap={false}>
-                  <InlineStack gap="200" blockAlign="center">
-                    <Box minWidth="90px">
-                      <TextField
-                        label=""
-                        labelHidden
-                        type="number"
-                        value={row.gifts.toString()}
-                        autoComplete="off"
-                        onChange={() => {}}
-                      />
-                    </Box>
-                    <Text as="span" tone="subdued" variant="bodySm">gifts</Text>
-                  </InlineStack>
-                  <InlineStack gap="200" blockAlign="center">
-                    <Box minWidth="90px">
-                      <TextField
-                        label=""
-                        labelHidden
-                        type="number"
-                        value={row.off.toString()}
-                        suffix="%"
-                        autoComplete="off"
-                        onChange={() => {}}
-                      />
-                    </Box>
-                    <Button
-                      variant="plain"
-                      icon={DeleteIcon}
-                      accessibilityLabel="Remove tier"
-                    />
-                  </InlineStack>
-                </InlineStack>
+        <BlockStack gap="200">
+          {tiers.map((row) => (
+            <InlineStack key={row.gifts} gap="200" blockAlign="center" wrap={false}>
+              <Box minWidth="84px">
+                <TextField
+                  label=""
+                  labelHidden
+                  type="number"
+                  value={row.gifts.toString()}
+                  autoComplete="off"
+                  onChange={() => {}}
+                />
               </Box>
-            </div>
+              <Text as="span" tone="subdued" variant="bodySm">+ gifts =</Text>
+              <Box minWidth="84px">
+                <TextField
+                  label=""
+                  labelHidden
+                  type="number"
+                  value={row.off.toString()}
+                  suffix="%"
+                  autoComplete="off"
+                  onChange={() => {}}
+                />
+              </Box>
+              <Button variant="plain" icon={DeleteIcon} accessibilityLabel="Remove tier" />
+            </InlineStack>
           ))}
-          <Divider />
-          <Box paddingInline="400" paddingBlock="300">
+          <InlineStack>
             <Button variant="plain" icon={PlusIcon}>Add tier</Button>
-          </Box>
-        </Card>
+          </InlineStack>
+        </BlockStack>
       )}
     </BlockStack>
   );
@@ -449,31 +356,33 @@ function FrameCatalogProducts(_: FrameProps) {
   const allSelected = selectedCount === products.length;
 
   return (
-    <BlockStack gap="300">
-      <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
-        <Box minWidth="280px">
+    <BlockStack gap="200">
+      <InlineStack align="space-between" blockAlign="center" gap="200" wrap={false}>
+        <Box minWidth="200px">
           <TextField
             label=""
             labelHidden
-            placeholder="Search your catalog…"
+            placeholder="Search catalog…"
             autoComplete="off"
             onChange={() => {}}
           />
         </Box>
-        <InlineStack gap="300" blockAlign="center">
+        <InlineStack gap="200" blockAlign="center" wrap={false}>
           <Text as="span" variant="bodySm" tone="subdued">
-            {selectedCount} of {products.length} selected
+            {selectedCount} of {products.length}
           </Text>
-          <Button variant="plain">{allSelected ? 'Deselect all' : 'Select all'}</Button>
+          <Button variant="plain" size="micro">
+            {allSelected ? 'Deselect all' : 'Select all'}
+          </Button>
         </InlineStack>
       </InlineStack>
 
       <div
         style={{
           display: 'flex',
-          gap: 12,
+          gap: 10,
           overflowX: 'auto',
-          paddingBottom: 8,
+          paddingBottom: 4,
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
         }}
@@ -483,19 +392,19 @@ function FrameCatalogProducts(_: FrameProps) {
             key={p.id}
             style={{
               flexShrink: 0,
-              width: 148,
+              width: 108,
               scrollSnapAlign: 'start',
             }}
           >
             <Box
-              padding="200"
+              padding="150"
               borderRadius="200"
               borderWidth="025"
               borderColor={p.sel ? 'border-emphasis' : 'border'}
               background={p.sel ? 'bg-surface-selected' : 'bg-surface'}
               position="relative"
             >
-              <BlockStack gap="200">
+              <BlockStack gap="150">
                 <div
                   style={{
                     width: '100%',
@@ -514,7 +423,7 @@ function FrameCatalogProducts(_: FrameProps) {
                 </BlockStack>
               </BlockStack>
               {p.sel && (
-                <Box position="absolute" insetBlockStart="200" insetInlineEnd="200">
+                <Box position="absolute" insetBlockStart="100" insetInlineEnd="100">
                   <Icon source={CheckIcon} tone="emphasis" />
                 </Box>
               )}
@@ -580,40 +489,32 @@ function FrameSupport({ answers, onChange }: FrameProps) {
 
 function FrameReview(_: FrameProps) {
   const items = [
-    { title: 'Payment method',     desc: 'Visa •••• 4242 — charged only when gifts send' },
-    { title: 'Experience fee',     desc: '10% passed to gifter at checkout' },
-    { title: 'Volume discounts',   desc: '3 tiers — 5% at 25, 10% at 50, 15% at 100' },
-    { title: 'Products',           desc: '5 of 12 selected from your catalog' },
-    { title: 'Landing page',       desc: 'acmestore.com/gift — added to nav & footer' },
-    { title: 'Support',            desc: 'Giftwell concierge enabled' },
+    { title: 'Payment method',   value: 'Visa •••• 4242' },
+    { title: 'Experience fee',   value: '10% passed to gifter' },
+    { title: 'Volume discounts', value: '3 tiers (5/10/15%)' },
+    { title: 'Products',         value: '5 of 12 selected' },
+    { title: 'Landing page',     value: 'acmestore.com/gift' },
+    { title: 'Support',          value: 'Concierge enabled' },
   ];
   return (
-    <BlockStack gap="400">
-      <Card padding="0">
-        {items.map((item, i) => (
-          <div key={item.title}>
-            {i > 0 && <Divider />}
-            <Box paddingInline="400" paddingBlock="300">
-              <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
-                <InlineStack gap="300" blockAlign="center" wrap={false}>
-                  <Icon source={CheckCircleIcon} tone="success" />
-                  <BlockStack gap="050">
-                    <Text as="p" variant="bodyMd" fontWeight="semibold">{item.title}</Text>
-                    <Text as="p" variant="bodySm" tone="subdued">{item.desc}</Text>
-                  </BlockStack>
-                </InlineStack>
-                <Button variant="plain">Edit</Button>
+    <Card padding="0">
+      {items.map((item, i) => (
+        <div key={item.title}>
+          {i > 0 && <Divider />}
+          <Box paddingInline="300" paddingBlock="150">
+            <InlineStack align="space-between" blockAlign="center" gap="200" wrap={false}>
+              <InlineStack gap="200" blockAlign="center" wrap={false}>
+                <Icon source={CheckCircleIcon} tone="success" />
+                <Text as="span" variant="bodySm" fontWeight="semibold">{item.title}</Text>
+                <Text as="span" variant="bodySm" tone="subdued">·</Text>
+                <Text as="span" variant="bodySm" tone="subdued" truncate>{item.value}</Text>
               </InlineStack>
-            </Box>
-          </div>
-        ))}
-      </Card>
-      <InlineStack gap="200">
-        <Button>Preview gift page</Button>
-        <Button>Send test gift</Button>
-        <Button>Preview recipient email</Button>
-      </InlineStack>
-    </BlockStack>
+              <Button variant="plain" size="micro">Edit</Button>
+            </InlineStack>
+          </Box>
+        </div>
+      ))}
+    </Card>
   );
 }
 
