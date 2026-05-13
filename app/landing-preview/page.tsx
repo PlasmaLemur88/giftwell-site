@@ -3,34 +3,29 @@
 import { useState } from 'react';
 
 const BRAND = '#7C5CFF';
-const BRAND_DARK = '#5C3FE0';
+const LAVENDER_BG = '#F0EEFA';
 const MERCHANT = 'Acme Store';
 
-const PRODUCTS = [
-  { id: '1', name: 'Signature Candle',     price: '$34', bg: 'linear-gradient(135deg, #F4ECD8, #E8D8B8)', text: '#5a4a2a' },
-  { id: '2', name: 'Bath Salts',           price: '$28', bg: 'linear-gradient(135deg, #DCDCFF, #B8B8E8)', text: '#3a3a8a' },
-  { id: '3', name: 'Artisan Tea Set',      price: '$32', bg: 'linear-gradient(135deg, #A8E5C5, #6FCBA0)', text: '#1a4a2a' },
-  { id: '4', name: 'Single-Origin Coffee', price: '$24', bg: 'linear-gradient(135deg, #d4a574, #8b5a2b)', text: '#fff' },
-  { id: '5', name: 'Leather Notebook',     price: '$38', bg: 'linear-gradient(135deg, #2a2a2a, #4a4a4a)', text: '#fff' },
-  { id: '6', name: 'Lavender Soap Bar',    price: '$18', bg: 'linear-gradient(135deg, #d8c4f0, #b896d8)', text: '#3a2a5a' },
-];
+type Bundle = {
+  id: string;
+  name: string;
+  price: string;
+  blurb: string;
+  bg: string;
+};
 
-const FAQS = [
-  { q: 'How much does it cost?',                         a: `Just the gift budget plus a 10% Giftwell fee. No subscription, no hidden charges. You only pay when a recipient claims their gift.` },
-  { q: `What if a recipient doesn't claim their gift?`,  a: `Unclaimed gifts expire after 30 days and are automatically refunded to your card. We'll email you before that happens so you can extend or re-send.` },
-  { q: 'Can I send internationally?',                    a: `Yes, wherever ${MERCHANT} ships. Recipients in countries you don't ship to will get a digital alternative.` },
-  { q: 'Can I add a personal message?',                  a: `Every gift includes a personal message you write at checkout. You can also choose from a few card themes to match the occasion.` },
-  { q: 'Is there a minimum order?',                      a: `No. Send one gift or a thousand. Volume discounts kick in at 25, 50, and 100 recipients.` },
-  { q: 'What if I need to make a change?',               a: `You can edit recipients, budgets, or shipping windows up until the moment a recipient claims their gift. Cancel any sub-order for a full refund.` },
+const BUNDLES: Bundle[] = [
+  { id: '1', name: 'Elite Oral Health',         price: '$519.00', blurb: 'Comprehensive oral intelligence valued at over $740 . offered at $519. Our system eliminates inconsistent brushing while...', bg: 'linear-gradient(135deg, #E8E2F4, #C9C0E8)' },
+  { id: '2', name: `Founder's Edition Plus`,    price: '$399.00', blurb: `This premium bundle delivers $530+ worth of advanced oral health tools and smart support . all for $399. This package...`, bg: 'linear-gradient(135deg, #D4CFE8, #B5ADD8)' },
+  { id: '3', name: `Founder's Edition Bundle`,  price: '$299.00', blurb: `This limited-time bundle features ${MERCHANT}'s complete oral care suite, including: The Acme Smartbrush™ (comprised of the...`, bg: 'linear-gradient(135deg, #BBB2D4, #9C90C0)' },
 ];
 
 export default function LandingPreviewPage() {
+  const [chatOpen, setChatOpen] = useState(false);
   const [recipientCount, setRecipientCount] = useState('25');
   const [budget, setBudget] = useState('100');
   const [date, setDate] = useState('');
   const [occasion, setOccasion] = useState('');
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [chatOpen, setChatOpen] = useState(false);
 
   return (
     <div style={{ fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif', color: '#1a1a1f', background: '#fff' }}>
@@ -44,26 +39,18 @@ export default function LandingPreviewPage() {
       <ThemeHeader />
 
       <Hero />
-
       <QuickStartForm
-        recipientCount={recipientCount}
-        setRecipientCount={setRecipientCount}
-        budget={budget}
-        setBudget={setBudget}
-        date={date}
-        setDate={setDate}
-        occasion={occasion}
-        setOccasion={setOccasion}
+        recipientCount={recipientCount} setRecipientCount={setRecipientCount}
+        budget={budget} setBudget={setBudget}
+        date={date} setDate={setDate}
+        occasion={occasion} setOccasion={setOccasion}
       />
-
-      <FeaturedProducts />
+      <NoAddressesSection />
+      <DigitalUnboxingSection />
+      <BundleShowcase />
       <HowItWorks />
-      <TrustStrip />
-      <Faq open={openFaq} onToggle={(i) => setOpenFaq(openFaq === i ? null : i)} />
-      <FinalCta />
 
       <ThemeFooter />
-
       <ChatWidget open={chatOpen} onToggle={() => setChatOpen(!chatOpen)} />
     </div>
   );
@@ -73,13 +60,7 @@ export default function LandingPreviewPage() {
 
 function ThemeHeader() {
   return (
-    <header style={{
-      borderBottom: '1px solid #ececef',
-      background: '#fff',
-      position: 'sticky',
-      top: 0,
-      zIndex: 10,
-    }}>
+    <header style={{ borderBottom: '1px solid #ececef', background: '#fff', position: 'sticky', top: 0, zIndex: 10 }}>
       <div style={{
         maxWidth: 1200, margin: '0 auto', padding: '16px 32px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -89,7 +70,7 @@ function ThemeHeader() {
           <a href="#" style={{ color: '#1a1a1f', textDecoration: 'none' }}>Shop</a>
           <a href="#" style={{ color: '#1a1a1f', textDecoration: 'none' }}>About</a>
           <a href="#" style={{ color: '#1a1a1f', textDecoration: 'none' }}>Stories</a>
-          <a href="#" style={{ color: BRAND, textDecoration: 'none', fontWeight: 600 }}>Send a gift</a>
+          <a href="#" style={{ color: '#1a1a1f', textDecoration: 'none', fontWeight: 600 }}>Send a gift</a>
           <a href="#" style={{ color: '#1a1a1f', textDecoration: 'none' }}>Contact</a>
         </nav>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -116,10 +97,10 @@ function ThemeFooter() {
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 32px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32, marginBottom: 32 }}>
           {[
-            { title: 'Shop',    links: ['All products', 'New', 'Best sellers', 'Sale'] },
-            { title: 'Support', links: ['FAQ', 'Shipping', 'Returns', 'Contact'] },
-            { title: 'Company', links: ['About', 'Stories', 'Press', 'Careers'] },
-            { title: 'Stay in touch', links: ['Newsletter', 'Instagram', 'TikTok', 'Pinterest'] },
+            { title: 'Shop',           links: ['All products', 'New', 'Best sellers', 'Sale'] },
+            { title: 'Support',        links: ['FAQ', 'Shipping', 'Returns', 'Contact'] },
+            { title: 'Company',        links: ['About', 'Stories', 'Press', 'Careers'] },
+            { title: 'Stay in touch',  links: ['Newsletter', 'Instagram', 'TikTok', 'Pinterest'] },
           ].map((col) => (
             <div key={col.title}>
               <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>{col.title}</div>
@@ -140,48 +121,79 @@ function ThemeFooter() {
   );
 }
 
-/* ─── 1. Hero ─── */
+/* ─── 1. Hero (image-led, split, lavender wash) ─── */
 
 function Hero() {
   return (
-    <section style={{
-      background: `
-        radial-gradient(ellipse 60% 50% at 20% 15%, rgba(167, 139, 250, 0.55) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 45% at 85% 90%, rgba(91, 63, 224, 0.5) 0%, transparent 60%),
-        linear-gradient(135deg, ${BRAND_DARK} 0%, ${BRAND} 50%, #B197F2 100%)
-      `,
-      color: '#fff',
-      padding: '96px 32px 120px',
-      textAlign: 'center',
-    }}>
-      <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.85, marginBottom: 20 }}>
-          Corporate gifting by {MERCHANT}
+    <section style={{ background: LAVENDER_BG, padding: '64px 32px 80px' }}>
+      <div style={{
+        maxWidth: 1100, margin: '0 auto',
+        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center',
+      }}>
+        <div>
+          <h1 style={{
+            fontSize: 44, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1,
+            margin: '0 0 16px', color: '#1a1a1f',
+          }}>
+            Send hundreds of gifts at once.
+            <br />Without the busywork.
+          </h1>
+          <p style={{ fontSize: 15.5, lineHeight: 1.6, color: '#3a3a42', margin: '0 0 28px', maxWidth: 460 }}>
+            From flexible recipient input to a pre-populated or customizable unwrapping experience, it all happens <strong>in seconds</strong>.
+          </p>
+          <a href="#start" style={{
+            display: 'inline-block',
+            background: '#1a1a1f', color: '#fff',
+            padding: '14px 36px', borderRadius: 10, fontSize: 15, fontWeight: 600,
+            textDecoration: 'none',
+          }}>
+            Start Gifting
+          </a>
         </div>
-        <h1 style={{
-          fontSize: 56, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.05,
-          margin: '0 0 20px', color: '#fff',
+        <div style={{
+          aspectRatio: '1 / 1',
+          background: 'radial-gradient(circle at 50% 45%, #2a2a3a 0%, #0a0a18 80%)',
+          borderRadius: 16,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          position: 'relative', overflow: 'hidden',
         }}>
-          Gifts they'll love, sent in minutes.
-        </h1>
-        <p style={{ fontSize: 18, lineHeight: 1.55, opacity: 0.92, margin: '0 auto 36px', maxWidth: 580 }}>
-          Bulk gifting for client thank-yous, employee onboarding, and holiday programs. Recipients pick their own gift. You ship one address.
-        </p>
-        <a href="#start" style={{
-          display: 'inline-flex', alignItems: 'center', gap: 10,
-          background: '#fff', color: BRAND_DARK,
-          padding: '14px 28px', borderRadius: 999, fontSize: 15, fontWeight: 600,
-          textDecoration: 'none',
-          boxShadow: '0 10px 30px -10px rgba(0,0,0,0.3)',
-        }}>
-          Start a gift order ↓
-        </a>
+          {/* Faux gift box visual */}
+          <div style={{ position: 'relative', width: '70%', height: '55%' }}>
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(135deg, #d4d4dc, #f0f0f5)',
+              borderRadius: 4,
+              boxShadow: '0 20px 50px -10px rgba(0,0,0,0.5)',
+            }} />
+            {/* Ribbon vertical */}
+            <div style={{
+              position: 'absolute', left: '47%', top: -10, bottom: -10, width: '6%',
+              background: 'linear-gradient(180deg, #3a5fb8, #1d3d8a)',
+            }} />
+            {/* Ribbon horizontal */}
+            <div style={{
+              position: 'absolute', top: '47%', left: -10, right: -10, height: '6%',
+              background: 'linear-gradient(180deg, #3a5fb8, #1d3d8a)',
+            }} />
+            {/* Bow */}
+            <div style={{
+              position: 'absolute', left: '40%', top: '38%', width: '20%', height: '20%',
+              background: 'radial-gradient(ellipse, #4a6fc8 0%, #1d3d8a 80%)',
+              borderRadius: '50%',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+            }} />
+          </div>
+          <div style={{
+            position: 'absolute', bottom: 18, left: 18, fontSize: 11,
+            color: 'rgba(255,255,255,0.5)', fontStyle: 'italic',
+          }}>Merchant-uploaded hero image</div>
+        </div>
       </div>
     </section>
   );
 }
 
-/* ─── 2. Quick-start form ─── */
+/* ─── 2. Quick-start form (the form Brandon wanted) ─── */
 
 const RECIPIENT_CHIPS = ['5', '10', '25', '50', '100+'];
 const BUDGET_CHIPS = ['$25', '$50', '$100', '$200', '$500'];
@@ -198,22 +210,21 @@ function QuickStartForm({
   occasion: string; setOccasion: (v: string) => void;
 }) {
   return (
-    <section id="start" style={{ background: '#fafafb', padding: '80px 32px' }}>
-      <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <h2 style={{ fontSize: 32, fontWeight: 700, letterSpacing: '-0.015em', margin: '0 0 12px' }}>
+    <section id="start" style={{ background: '#fff', padding: '72px 32px' }}>
+      <div style={{ maxWidth: 760, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <h2 style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.015em', margin: '0 0 10px' }}>
             Start a gift order
           </h2>
-          <p style={{ fontSize: 15, color: '#5a5a62', margin: 0 }}>
-            Tell us a bit and we'll show you what fits.
+          <p style={{ fontSize: 14.5, color: '#5a5a62', margin: 0 }}>
+            Tell us a bit, we'll show you what fits.
           </p>
         </div>
 
         <div style={{
-          background: '#fff', borderRadius: 14, padding: 32,
-          boxShadow: '0 4px 24px rgba(15, 15, 25, 0.06)', border: '1px solid #ececef',
+          background: '#fff', borderRadius: 14, padding: 28,
+          border: '1px solid #ececef',
         }}>
-          {/* Recipients */}
           <FieldGroup label="How many recipients?">
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {RECIPIENT_CHIPS.map((c) => (
@@ -229,7 +240,6 @@ function QuickStartForm({
             </div>
           </FieldGroup>
 
-          {/* Budget */}
           <FieldGroup label="Budget per person?">
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {BUDGET_CHIPS.map((c) => (
@@ -245,15 +255,9 @@ function QuickStartForm({
             </div>
           </FieldGroup>
 
-          {/* Date + Occasion */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <FieldGroup label="When should it ship?">
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                style={textInput}
-              />
+              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={textInput} />
             </FieldGroup>
             <FieldGroup label="What's the occasion?">
               <select value={occasion} onChange={(e) => setOccasion(e.target.value)} style={textInput}>
@@ -267,19 +271,16 @@ function QuickStartForm({
             </FieldGroup>
           </div>
 
-          {/* CTA */}
           <button style={{
-            width: '100%', marginTop: 24, padding: '14px 24px', borderRadius: 12,
-            background: BRAND, color: '#fff',
+            width: '100%', marginTop: 20, padding: '14px 24px', borderRadius: 10,
+            background: '#1a1a1f', color: '#fff',
             border: 'none', fontSize: 15, fontWeight: 600, cursor: 'pointer',
-            boxShadow: '0 8px 20px -8px rgba(124, 92, 255, 0.6)',
-            transition: 'transform 120ms ease',
           }}>
-            See gifts that fit →
+            Continue →
           </button>
 
-          <p style={{ fontSize: 12.5, color: '#8a8a93', textAlign: 'center', margin: '14px 0 0' }}>
-            Takes 2 minutes. No signup until you're ready to pay.
+          <p style={{ fontSize: 12.5, color: '#8a8a93', textAlign: 'center', margin: '12px 0 0' }}>
+            Takes 2 minutes. No signup until checkout.
           </p>
         </div>
       </div>
@@ -289,7 +290,7 @@ function QuickStartForm({
 
 function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 20 }}>
+    <div style={{ marginBottom: 18 }}>
       <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: '#1a1a1f' }}>{label}</label>
       {children}
     </div>
@@ -304,9 +305,9 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       style={{
         all: 'unset', cursor: 'pointer',
         padding: '8px 16px', borderRadius: 999, fontSize: 13.5, fontWeight: 500,
-        background: active ? BRAND : '#fff',
+        background: active ? '#1a1a1f' : '#fff',
         color: active ? '#fff' : '#1a1a1f',
-        border: `1px solid ${active ? BRAND : '#dcdcde'}`,
+        border: `1px solid ${active ? '#1a1a1f' : '#dcdcde'}`,
         transition: 'all 120ms ease',
       }}
     >
@@ -327,45 +328,75 @@ const textInput: React.CSSProperties = {
   fontFamily: 'inherit', outline: 'none', color: '#1a1a1f',
 };
 
-/* ─── 3. Featured products ─── */
+/* ─── 3. "No addresses? No problem" (image + bullets + CTA, split) ─── */
 
-function FeaturedProducts() {
+function NoAddressesSection() {
+  const items = [
+    'Pick your gift and send as email gifts to redeem.',
+    'No addresses needed; schedule delivery and include a message.',
+    'Recipient redeems with code for your preselected bundle value.',
+  ];
   return (
     <section style={{ background: '#fff', padding: '80px 32px' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <h2 style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.015em', margin: '0 0 10px' }}>
-            Curated for gifting
-          </h2>
-          <p style={{ fontSize: 15, color: '#5a5a62', margin: 0 }}>
-            Pulled straight from {MERCHANT}'s shop. Recipients pick what fits your budget.
-          </p>
-        </div>
+      <div style={{
+        maxWidth: 1100, margin: '0 auto',
+        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 56, alignItems: 'center',
+      }}>
         <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20,
+          aspectRatio: '4 / 3',
+          background: 'radial-gradient(circle at 30% 40%, #2747a8 0%, #0a0a30 90%)',
+          borderRadius: 14,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          position: 'relative', overflow: 'hidden',
         }}>
-          {PRODUCTS.map((p) => (
-            <div key={p.id} style={{
-              border: '1px solid #ececef', borderRadius: 14, overflow: 'hidden',
-              background: '#fff', transition: 'transform 120ms ease, box-shadow 120ms ease',
-              cursor: 'pointer',
-            }}>
-              <div style={{ height: 200, background: p.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: p.text, fontSize: 14, fontWeight: 500 }}>
-                {p.name}
-              </div>
-              <div style={{ padding: '14px 18px' }}>
-                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{p.name}</div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 14, color: '#5a5a62' }}>{p.price}</span>
-                  <a href="#" style={{ color: BRAND, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Send this →</a>
-                </div>
-              </div>
-            </div>
-          ))}
+          {/* Faux digital gift card */}
+          <div style={{
+            background: '#0a0a18', padding: '36px 44px', borderRadius: 6,
+            display: 'flex', alignItems: 'center', gap: 12,
+            transform: 'rotate(-3deg)',
+            boxShadow: '0 30px 60px -20px rgba(0,0,0,0.6)',
+          }}>
+            <span style={{
+              fontSize: 28, fontWeight: 800, color: '#fff', letterSpacing: '0.06em',
+            }}>{MERCHANT.toUpperCase()}</span>
+            <span style={{
+              fontSize: 11, fontWeight: 700, padding: '4px 8px',
+              background: BRAND, color: '#fff', borderRadius: 4, letterSpacing: '0.05em',
+            }}>GIFT</span>
+          </div>
+          <div style={{
+            position: 'absolute', bottom: 18, left: '50%', transform: 'translateX(-50%)',
+            fontSize: 12, color: 'rgba(255,255,255,0.7)', fontStyle: 'italic',
+          }}>Delivered Digitally</div>
         </div>
-        <div style={{ textAlign: 'center', marginTop: 32 }}>
-          <a href="#" style={{ color: BRAND, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
-            See all gifts →
+        <div>
+          <h2 style={{
+            fontSize: 30, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.15,
+            margin: '0 0 20px',
+          }}>
+            No addresses? No problem
+          </h2>
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {items.map((t) => (
+              <li key={t} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14.5, color: '#3a3a42', lineHeight: 1.55 }}>
+                <span style={{
+                  width: 20, height: 20, borderRadius: '50%', border: '1.5px solid #1a1a1f',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2,
+                }}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </span>
+                {t}
+              </li>
+            ))}
+          </ul>
+          <a href="#start" style={{
+            display: 'inline-block',
+            background: '#1a1a1f', color: '#fff',
+            padding: '13px 32px', borderRadius: 10, fontSize: 14.5, fontWeight: 600, textDecoration: 'none',
+          }}>
+            Get Started
           </a>
         </div>
       </div>
@@ -373,97 +404,135 @@ function FeaturedProducts() {
   );
 }
 
-/* ─── 4. How it works ─── */
+/* ─── 4. Digital unboxing showcase ─── */
+
+function DigitalUnboxingSection() {
+  return (
+    <section style={{ background: '#fff', padding: '40px 32px 80px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+        <h2 style={{
+          fontSize: 30, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.15,
+          margin: '0 0 14px',
+        }}>
+          Delight them with a<br />digital unboxing
+        </h2>
+        <p style={{ fontSize: 15, color: '#5a5a62', lineHeight: 1.6, margin: '0 0 36px', maxWidth: 560, marginLeft: 'auto', marginRight: 'auto' }}>
+          Personalize your gift with a unique digital unwrapping to create a memorable and branded experience.
+        </p>
+        <div style={{
+          aspectRatio: '16 / 10',
+          background: '#ececef',
+          borderRadius: 14,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          position: 'relative',
+        }}>
+          {/* Faux video play button */}
+          <div style={{
+            width: 72, height: 72, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.9)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 10px 30px -8px rgba(0,0,0,0.2)',
+          }}>
+            <div style={{
+              width: 0, height: 0,
+              borderLeft: '20px solid #1a1a1f',
+              borderTop: '12px solid transparent',
+              borderBottom: '12px solid transparent',
+              marginLeft: 5,
+            }} />
+          </div>
+          <div style={{ position: 'absolute', bottom: 14, fontSize: 11, color: '#8a8a93', fontStyle: 'italic' }}>
+            Digital unboxing demo video / GIF
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── 5. Bundle showcase ("The perfect gift, at scale") ─── */
+
+function BundleShowcase() {
+  return (
+    <section style={{ background: LAVENDER_BG, padding: '80px 32px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <h2 style={{
+          fontSize: 30, fontWeight: 700, letterSpacing: '-0.015em',
+          margin: '0 0 40px', textAlign: 'center',
+        }}>
+          The perfect gift, at scale
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+          {BUNDLES.map((b) => (
+            <div key={b.id} style={{
+              background: '#fff', borderRadius: 14, padding: 18,
+              display: 'flex', flexDirection: 'column', gap: 14,
+            }}>
+              <div style={{
+                aspectRatio: '4 / 3', background: b.bg, borderRadius: 10,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'rgba(0,0,0,0.4)', fontSize: 12, fontStyle: 'italic',
+              }}>
+                Bundle image
+              </div>
+              <div>
+                <h3 style={{ fontSize: 16, fontWeight: 600, margin: '0 0 6px' }}>{b.name}</h3>
+                <p style={{ fontSize: 12.5, color: '#5a5a62', lineHeight: 1.5, margin: '0 0 10px' }}>{b.blurb}</p>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#1a1a1f' }}>{b.price}</div>
+              </div>
+              <button style={{
+                all: 'unset', cursor: 'pointer', textAlign: 'center',
+                padding: '11px 16px', borderRadius: 8,
+                border: '1px solid #1a1a1f', color: '#1a1a1f',
+                fontSize: 13.5, fontWeight: 500,
+                transition: 'background 120ms ease',
+              }}>
+                Gift this Set
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── 6. How it works (image + numbered steps, split) ─── */
 
 function HowItWorks() {
   const steps = [
-    { n: '1', title: 'Set your budget', body: 'Pick how much to spend per person. We curate options that fit.' },
-    { n: '2', title: 'Send the link',  body: `Each recipient gets a personal email from ${MERCHANT} with their gift link.` },
-    { n: '3', title: 'They pick, you ship', body: 'Recipients choose what they want. We handle shipping and tracking.' },
+    { n: '1', title: 'Choose a Gift Set',        body: 'Browse our curated collections and pick the perfect fit.' },
+    { n: '2', title: 'Personalize Your Message', body: 'Add a heartfelt note and customize the experience.' },
+    { n: '3', title: 'Send & Delight',           body: 'Your recipient gets a beautiful gift experience delivered right to them.' },
   ];
   return (
-    <section style={{ background: '#fafafb', padding: '80px 32px' }}>
-      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-        <h2 style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.015em', margin: '0 0 40px', textAlign: 'center' }}>
-          How it works
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
-          {steps.map((s) => (
-            <div key={s.n} style={{ textAlign: 'center' }}>
-              <div style={{
-                width: 56, height: 56, borderRadius: '50%',
-                background: `linear-gradient(135deg, ${BRAND}, ${BRAND_DARK})`,
-                color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 22, fontWeight: 700, marginBottom: 20,
-              }}>{s.n}</div>
-              <h3 style={{ fontSize: 17, fontWeight: 600, margin: '0 0 8px' }}>{s.title}</h3>
-              <p style={{ fontSize: 14.5, color: '#5a5a62', lineHeight: 1.55, margin: 0 }}>{s.body}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── 5. Trust strip ─── */
-
-function TrustStrip() {
-  return (
-    <section style={{ background: '#1a1a1f', color: '#fff', padding: '48px 32px' }}>
-      <div style={{
-        maxWidth: 900, margin: '0 auto',
-        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, textAlign: 'center',
-      }}>
-        {[
-          { stat: '200+',  label: 'teams trust Giftwell' },
-          { stat: '98%',   label: 'of recipients claim their gift' },
-          { stat: '2 days', label: 'average claim time' },
-        ].map((s, i) => (
-          <div key={i}>
-            <div style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-0.02em', color: '#fff', marginBottom: 4 }}>{s.stat}</div>
-            <div style={{ fontSize: 13, color: '#a8a8b0' }}>{s.label}</div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ─── 6. FAQ ─── */
-
-function Faq({ open, onToggle }: { open: number | null; onToggle: (i: number) => void }) {
-  return (
     <section style={{ background: '#fff', padding: '80px 32px' }}>
-      <div style={{ maxWidth: 760, margin: '0 auto' }}>
-        <h2 style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.015em', margin: '0 0 32px', textAlign: 'center' }}>
-          Questions
-        </h2>
-        <div style={{ borderTop: '1px solid #ececef' }}>
-          {FAQS.map((f, i) => (
-            <div key={i} style={{ borderBottom: '1px solid #ececef' }}>
-              <button
-                onClick={() => onToggle(i)}
-                style={{
-                  all: 'unset', cursor: 'pointer', display: 'flex', justifyContent: 'space-between',
-                  alignItems: 'center', width: '100%', padding: '18px 0',
-                  fontSize: 16, fontWeight: 500, color: '#1a1a1f',
-                }}
-              >
-                {f.q}
-                <span style={{
-                  width: 24, height: 24, borderRadius: 999, background: '#f5f5f7',
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  transform: open === i ? 'rotate(45deg)' : 'none',
-                  transition: 'transform 200ms ease',
-                  fontSize: 14, fontWeight: 600, color: '#1a1a1f',
-                }}>+</span>
-              </button>
-              {open === i && (
-                <div style={{ padding: '0 0 18px', fontSize: 14.5, color: '#5a5a62', lineHeight: 1.65 }}>
-                  {f.a}
-                </div>
-              )}
+      <div style={{
+        maxWidth: 1100, margin: '0 auto',
+        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center',
+      }}>
+        <div style={{
+          aspectRatio: '4 / 3',
+          background: 'linear-gradient(135deg, #f5f5f5, #e0e0e0)',
+          borderRadius: 14,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: '#8a8a93', fontSize: 12, fontStyle: 'italic',
+        }}>
+          Product / experience image
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          {steps.map((s) => (
+            <div key={s.n}>
+              <span style={{
+                display: 'inline-block',
+                fontSize: 11.5, fontWeight: 600, color: '#3a3a42',
+                padding: '4px 11px', borderRadius: 999,
+                border: '1px solid #dcdcde', marginBottom: 10,
+              }}>
+                Step {s.n}
+              </span>
+              <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', margin: '0 0 6px' }}>{s.title}</h3>
+              <p style={{ fontSize: 14, color: '#5a5a62', lineHeight: 1.55, margin: 0, borderLeft: '2px solid #ececef', paddingLeft: 12 }}>{s.body}</p>
             </div>
           ))}
         </div>
@@ -472,43 +541,11 @@ function Faq({ open, onToggle }: { open: number | null; onToggle: (i: number) =>
   );
 }
 
-/* ─── 7. Final CTA ─── */
-
-function FinalCta() {
-  return (
-    <section style={{
-      background: `linear-gradient(135deg, ${BRAND_DARK} 0%, ${BRAND} 100%)`,
-      color: '#fff', padding: '80px 32px', textAlign: 'center',
-    }}>
-      <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <h2 style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-0.02em', margin: '0 0 16px' }}>
-          Ready to send something they'll love?
-        </h2>
-        <p style={{ fontSize: 16, opacity: 0.9, margin: '0 0 32px' }}>
-          Most orders take less than two minutes to set up.
-        </p>
-        <a href="#start" style={{
-          display: 'inline-flex', alignItems: 'center',
-          background: '#fff', color: BRAND_DARK,
-          padding: '15px 32px', borderRadius: 999, fontSize: 15, fontWeight: 600,
-          textDecoration: 'none', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.3)',
-        }}>
-          Start a gift order ↑
-        </a>
-        <p style={{ fontSize: 13, opacity: 0.75, margin: '24px 0 0' }}>
-          Or chat with us, bottom right →
-        </p>
-      </div>
-    </section>
-  );
-}
-
-/* ─── 8. Chat widget ─── */
+/* ─── 7. Chat widget (Giftwell-operated, floating) ─── */
 
 function ChatWidget({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   return (
     <>
-      {/* Floating button */}
       <button
         onClick={onToggle}
         aria-label="Chat with Giftwell"
@@ -517,9 +554,9 @@ function ChatWidget({ open, onToggle }: { open: boolean; onToggle: () => void })
           position: 'fixed', bottom: 24, right: 24, zIndex: 100,
           display: open ? 'none' : 'inline-flex',
           alignItems: 'center', gap: 10,
-          background: BRAND, color: '#fff',
+          background: '#1a1a1f', color: '#fff',
           padding: '12px 18px', borderRadius: 999,
-          boxShadow: '0 10px 30px -8px rgba(124, 92, 255, 0.55), 0 4px 10px rgba(0,0,0,0.1)',
+          boxShadow: '0 10px 30px -8px rgba(0,0,0,0.25), 0 4px 10px rgba(0,0,0,0.1)',
           fontSize: 14, fontWeight: 600,
         }}
       >
@@ -529,7 +566,6 @@ function ChatWidget({ open, onToggle }: { open: boolean; onToggle: () => void })
         Questions? Chat with us
       </button>
 
-      {/* Panel */}
       {open && (
         <div style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 100,
@@ -538,16 +574,14 @@ function ChatWidget({ open, onToggle }: { open: boolean; onToggle: () => void })
           border: '1px solid #ececef',
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
         }}>
-          {/* Header */}
           <div style={{
             padding: '16px 18px',
-            background: `linear-gradient(135deg, ${BRAND_DARK}, ${BRAND})`,
-            color: '#fff',
+            background: '#1a1a1f', color: '#fff',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           }}>
             <div>
               <div style={{ fontSize: 15, fontWeight: 600 }}>Giftwell support</div>
-              <div style={{ fontSize: 12, opacity: 0.85 }}>Quick answers, real humans</div>
+              <div style={{ fontSize: 12, opacity: 0.7 }}>Quick answers, real humans</div>
             </div>
             <button onClick={onToggle} aria-label="Close" style={{
               all: 'unset', cursor: 'pointer', padding: 4, borderRadius: 6,
@@ -555,7 +589,6 @@ function ChatWidget({ open, onToggle }: { open: boolean; onToggle: () => void })
             }}>×</button>
           </div>
 
-          {/* Messages */}
           <div style={{ flex: 1, padding: 18, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{
               background: '#f3f3f5', color: '#1a1a1f',
@@ -569,14 +602,13 @@ function ChatWidget({ open, onToggle }: { open: boolean; onToggle: () => void })
                 <button key={q} style={{
                   all: 'unset', cursor: 'pointer',
                   padding: '6px 12px', borderRadius: 999,
-                  border: `1px solid ${BRAND}`, color: BRAND,
+                  border: '1px solid #1a1a1f', color: '#1a1a1f',
                   fontSize: 12.5, fontWeight: 500,
                 }}>{q}</button>
               ))}
             </div>
           </div>
 
-          {/* Input */}
           <div style={{ borderTop: '1px solid #ececef', padding: 12, display: 'flex', gap: 8 }}>
             <input
               type="text"
@@ -589,12 +621,11 @@ function ChatWidget({ open, onToggle }: { open: boolean; onToggle: () => void })
             />
             <button style={{
               all: 'unset', cursor: 'pointer',
-              background: BRAND, color: '#fff',
+              background: '#1a1a1f', color: '#fff',
               padding: '10px 16px', borderRadius: 999, fontSize: 13.5, fontWeight: 600,
             }}>Send</button>
           </div>
 
-          {/* Footer */}
           <div style={{ padding: '8px 18px', fontSize: 11, color: '#8a8a93', textAlign: 'center', borderTop: '1px solid #ececef', background: '#fafafb' }}>
             Powered by <strong style={{ color: '#6b6b73' }}>Giftwell</strong>
           </div>
