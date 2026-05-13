@@ -13,23 +13,24 @@ import {
   InlineGrid,
   Icon,
   Divider,
+  Card,
 } from '@shopify/polaris';
-import { CheckIcon } from '@shopify/polaris-icons';
+import {
+  CheckIcon,
+  CheckCircleIcon,
+  LockIcon,
+  DeleteIcon,
+  PlusIcon,
+} from '@shopify/polaris-icons';
 
 export type FrameAnswers = {
   goals?: string[];
   buyerStatus?: string;
   volume?: string;
+  cardOnFile?: boolean;
   catalogApproach?: string;
-  feeHandling?: string;
-  feeSplit?: boolean;
-  optInPlacements?: string[];
-  enableMarketingOptIn?: boolean;
-  preCheckOptIn?: boolean;
-  enableDoubleOptIn?: boolean;
-  addToKlaviyo?: boolean;
-  applyTags?: boolean;
-  triggerWelcome?: boolean;
+  productsSelected?: string[];
+  feeHandling?: 'pass' | 'absorb' | 'split';
   enableVolumeDiscounts?: boolean;
   enableConcierge?: boolean;
   addToNav?: boolean;
@@ -50,31 +51,24 @@ export type FrameDef = {
 
 export const FRAMES: FrameDef[] = [
   // Welcome
-  { id: 'goals',           phase: 'Welcome',      title: 'What are you hoping to achieve?', helper: 'Select all that apply.' },
-  { id: 'buyers',          phase: 'Welcome',      title: 'Do you have corporate buyers already?' },
-  { id: 'volume',          phase: 'Welcome',      title: 'Expected monthly volume?' },
-  // Catalog
-  { id: 'catalog-approach', phase: 'Catalog',     title: 'How do you want gifters to choose products?' },
-  { id: 'catalog-bundle',   phase: 'Catalog',     title: 'Pick products for your first bundle', helper: 'You can edit or add more bundles later.' },
+  { id: 'goals',            phase: 'Welcome',      title: 'What are you hoping to achieve?', helper: 'Select all that apply.' },
+  { id: 'buyers',           phase: 'Welcome',      title: 'Do you have corporate buyers already?' },
+  { id: 'volume',           phase: 'Welcome',      title: 'Expected monthly volume?' },
+  // Billing
+  { id: 'payment-method',   phase: 'Billing',      title: 'Add a payment method', helper: 'We only charge when gifts send — never up front.' },
   // Pricing
-  { id: 'pricing-fee',     phase: 'Pricing',      title: 'How should the experience fee be handled?' },
-  { id: 'pricing-volume',  phase: 'Pricing',      title: 'Offer volume discounts?' },
-  // Integrations
-  { id: 'integrations',    phase: 'Integrations', title: 'Connect your email marketing tool' },
-  // Marketing opt-in
-  { id: 'optin-enable',     phase: 'Marketing',   title: 'Show a marketing opt-in?', helper: 'Recipients can join your list when they claim their gift.' },
-  { id: 'optin-placement',  phase: 'Marketing',   title: 'Where should the opt-in show?' },
-  { id: 'optin-copy',       phase: 'Marketing',   title: 'What should the checkbox say?' },
-  { id: 'optin-compliance', phase: 'Marketing',   title: 'Compliance settings' },
-  { id: 'optin-actions',    phase: 'Marketing',   title: 'What happens when someone opts in?' },
+  { id: 'pricing-fee',      phase: 'Pricing',      title: 'How should the experience fee be handled?' },
+  { id: 'pricing-volume',   phase: 'Pricing',      title: 'Offer volume discounts?' },
+  // Catalog
+  { id: 'catalog-approach', phase: 'Catalog',      title: 'How do you want gifters to choose products?' },
+  { id: 'catalog-products', phase: 'Catalog',      title: 'Pick gifts from your store', helper: 'Select the products gifters can include in a gift.' },
   // Landing page
   { id: 'landing-url',       phase: 'Landing Page', title: 'Pick your gift page URL' },
   { id: 'landing-placement', phase: 'Landing Page', title: 'Where should we link to it?' },
   // Support
   { id: 'support',  phase: 'Support', title: 'Want Giftwell to handle support?' },
-  // Review
+  // Review + Launch
   { id: 'review',   phase: 'Review',  title: 'Almost there — review your setup' },
-  // Launch
   { id: 'launched', phase: 'Launch',  title: "You're live" },
 ];
 
@@ -174,9 +168,9 @@ function FrameGoals({ answers, onChange }: FrameProps) {
       value={answers.goals}
       onChange={(v) => onChange({ goals: v as string[] })}
       options={[
-        { id: 'revenue', title: 'Increase Revenue', description: 'Drive high-value bulk orders from corporate buyers' },
-        { id: 'customers', title: 'Acquire Customers', description: 'Turn gift recipients into repeat customers' },
-        { id: 'brand', title: 'Brand Awareness', description: 'Create memorable brand moments' },
+        { id: 'revenue',   title: 'Increase Revenue',   description: 'Drive high-value bulk orders from corporate buyers' },
+        { id: 'customers', title: 'Acquire Customers',  description: 'Turn gift recipients into repeat customers' },
+        { id: 'brand',     title: 'Brand Awareness',    description: 'Create memorable brand moments' },
       ]}
     />
   );
@@ -190,8 +184,8 @@ function FrameBuyers({ answers, onChange }: FrameProps) {
       onChange={(v) => onChange({ buyerStatus: v as string })}
       options={[
         { id: 'waiting', title: 'Yes, waiting on me', description: 'Buyers ready to order once I set this up' },
-        { id: 'some', title: 'Some interest', description: 'Had inquiries but no formal process' },
-        { id: 'none', title: 'Not yet', description: 'Looking to capture this opportunity' },
+        { id: 'some',    title: 'Some interest',       description: 'Had inquiries but no formal process' },
+        { id: 'none',    title: 'Not yet',              description: 'Looking to capture this opportunity' },
       ]}
     />
   );
@@ -205,12 +199,211 @@ function FrameVolume({ answers, onChange }: FrameProps) {
       value={answers.volume}
       onChange={(v) => onChange({ volume: v as string })}
       options={[
-        { id: 'lt50', title: '< 50 gifts', description: 'Just getting started' },
-        { id: '50-200', title: '50–200 gifts', description: 'Growing demand', badge: 'Most common' },
-        { id: '200-500', title: '200–500 gifts', description: 'Established program' },
-        { id: '500plus', title: '500+ gifts', description: 'Enterprise scale' },
+        { id: 'lt50',    title: '< 50 gifts',     description: 'Just getting started' },
+        { id: '50-200',  title: '50–200 gifts',   description: 'Growing demand', badge: 'Most common' },
+        { id: '200-500', title: '200–500 gifts',  description: 'Established program' },
+        { id: '500plus', title: '500+ gifts',     description: 'Enterprise scale' },
       ]}
     />
+  );
+}
+
+function FramePaymentMethod(_: FrameProps) {
+  return (
+    <BlockStack gap="500">
+      <Card padding="400">
+        <BlockStack gap="200">
+          <Text as="p" variant="bodyMd" fontWeight="semibold">How charging works</Text>
+          <Text as="p" variant="bodySm" tone="subdued">
+            We charge a 10% experience fee per gift sent. Volume discounts apply to larger
+            orders. Your card is only charged when gifts go out — never up front. Product
+            costs are still billed through your Shopify checkout.
+          </Text>
+        </BlockStack>
+      </Card>
+
+      <BlockStack gap="300">
+        <TextField
+          label="Cardholder name"
+          value="Brandon Sims"
+          autoComplete="cc-name"
+          onChange={() => {}}
+        />
+        <TextField
+          label="Card number"
+          placeholder="•••• •••• •••• ••••"
+          autoComplete="cc-number"
+          onChange={() => {}}
+        />
+        <InlineGrid gap="300" columns={2}>
+          <TextField
+            label="Expires"
+            placeholder="MM / YY"
+            autoComplete="cc-exp"
+            onChange={() => {}}
+          />
+          <TextField
+            label="CVC"
+            placeholder="•••"
+            autoComplete="cc-csc"
+            onChange={() => {}}
+          />
+        </InlineGrid>
+        <InlineStack gap="100" blockAlign="center">
+          <Icon source={LockIcon} tone="subdued" />
+          <Text as="span" variant="bodySm" tone="subdued">
+            Card details are encrypted and stored by Stripe. We never see your card number.
+          </Text>
+        </InlineStack>
+      </BlockStack>
+    </BlockStack>
+  );
+}
+
+function FramePricingFee({ answers, onChange }: FrameProps) {
+  const handling = answers.feeHandling ?? 'pass';
+  const subtotal = 4005.00;
+  const fee = 400.50;
+  let revenue = subtotal;
+  let note = '';
+  if (handling === 'pass') {
+    revenue = subtotal;
+    note = 'Fee is added at the gifter’s checkout. Your margin stays whole.';
+  } else if (handling === 'absorb') {
+    revenue = subtotal - fee;
+    note = 'Fee is deducted from your revenue.';
+  } else {
+    revenue = subtotal - fee / 2;
+    note = '5% added at checkout, 5% deducted from your revenue.';
+  }
+
+  return (
+    <BlockStack gap="400">
+      <TilePicker
+        mode="single"
+        columns={3}
+        value={handling}
+        onChange={(v) => onChange({ feeHandling: v as 'pass' | 'absorb' | 'split' })}
+        options={[
+          { id: 'pass',   title: 'Pass to Gifter',   description: '10% added at checkout. Margin stays intact.', badge: 'Recommended for DTC' },
+          { id: 'absorb', title: 'Absorb in Margin', description: 'Cleaner pricing for buyers. 10% deducted from revenue.' },
+          { id: 'split',  title: 'Split 50/50',      description: '5% added at checkout, 5% from margin.' },
+        ]}
+      />
+      <Card padding="400">
+        <BlockStack gap="300">
+          <Text as="p" variant="bodySm" tone="subdued" fontWeight="semibold">
+            EXAMPLE · 50-GIFT CAMPAIGN
+          </Text>
+          <BlockStack gap="150">
+            <CalcRow label="Bundle revenue (50 × $89)" value="$4,450.00" />
+            <CalcRow label="Volume discount (10%)" value="−$445.00" />
+            <CalcRow label="Experience fee (10%)" value={`−$${fee.toFixed(2)}`} />
+          </BlockStack>
+          <Divider />
+          <InlineStack align="space-between" blockAlign="center">
+            <BlockStack gap="050">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">Your net revenue</Text>
+              <Text as="span" variant="bodySm" tone="subdued">{note}</Text>
+            </BlockStack>
+            <Text as="span" variant="headingLg">${revenue.toFixed(2)}</Text>
+          </InlineStack>
+        </BlockStack>
+      </Card>
+    </BlockStack>
+  );
+}
+
+function CalcRow({ label, value }: { label: string; value: string }) {
+  return (
+    <InlineStack align="space-between">
+      <Text as="span" tone="subdued" variant="bodySm">{label}</Text>
+      <Text as="span" variant="bodySm">{value}</Text>
+    </InlineStack>
+  );
+}
+
+function FramePricingVolume({ answers, onChange }: FrameProps) {
+  const tiers = [
+    { gifts: 25, off: 5 },
+    { gifts: 50, off: 10 },
+    { gifts: 100, off: 15 },
+  ];
+  const enabled = answers.enableVolumeDiscounts ?? true;
+
+  return (
+    <BlockStack gap="400">
+      <Checkbox
+        label="Enable volume discounts"
+        helpText="Automatically apply discounts based on order size."
+        checked={enabled}
+        onChange={(v) => onChange({ enableVolumeDiscounts: v })}
+      />
+      {enabled && (
+        <Card padding="0">
+          <Box
+            paddingInline="400"
+            paddingBlock="300"
+            background="bg-surface-secondary"
+            borderColor="border"
+            borderBlockEndWidth="025"
+          >
+            <InlineStack align="space-between" gap="400">
+              <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
+                When the order is at least
+              </Text>
+              <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
+                Discount
+              </Text>
+            </InlineStack>
+          </Box>
+          {tiers.map((row, i) => (
+            <div key={row.gifts}>
+              {i > 0 && <Divider />}
+              <Box paddingInline="400" paddingBlock="300">
+                <InlineStack align="space-between" blockAlign="center" gap="200" wrap={false}>
+                  <InlineStack gap="200" blockAlign="center">
+                    <Box minWidth="90px">
+                      <TextField
+                        label=""
+                        labelHidden
+                        type="number"
+                        value={row.gifts.toString()}
+                        autoComplete="off"
+                        onChange={() => {}}
+                      />
+                    </Box>
+                    <Text as="span" tone="subdued" variant="bodySm">gifts</Text>
+                  </InlineStack>
+                  <InlineStack gap="200" blockAlign="center">
+                    <Box minWidth="90px">
+                      <TextField
+                        label=""
+                        labelHidden
+                        type="number"
+                        value={row.off.toString()}
+                        suffix="%"
+                        autoComplete="off"
+                        onChange={() => {}}
+                      />
+                    </Box>
+                    <Button
+                      variant="plain"
+                      icon={DeleteIcon}
+                      accessibilityLabel="Remove tier"
+                    />
+                  </InlineStack>
+                </InlineStack>
+              </Box>
+            </div>
+          ))}
+          <Divider />
+          <Box paddingInline="400" paddingBlock="300">
+            <Button variant="plain" icon={PlusIcon}>Add tier</Button>
+          </Box>
+        </Card>
+      )}
+    </BlockStack>
   );
 }
 
@@ -221,304 +414,106 @@ function FrameCatalogApproach({ answers, onChange }: FrameProps) {
       value={answers.catalogApproach}
       onChange={(v) => onChange({ catalogApproach: v as string })}
       options={[
-        { id: 'full', title: 'Full Catalog', description: 'Make all 847 products available for gifting' },
-        { id: 'curated', title: 'Curated Bundles', description: 'Create gift bundles from your products', badge: 'Recommended' },
-        { id: 'both', title: 'Both', description: 'Featured bundles + browse full catalog' },
+        { id: 'full',    title: 'Full Catalog',     description: 'Make all 847 products available for gifting' },
+        { id: 'curated', title: 'Curated Selection', description: 'Hand-pick which products gifters can choose', badge: 'Recommended' },
+        { id: 'both',    title: 'Both',              description: 'Featured picks + browse full catalog' },
       ]}
     />
   );
 }
 
-function FrameCatalogBundle(_: FrameProps) {
+function FrameCatalogProducts(_: FrameProps) {
   const products = [
-    { name: 'Signature Candle', price: '$34.00', sel: true },
-    { name: 'Bath Salts', price: '$28.00', sel: true },
-    { name: 'Artisan Tea Set', price: '$32.00', sel: true },
-    { name: 'Cashmere Gloves', price: '$65.00', sel: false },
-    { name: 'Leather Journal', price: '$45.00', sel: false },
-    { name: 'Ceramic Mug', price: '$24.00', sel: false },
-    { name: 'Chocolate Box', price: '$38.00', sel: false },
-    { name: 'Wool Scarf', price: '$55.00', sel: false },
+    { id: '1',  name: 'Signature Candle',  price: '$34.00', sel: true,  bg: 'linear-gradient(135deg, #F4ECD8, #E8D8B8)' },
+    { id: '2',  name: 'Bath Salts',        price: '$28.00', sel: true,  bg: 'linear-gradient(135deg, #DCDCFF, #B8B8E8)' },
+    { id: '3',  name: 'Artisan Tea Set',   price: '$32.00', sel: true,  bg: 'linear-gradient(135deg, #A8E5C5, #6FCBA0)' },
+    { id: '4',  name: 'Cashmere Gloves',   price: '$65.00', sel: false, bg: 'linear-gradient(135deg, #2a2a2a, #4a4a4a)' },
+    { id: '5',  name: 'Leather Journal',   price: '$45.00', sel: false, bg: 'linear-gradient(135deg, #8B4513, #654321)' },
+    { id: '6',  name: 'Ceramic Mug',       price: '$24.00', sel: false, bg: 'linear-gradient(135deg, #FFC9D5, #F58CA8)' },
+    { id: '7',  name: 'Chocolate Box',     price: '$38.00', sel: false, bg: 'linear-gradient(135deg, #5D4037, #3E2723)' },
+    { id: '8',  name: 'Wool Scarf',        price: '$55.00', sel: false, bg: 'linear-gradient(135deg, #B0BEC5, #78909C)' },
+    { id: '9',  name: 'Hand Cream',        price: '$22.00', sel: true,  bg: 'linear-gradient(135deg, #FFE9A0, #FFD060)' },
+    { id: '10', name: 'Wine Tumbler',      price: '$48.00', sel: false, bg: 'linear-gradient(135deg, #1F3A5F, #0F1A2E)' },
+    { id: '11', name: 'Cookie Tin',        price: '$36.00', sel: true,  bg: 'linear-gradient(135deg, #E8B4B8, #D08A8E)' },
+    { id: '12', name: 'Espresso Beans',    price: '$30.00', sel: false, bg: 'linear-gradient(135deg, #3E2723, #1B0A06)' },
   ];
-  return (
-    <BlockStack gap="400">
-      <TextField label="" labelHidden placeholder="Search products…" autoComplete="off" />
-      <InlineGrid gap="300" columns={4}>
-        {products.map((p) => (
-          <Box
-            key={p.name}
-            padding="200"
-            borderRadius="200"
-            borderWidth="025"
-            borderColor={p.sel ? 'border-emphasis' : 'border'}
-            background={p.sel ? 'bg-surface-selected' : 'bg-surface'}
-            position="relative"
-          >
-            <BlockStack gap="200">
-              <Box background="bg-surface-secondary" borderRadius="100" minHeight="80px" />
-              <BlockStack gap="050">
-                <Text as="p" variant="bodySm" fontWeight="semibold" truncate>
-                  {p.name}
-                </Text>
-                <Text as="p" tone="subdued" variant="bodySm">
-                  {p.price}
-                </Text>
-              </BlockStack>
-            </BlockStack>
-            {p.sel && (
-              <Box position="absolute" insetBlockStart="200" insetInlineEnd="200">
-                <Icon source={CheckIcon} tone="emphasis" />
-              </Box>
-            )}
-          </Box>
-        ))}
-      </InlineGrid>
-      <InlineStack align="space-between" blockAlign="center">
-        <Text as="span" tone="subdued" variant="bodySm">
-          3 selected · combined retail $94.00
-        </Text>
-      </InlineStack>
-    </BlockStack>
-  );
-}
+  const selectedCount = products.filter((p) => p.sel).length;
+  const allSelected = selectedCount === products.length;
 
-function FramePricingFee({ answers, onChange }: FrameProps) {
   return (
-    <InlineGrid gap="500" columns={['twoThirds', 'oneThird']}>
-      <BlockStack gap="300">
-        <TilePicker
-          mode="single"
-          columns={2}
-          value={answers.feeHandling}
-          onChange={(v) => onChange({ feeHandling: v as string })}
-          options={[
-            { id: 'pass', title: 'Pass to Gifter', description: '10% added at checkout. Margin stays intact.', badge: 'Recommended for DTC' },
-            { id: 'absorb', title: 'Absorb in Margin', description: 'Cleaner pricing for buyers. 10% deducted from revenue.' },
-          ]}
-        />
-        <Box padding="300" borderRadius="200" borderWidth="025" borderColor="border">
-          <Checkbox
-            label="Split 50/50"
-            helpText="5% to gifter, 5% from margin"
-            checked={answers.feeSplit ?? false}
-            onChange={(v) => onChange({ feeSplit: v })}
+    <BlockStack gap="300">
+      <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
+        <Box minWidth="280px">
+          <TextField
+            label=""
+            labelHidden
+            placeholder="Search your catalog…"
+            autoComplete="off"
+            onChange={() => {}}
           />
         </Box>
-      </BlockStack>
-
-      <Box padding="400" borderRadius="200" background="bg-fill-inverse">
-        <BlockStack gap="200">
-          <Text as="p" tone="text-inverse-secondary" variant="bodySm">
-            EXAMPLE · 50 GIFTS
+        <InlineStack gap="300" blockAlign="center">
+          <Text as="span" variant="bodySm" tone="subdued">
+            {selectedCount} of {products.length} selected
           </Text>
-          <BlockStack gap="100">
-            <CalcRow label="Bundle × 50" value="$4,450.00" />
-            <CalcRow label="Volume discount" value="−$445.00" tone="success" />
-            <CalcRow label="Subtotal" value="$4,005.00" />
-            <CalcRow label="Fee (10%)" value="$400.50" />
-          </BlockStack>
-          <Divider borderColor="border-inverse" />
-          <BlockStack gap="050">
-            <Text as="p" tone="text-inverse-secondary" variant="bodySm">
-              Your revenue
-            </Text>
-            <Text as="p" variant="headingLg" tone="success">
-              $4,005.00
-            </Text>
-          </BlockStack>
-        </BlockStack>
-      </Box>
-    </InlineGrid>
-  );
-}
+          <Button variant="plain">{allSelected ? 'Deselect all' : 'Select all'}</Button>
+        </InlineStack>
+      </InlineStack>
 
-function CalcRow({ label, value, tone }: { label: string; value: string; tone?: 'success' }) {
-  return (
-    <InlineStack align="space-between">
-      <Text as="span" tone="text-inverse-secondary" variant="bodySm">{label}</Text>
-      <Text as="span" tone={tone === 'success' ? 'success' : 'text-inverse'} variant="bodySm">
-        {value}
-      </Text>
-    </InlineStack>
-  );
-}
-
-function FramePricingVolume({ answers, onChange }: FrameProps) {
-  return (
-    <BlockStack gap="400">
-      <Checkbox
-        label="Enable volume discounts"
-        helpText="Automatically apply discounts based on order size"
-        checked={answers.enableVolumeDiscounts ?? false}
-        onChange={(v) => onChange({ enableVolumeDiscounts: v })}
-      />
-      {answers.enableVolumeDiscounts && (
-        <BlockStack gap="200">
-          {[
-            ['25', '5'],
-            ['50', '10'],
-            ['100', '15'],
-          ].map(([gifts, off]) => (
-            <InlineStack key={gifts} gap="200" blockAlign="center">
-              <Box minWidth="80px"><TextField label="" labelHidden type="number" value={gifts} autoComplete="off" onChange={() => {}} /></Box>
-              <Text as="span" tone="subdued">+ gifts =</Text>
-              <Box minWidth="80px"><TextField label="" labelHidden type="number" value={off} autoComplete="off" onChange={() => {}} /></Box>
-              <Text as="span" tone="subdued">% off</Text>
-              <Button variant="plain" tone="critical">Remove</Button>
-            </InlineStack>
-          ))}
-          <InlineStack>
-            <Button variant="plain">+ Add tier</Button>
-          </InlineStack>
-        </BlockStack>
-      )}
-    </BlockStack>
-  );
-}
-
-function FrameIntegrations(_: FrameProps) {
-  const integrations = [
-    { name: 'Klaviyo', desc: 'Sync recipients to Klaviyo lists', status: 'connected' },
-    { name: 'Mailchimp', desc: 'Sync user contact info', status: null },
-    { name: 'Omnisend', desc: 'Sync user contact info', status: null },
-    { name: 'Postscript', desc: 'SMS for gift recipients', status: null },
-  ];
-  return (
-    <BlockStack gap="200">
-      {integrations.map((i) => (
-        <Box
-          key={i.name}
-          padding="300"
-          borderRadius="200"
-          borderWidth="025"
-          borderColor="border"
-        >
-          <InlineStack align="space-between" blockAlign="center">
-            <InlineStack gap="300" blockAlign="center">
-              <Box
-                background="bg-surface-secondary"
-                borderRadius="200"
-                minWidth="36px"
-                minHeight="36px"
-                padding="200"
-              >
-                <Text as="span" variant="bodyMd" fontWeight="bold">{i.name[0]}</Text>
-              </Box>
-              <BlockStack gap="050">
-                <Text as="p" variant="bodyMd" fontWeight="medium">{i.name}</Text>
-                {i.status === 'connected' ? (
-                  <InlineStack gap="100" blockAlign="center">
-                    <Badge tone="success">Connected</Badge>
-                  </InlineStack>
-                ) : (
-                  <Text as="p" tone="subdued" variant="bodySm">{i.desc}</Text>
-                )}
+      <div
+        style={{
+          display: 'flex',
+          gap: 12,
+          overflowX: 'auto',
+          paddingBottom: 8,
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {products.map((p) => (
+          <div
+            key={p.id}
+            style={{
+              flexShrink: 0,
+              width: 148,
+              scrollSnapAlign: 'start',
+            }}
+          >
+            <Box
+              padding="200"
+              borderRadius="200"
+              borderWidth="025"
+              borderColor={p.sel ? 'border-emphasis' : 'border'}
+              background={p.sel ? 'bg-surface-selected' : 'bg-surface'}
+              position="relative"
+            >
+              <BlockStack gap="200">
+                <div
+                  style={{
+                    width: '100%',
+                    aspectRatio: '1 / 1',
+                    borderRadius: 6,
+                    background: p.bg,
+                  }}
+                />
+                <BlockStack gap="050">
+                  <Text as="p" variant="bodySm" fontWeight="semibold" truncate>
+                    {p.name}
+                  </Text>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    {p.price}
+                  </Text>
+                </BlockStack>
               </BlockStack>
-            </InlineStack>
-            {i.status === 'connected' ? (
-              <Button>Configure</Button>
-            ) : (
-              <Button variant="primary">Connect</Button>
-            )}
-          </InlineStack>
-        </Box>
-      ))}
-    </BlockStack>
-  );
-}
-
-function FrameOptInEnable({ answers, onChange }: FrameProps) {
-  const current = answers.enableMarketingOptIn === undefined
-    ? undefined
-    : answers.enableMarketingOptIn ? 'yes' : 'no';
-  return (
-    <TilePicker
-      mode="single"
-      columns={2}
-      value={current}
-      onChange={(v) => onChange({ enableMarketingOptIn: v === 'yes' })}
-      options={[
-        { id: 'yes', title: 'Yes, show opt-in', description: 'Recipients can join your list when they claim a gift', badge: 'Most opt in' },
-        { id: 'no', title: 'No, skip it', description: 'Recipients only see what they need to claim' },
-      ]}
-    />
-  );
-}
-
-function FrameOptInPlacement({ answers, onChange }: FrameProps) {
-  return (
-    <TilePicker
-      mode="multi"
-      columns={2}
-      value={answers.optInPlacements}
-      onChange={(v) => onChange({ optInPlacements: v as string[] })}
-      options={[
-        { id: 'claim', title: 'Claim Form', description: 'When entering shipping address' },
-        { id: 'unwrap', title: 'Unwrapping Page', description: 'After revealing the gift' },
-      ]}
-    />
-  );
-}
-
-function FrameOptInCopy(_: FrameProps) {
-  return (
-    <TextField
-      label=""
-      labelHidden
-      value="Keep me updated on exclusive offers and new products"
-      helpText="Keep it short and clear about what they're signing up for."
-      autoComplete="off"
-      onChange={() => {}}
-    />
-  );
-}
-
-function FrameOptInCompliance({ answers, onChange }: FrameProps) {
-  return (
-    <BlockStack gap="400">
-      <Checkbox
-        label="Pre-check the box"
-        helpText="Not recommended for EU"
-        checked={answers.preCheckOptIn ?? false}
-        onChange={(v) => onChange({ preCheckOptIn: v })}
-      />
-      <Checkbox
-        label="Enable double opt-in for EU"
-        helpText="Auto-detect EU recipients and require email confirmation"
-        checked={answers.enableDoubleOptIn ?? false}
-        onChange={(v) => onChange({ enableDoubleOptIn: v })}
-      />
-      <TextField
-        label="Privacy policy URL"
-        value="https://acmestore.com/privacy"
-        autoComplete="off"
-        onChange={() => {}}
-      />
-    </BlockStack>
-  );
-}
-
-function FrameOptInActions({ answers, onChange }: FrameProps) {
-  return (
-    <BlockStack gap="400">
-      <Checkbox
-        label="Add to Klaviyo list"
-        helpText="List: Gift Recipients"
-        checked={answers.addToKlaviyo ?? false}
-        onChange={(v) => onChange({ addToKlaviyo: v })}
-      />
-      <Checkbox
-        label="Apply tags"
-        helpText="gift_recipient, opted_in, source:giftwell"
-        checked={answers.applyTags ?? false}
-        onChange={(v) => onChange({ applyTags: v })}
-      />
-      <Checkbox
-        label="Trigger welcome flow"
-        helpText='Start "Gift Recipient Welcome" flow in Klaviyo'
-        checked={answers.triggerWelcome ?? false}
-        onChange={(v) => onChange({ triggerWelcome: v })}
-      />
+              {p.sel && (
+                <Box position="absolute" insetBlockStart="200" insetInlineEnd="200">
+                  <Icon source={CheckIcon} tone="emphasis" />
+                </Box>
+              )}
+            </Box>
+          </div>
+        ))}
+      </div>
     </BlockStack>
   );
 }
@@ -577,38 +572,34 @@ function FrameSupport({ answers, onChange }: FrameProps) {
 
 function FrameReview(_: FrameProps) {
   const items = [
-    { title: 'Catalog configured', desc: '3 gift bundles created' },
-    { title: 'Pricing & fees', desc: '10% fee passed to gifter, volume discounts enabled' },
-    { title: 'Branding', desc: 'Logo, colors, background, sparkle effects' },
-    { title: 'Klaviyo connected', desc: 'Recipients sync to "Gift Recipients" list' },
-    { title: 'Marketing opt-in', desc: 'Enabled on claim form, double opt-in for EU' },
-    { title: 'Landing page', desc: 'acmestore.com/gift — added to nav & footer' },
-    { title: 'Support', desc: 'Giftwell concierge enabled' },
+    { title: 'Payment method',     desc: 'Visa •••• 4242 — charged only when gifts send' },
+    { title: 'Experience fee',     desc: '10% passed to gifter at checkout' },
+    { title: 'Volume discounts',   desc: '3 tiers — 5% at 25, 10% at 50, 15% at 100' },
+    { title: 'Products',           desc: '5 of 12 selected from your catalog' },
+    { title: 'Landing page',       desc: 'acmestore.com/gift — added to nav & footer' },
+    { title: 'Support',            desc: 'Giftwell concierge enabled' },
   ];
   return (
     <BlockStack gap="400">
-      <BlockStack gap="200">
-        {items.map((i) => (
-          <Box
-            key={i.title}
-            padding="300"
-            borderRadius="200"
-            borderWidth="025"
-            borderColor="border"
-            background="bg-surface-success"
-          >
-            <InlineStack gap="300" blockAlign="start">
-              <Box>
-                <Icon source={CheckIcon} tone="success" />
-              </Box>
-              <BlockStack gap="050">
-                <Text as="p" variant="bodyMd" fontWeight="medium">{i.title}</Text>
-                <Text as="p" tone="subdued" variant="bodySm">{i.desc}</Text>
-              </BlockStack>
-            </InlineStack>
-          </Box>
+      <Card padding="0">
+        {items.map((item, i) => (
+          <div key={item.title}>
+            {i > 0 && <Divider />}
+            <Box paddingInline="400" paddingBlock="300">
+              <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
+                <InlineStack gap="300" blockAlign="center" wrap={false}>
+                  <Icon source={CheckCircleIcon} tone="success" />
+                  <BlockStack gap="050">
+                    <Text as="p" variant="bodyMd" fontWeight="semibold">{item.title}</Text>
+                    <Text as="p" variant="bodySm" tone="subdued">{item.desc}</Text>
+                  </BlockStack>
+                </InlineStack>
+                <Button variant="plain">Edit</Button>
+              </InlineStack>
+            </Box>
+          </div>
         ))}
-      </BlockStack>
+      </Card>
       <InlineStack gap="200">
         <Button>Preview gift page</Button>
         <Button>Send test gift</Button>
@@ -657,16 +648,11 @@ export const Frames: Record<string, (p: FrameProps) => ReactNode> = {
   goals: FrameGoals,
   buyers: FrameBuyers,
   volume: FrameVolume,
-  'catalog-approach': FrameCatalogApproach,
-  'catalog-bundle': FrameCatalogBundle,
+  'payment-method': FramePaymentMethod,
   'pricing-fee': FramePricingFee,
   'pricing-volume': FramePricingVolume,
-  integrations: FrameIntegrations,
-  'optin-enable': FrameOptInEnable,
-  'optin-placement': FrameOptInPlacement,
-  'optin-copy': FrameOptInCopy,
-  'optin-compliance': FrameOptInCompliance,
-  'optin-actions': FrameOptInActions,
+  'catalog-approach': FrameCatalogApproach,
+  'catalog-products': FrameCatalogProducts,
   'landing-url': FrameLandingUrl,
   'landing-placement': FrameLandingPlacement,
   support: FrameSupport,

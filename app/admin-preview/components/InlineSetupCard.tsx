@@ -10,12 +10,6 @@ const DEFAULT_ANSWERS: FrameAnswers = {
   volume: '50-200',
   catalogApproach: 'curated',
   feeHandling: 'pass',
-  optInPlacements: ['claim', 'unwrap'],
-  enableMarketingOptIn: true,
-  enableDoubleOptIn: true,
-  addToKlaviyo: true,
-  applyTags: true,
-  triggerWelcome: true,
   enableVolumeDiscounts: true,
   enableConcierge: true,
   addToNav: true,
@@ -76,23 +70,9 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
         </div>
 
         <div className="setup-actions">
-          <div className="setup-actions-left">
-            <button className="setup-link" onClick={onComplete}>
-              Skip setup
-            </button>
-            <select
-              className="setup-jump"
-              value={step}
-              onChange={(e) => setStep(Number(e.target.value))}
-              aria-label="Jump to frame (preview)"
-            >
-              {FRAMES.map((f, i) => (
-                <option key={f.id} value={i}>
-                  {i + 1}. {f.title.length > 36 ? f.title.slice(0, 34) + '…' : f.title}
-                </option>
-              ))}
-            </select>
-          </div>
+          <button className="setup-link" onClick={onComplete}>
+            Skip setup
+          </button>
           <div className="setup-actions-right">
             {step > 0 && (
               <button
@@ -194,13 +174,6 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
           padding-top: 16px;
           border-top: 1px solid #f1f1f3;
         }
-        .setup-actions-left {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          flex: 1;
-          min-width: 0;
-        }
         .setup-actions-right {
           display: flex;
           gap: 8px;
@@ -215,16 +188,6 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
           padding: 6px 4px;
         }
         .setup-link:hover { text-decoration: underline; }
-        .setup-jump {
-          font-size: 11.5px;
-          color: #8a8a93;
-          background: #f5f5f7;
-          border: 1px solid #ececef;
-          border-radius: 6px;
-          padding: 4px 6px;
-          max-width: 240px;
-          cursor: pointer;
-        }
         .setup-btn {
           display: inline-flex;
           align-items: center;
