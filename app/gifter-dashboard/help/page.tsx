@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { BRAND } from '../data';
 
 const FAQS = [
   { q: 'How do I send a new gift order?',
@@ -42,14 +41,6 @@ export default function Help() {
         ))}
       </div>
 
-      <div className="gd-help-cta">
-        <div className="gd-help-cta-text">
-          <strong>Still need help?</strong>
-          <span>Chat with a real person, usually under 2 minutes.</span>
-        </div>
-        <button className="gd-help-chat">Start a chat →</button>
-      </div>
-
       <style jsx>{`
         .gd-help { display: flex; flex-direction: column; gap: 20px; }
         .gd-page-header { padding: 4px 8px 8px; color: #fff; }
@@ -87,31 +78,6 @@ export default function Help() {
         .gd-faq-icon-open { transform: rotate(45deg); }
         .gd-faq-a {
           padding: 0 18px 16px; font-size: 13.5px; color: #43434b; line-height: 1.6;
-        }
-
-        .gd-help-cta {
-          background: #1a1a1f; color: #fff;
-          border-radius: 14px;
-          padding: 18px 22px;
-          display: flex; justify-content: space-between; align-items: center;
-          gap: 16px;
-        }
-        .gd-help-cta-text { display: flex; flex-direction: column; gap: 4px; }
-        .gd-help-cta-text strong { font-size: 14.5px; font-weight: 600; }
-        .gd-help-cta-text span { font-size: 12.5px; color: rgba(255,255,255,0.7); }
-        .gd-help-chat {
-          all: unset; cursor: pointer;
-          background: ${BRAND}; color: #fff;
-          padding: 10px 18px; border-radius: 999px;
-          font-size: 13.5px; font-weight: 600;
-          flex-shrink: 0;
-          transition: transform 120ms ease;
-        }
-        .gd-help-chat:hover { transform: translateY(-1px); }
-
-        @media (max-width: 640px) {
-          .gd-help-cta { flex-direction: column; align-items: stretch; }
-          .gd-help-chat { text-align: center; }
         }
       `}</style>
     </div>
