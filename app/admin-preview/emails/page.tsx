@@ -64,8 +64,18 @@ const CADENCE_OPTIONS = [
 
 /* ─── Merchant brand (in production these come from merchant settings) ─── */
 
-const BRAND_COLOR = '#5B6CFF';
+const DEFAULT_BRAND_COLOR = '#7C5CFF';
 const MERCHANT_NAME = 'Acme';
+
+const BRAND_SWATCHES: { id: string; value: string; label: string }[] = [
+  { id: 'purple',  value: '#7C5CFF', label: 'Giftwell purple' },
+  { id: 'blue',    value: '#2C6ECB', label: 'Blue' },
+  { id: 'green',   value: '#16A34A', label: 'Green' },
+  { id: 'red',     value: '#E04F4F', label: 'Red' },
+  { id: 'orange',  value: '#F0883E', label: 'Orange' },
+  { id: 'magenta', value: '#C026D3', label: 'Magenta' },
+  { id: 'black',   value: '#1a1a1a', label: 'Black' },
+];
 
 function lighten(hex: string, amount = 0.3): string {
   const cleaned = hex.replace('#', '');
@@ -102,6 +112,17 @@ function MerchantLogo({ size = 44, radius = 8 }: { size?: number; radius?: numbe
   );
 }
 
+function GiftwellMark({ size = 40 }: { size?: number }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/g-black-bold.png"
+      alt="Giftwell"
+      style={{ width: size, height: size, display: 'block' }}
+    />
+  );
+}
+
 /* ─── Per-email mockup content ─── */
 
 type EmailContent = {
@@ -119,8 +140,8 @@ type EmailContent = {
 
 const EMAIL_CONTENT: Record<string, EmailContent> = {
   r1: {
-    fromName: 'Acme Store via Giftwell',
-    fromEmail: 'gifts@giftwell.io',
+    fromName: 'Acme Store',
+    fromEmail: 'gifts@acmestore.com',
     audience: 'recipient',
     eyebrow: 'A GIFT FROM ACME STORE',
     headline: 'You’ve received a gift!',
@@ -129,8 +150,8 @@ const EMAIL_CONTENT: Record<string, EmailContent> = {
     footer: 'This gift expires in 30 days',
   },
   r2: {
-    fromName: 'Acme Store via Giftwell',
-    fromEmail: 'gifts@giftwell.io',
+    fromName: 'Acme Store',
+    fromEmail: 'gifts@acmestore.com',
     audience: 'recipient',
     eyebrow: 'DON’T MISS OUT',
     headline: 'Your gift is waiting',
@@ -139,8 +160,8 @@ const EMAIL_CONTENT: Record<string, EmailContent> = {
     footer: 'Sent 7 days after the original gift',
   },
   r3: {
-    fromName: 'Acme Store via Giftwell',
-    fromEmail: 'gifts@giftwell.io',
+    fromName: 'Acme Store',
+    fromEmail: 'gifts@acmestore.com',
     audience: 'recipient',
     eyebrow: 'ORDER CONFIRMED',
     headline: 'Your gift is on the way',
@@ -149,8 +170,8 @@ const EMAIL_CONTENT: Record<string, EmailContent> = {
     footer: 'Order #GW-1284 · Acme Store',
   },
   r4: {
-    fromName: 'Acme Store via Giftwell',
-    fromEmail: 'gifts@giftwell.io',
+    fromName: 'Acme Store',
+    fromEmail: 'gifts@acmestore.com',
     audience: 'recipient',
     eyebrow: 'ON THE WAY',
     headline: 'Your gift just shipped',
@@ -159,8 +180,8 @@ const EMAIL_CONTENT: Record<string, EmailContent> = {
     footer: 'USPS · 9400 1234 5678 9012 3456',
   },
   r5: {
-    fromName: 'Acme Store via Giftwell',
-    fromEmail: 'gifts@giftwell.io',
+    fromName: 'Acme Store',
+    fromEmail: 'gifts@acmestore.com',
     audience: 'recipient',
     eyebrow: 'DELIVERED',
     headline: 'Your gift has arrived',
@@ -218,6 +239,7 @@ const EMAIL_CONTENT: Record<string, EmailContent> = {
 
 export default function EmailsPage() {
   const [previewId, setPreviewId] = useState<string | null>(null);
+  const [brandColor, setBrandColor] = useState(DEFAULT_BRAND_COLOR);
   const previewRow =
     [...RECIPIENT_EMAILS, ...GIFTER_EMAILS].find((r) => r.id === previewId) ?? null;
 
@@ -233,6 +255,41 @@ export default function EmailsPage() {
           </BlockStack>
           <Button>Send test email</Button>
         </InlineStack>
+
+        <Card padding="400">
+          <InlineStack align="space-between" blockAlign="center" gap="400" wrap={false}>
+            <BlockStack gap="050">
+              <Text as="p" variant="bodyMd" fontWeight="semibold">Brand color</Text>
+              <Text as="p" variant="bodySm" tone="subdued">
+                Used on the gradient CTA and accents in every email.
+              </Text>
+            </BlockStack>
+            <InlineStack gap="200" blockAlign="center">
+              {BRAND_SWATCHES.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  aria-label={s.label}
+                  onClick={() => setBrandColor(s.value)}
+                  style={{
+                    all: 'unset',
+                    cursor: 'pointer',
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    background: s.value,
+                    outline:
+                      brandColor === s.value
+                        ? '2px solid var(--p-color-border-emphasis)'
+                        : '1px solid var(--p-color-border)',
+                    outlineOffset: brandColor === s.value ? 2 : 0,
+                    boxSizing: 'border-box',
+                  }}
+                />
+              ))}
+            </InlineStack>
+          </InlineStack>
+        </Card>
 
         <EmailGroup
           title="Recipient"
@@ -258,7 +315,7 @@ export default function EmailsPage() {
           <Modal.Section>
             <BlockStack gap="400">
               <Text as="p" variant="bodySm" tone="subdued">{previewRow.trigger}</Text>
-              <EmailMockup content={EMAIL_CONTENT[previewRow.id]} />
+              <EmailMockup content={EMAIL_CONTENT[previewRow.id]} brandColor={brandColor} />
             </BlockStack>
           </Modal.Section>
         )}
@@ -415,9 +472,9 @@ function CadenceSelect() {
 
 /* ─── Email mockup (the polished branded design) ─── */
 
-function EmailMockup({ content }: { content: EmailContent }) {
+function EmailMockup({ content, brandColor }: { content: EmailContent; brandColor: string }) {
   const isGifter = content.audience === 'gifter';
-  const brandLight = lighten(BRAND_COLOR, 0.25);
+  const brandLight = lighten(brandColor, 0.25);
   return (
     <div
       style={{
@@ -474,7 +531,7 @@ function EmailMockup({ content }: { content: EmailContent }) {
         style={{
           padding: '44px 28px 36px',
           background:
-            'radial-gradient(120% 80% at 50% 0%, #f5f7ff 0%, #fbfcff 60%, #ffffff 100%)',
+            'radial-gradient(120% 80% at 50% 0%, #f5edff 0%, #fbf8ff 60%, #ffffff 100%)',
           textAlign: 'center',
           position: 'relative',
           overflow: 'hidden',
@@ -485,18 +542,36 @@ function EmailMockup({ content }: { content: EmailContent }) {
         <Sparkle bottom={28} left={36} size={10} />
         <Sparkle bottom={48} right={20} size={8} />
 
-        {/* Merchant logo as the hero brand mark on every email type
-            (recipients see their gift's brand; gifters see the brand of
-            the program they're running). */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-          <MerchantLogo size={48} radius={10} />
+        {/* Co-brand lockup: Giftwell × Merchant. Present on every email. */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 10,
+            marginBottom: 18,
+          }}
+        >
+          <GiftwellMark size={40} />
+          <span
+            style={{
+              color: '#c4c4ca',
+              fontWeight: 300,
+              fontSize: 18,
+              lineHeight: 1,
+            }}
+            aria-hidden
+          >
+            ×
+          </span>
+          <MerchantLogo size={40} radius={8} />
         </div>
 
         <div
           style={{
             fontSize: 11,
             fontWeight: 600,
-            color: BRAND_COLOR,
+            color: brandColor,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
             marginBottom: 10,
@@ -529,7 +604,7 @@ function EmailMockup({ content }: { content: EmailContent }) {
           {content.body}
         </div>
 
-        {content.variant === 'milestone' && <ProgressBar percent={25} />}
+        {content.variant === 'milestone' && <ProgressBar percent={25} brandColor={brandColor} />}
         {content.variant === 'wrap' && <WrapupStats claimed={42} expired={8} total={50} />}
 
         <div
@@ -546,13 +621,13 @@ function EmailMockup({ content }: { content: EmailContent }) {
             style={{
               all: 'unset',
               cursor: 'pointer',
-              background: `linear-gradient(135deg, ${BRAND_COLOR}, ${brandLight})`,
+              background: `linear-gradient(135deg, ${brandColor}, ${brandLight})`,
               color: '#fff',
               padding: '12px 26px',
               borderRadius: 999,
               fontSize: 14,
               fontWeight: 600,
-              boxShadow: `0 6px 16px ${BRAND_COLOR}40`,
+              boxShadow: `0 6px 16px ${brandColor}40`,
             }}
           >
             {content.primaryCta}
@@ -629,12 +704,12 @@ function Sparkle({
   );
 }
 
-function ProgressBar({ percent }: { percent: number }) {
+function ProgressBar({ percent, brandColor }: { percent: number; brandColor: string }) {
   return (
     <div style={{ maxWidth: 280, margin: '0 auto 4px' }}>
       <div
         style={{
-          background: lighten(BRAND_COLOR, 0.85),
+          background: lighten(brandColor, 0.85),
           height: 8,
           borderRadius: 999,
           overflow: 'hidden',
@@ -644,7 +719,7 @@ function ProgressBar({ percent }: { percent: number }) {
           style={{
             width: `${percent}%`,
             height: '100%',
-            background: `linear-gradient(90deg, ${BRAND_COLOR}, ${lighten(BRAND_COLOR, 0.25)})`,
+            background: `linear-gradient(90deg, ${brandColor}, ${lighten(brandColor, 0.25)})`,
             borderRadius: 999,
           }}
         />
