@@ -12,17 +12,14 @@ import {
   Badge,
   Divider,
   Icon,
+  Tabs,
 } from '@shopify/polaris';
 import {
   ChevronLeftIcon,
-  EmailIcon,
   CashDollarIcon,
   CalendarIcon,
   DeliveryIcon,
-  PersonIcon,
-  GiftCardFilledIcon,
   CheckCircleIcon,
-  PackageFulfilledIcon,
 } from '@shopify/polaris-icons';
 import {
   ORDERS,
@@ -39,6 +36,7 @@ const RECIPIENT_FILTERS: ('All' | Recipient['status'])[] = [
 export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const order = ORDERS.find((o) => o.id === id);
+  const [tabIndex, setTabIndex] = useState(0);
   const [recipientFilter, setRecipientFilter] = useState<typeof RECIPIENT_FILTERS[number]>('All');
 
   if (!order) {
@@ -77,6 +75,12 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     Bounced:   recipients.filter((r) => r.status === 'Bounced').length,
   };
 
+  const tabs = [
+    { id: 'gift-order', content: 'Gift order',         panelID: 'p-gift' },
+    { id: 'recipients', content: `Recipients (${recipients.length})`, panelID: 'p-rec' },
+    { id: 'activity',   content: 'Activity',           panelID: 'p-act' },
+  ];
+
   return (
     <BlockStack gap="500">
       <Link href="/admin-preview/orders" style={BACK_LINK}>
@@ -89,221 +93,203 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <InlineStack gap="300" blockAlign="center">
             <Text as="h1" variant="headingXl">#{order.id}</Text>
             <Badge tone={STATUS_TONE[order.status]}>{order.status}</Badge>
+            <Box paddingInlineStart="100">
+              <Text as="span" variant="bodyMd" tone="subdued">
+                Bulk gift order from <strong style={{ color: '#111' }}>{order.sender}</strong> · {order.company}
+              </Text>
+            </Box>
           </InlineStack>
           <Text as="p" variant="bodyMd" tone="subdued">
-            Placed {order.orderDate} . Target shipping {order.targetShipping}
+            Placed {order.orderDate} · Target shipping {order.targetShipping} · {order.recipients} recipient{order.recipients === 1 ? '' : 's'} · {order.amount}
           </Text>
         </BlockStack>
         <InlineStack gap="200">
-          <Button>Resend invitations</Button>
+          <Button>Resend gift emails</Button>
           <Button>Export recipients</Button>
         </InlineStack>
       </InlineStack>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 14 }}>
-        {/* Left column */}
-        <BlockStack gap="400">
-          {/* Gift order card (the parent) */}
-          <Card>
-            <BlockStack gap="400">
-              <InlineStack gap="200" blockAlign="center">
-                <Icon source={GiftCardFilledIcon} tone="base" />
-                <Text as="h2" variant="headingMd">Gift order</Text>
-              </InlineStack>
-              <div style={GIFT_GRID}>
-                <Field label="Recipients" value={`${order.recipients}`} />
-                <Field label="Budget per recipient" value={order.budgetPerRecipient} />
-                <Field label="Total" value={order.amount} />
-                <Field label="Occasion" value={order.occasion} />
-                <Field
-                  label="Allowed categories"
-                  value={
-                    <InlineStack gap="100" wrap>
-                      {order.categories.map((c) => (
-                        <span key={c} style={CATEGORY_CHIP}>{c}</span>
-                      ))}
-                    </InlineStack>
-                  }
-                  full
-                />
-                <Field label="Card theme" value={order.theme} full />
-                {order.message && (
-                  <Field
-                    label="Personal message"
-                    value={
-                      <Box
-                        padding="300"
-                        borderRadius="200"
-                        background="bg-surface-secondary"
-                      >
-                        <Text as="p" variant="bodyMd">
-                          &ldquo;{order.message}&rdquo;
-                        </Text>
-                      </Box>
-                    }
-                    full
-                  />
-                )}
-              </div>
-            </BlockStack>
-          </Card>
-
-          {/* Recipients card */}
-          <Card padding="0">
-            <Box padding="400">
-              <BlockStack gap="300">
-                <InlineStack align="space-between" blockAlign="center">
-                  <InlineStack gap="200" blockAlign="center">
-                    <Icon source={PersonIcon} tone="base" />
-                    <Text as="h2" variant="headingMd">Recipients ({recipients.length})</Text>
-                  </InlineStack>
-                  <Text as="span" variant="bodySm" tone="subdued">
-                    Each recipient picks their gift independently
-                  </Text>
-                </InlineStack>
-                <InlineStack gap="100" wrap>
-                  {RECIPIENT_FILTERS.map((f) => (
-                    <RecipientChip
-                      key={f}
-                      label={f}
-                      count={counts[f]}
-                      active={recipientFilter === f}
-                      onClick={() => setRecipientFilter(f)}
-                    />
-                  ))}
-                </InlineStack>
-              </BlockStack>
-            </Box>
-            <Divider />
-            {filteredRecipients.length === 0 ? (
-              <Box padding="500">
-                <Text as="p" variant="bodyMd" tone="subdued" alignment="center">
-                  No recipients with status &ldquo;{recipientFilter}&rdquo;.
-                </Text>
-              </Box>
-            ) : (
-              <RecipientTable recipients={filteredRecipients} />
+      <Card padding="0">
+        <Tabs tabs={tabs} selected={tabIndex} onSelect={setTabIndex}>
+          <Box padding="500">
+            {tabIndex === 0 && <GiftOrderTab order={order} />}
+            {tabIndex === 1 && (
+              <RecipientsTab
+                recipients={filteredRecipients}
+                totalRecipients={recipients.length}
+                counts={counts}
+                filter={recipientFilter}
+                onFilter={setRecipientFilter}
+              />
             )}
-          </Card>
-
-          {/* Activity timeline */}
-          <Card>
-            <BlockStack gap="400">
-              <Text as="h2" variant="headingMd">Activity</Text>
-              <Timeline order={order} recipients={recipients} />
-            </BlockStack>
-          </Card>
-        </BlockStack>
-
-        {/* Right rail */}
-        <BlockStack gap="400">
-          <Card>
-            <BlockStack gap="300">
-              <Text as="h3" variant="headingSm">Gifter</Text>
-              <BlockStack gap="050">
-                <Text as="p" variant="bodyMd" fontWeight="semibold">{order.sender}</Text>
-                <Text as="p" variant="bodySm" tone="subdued">{order.email}</Text>
-                <Text as="p" variant="bodySm" tone="subdued">{order.company}</Text>
-              </BlockStack>
-              <Divider />
-              <BlockStack gap="200">
-                <SummaryRow icon={CalendarIcon} label="Ordered"        value={order.orderDate} />
-                <SummaryRow icon={DeliveryIcon} label="Target ship"    value={order.targetShipping} />
-                <SummaryRow icon={CashDollarIcon} label="Total"        value={order.amount} />
-                <SummaryRow icon={CheckCircleIcon} label="Claim rate"  value={`${Math.round((recipients.filter((r) => r.pickedProduct).length / recipients.length) * 100)}%`} />
-              </BlockStack>
-            </BlockStack>
-          </Card>
-
-          <Card>
-            <BlockStack gap="200">
-              <Text as="h3" variant="headingSm">Payment</Text>
-              <InlineStack gap="200" blockAlign="center">
-                <Box
-                  padding="100"
-                  borderRadius="100"
-                  background="bg-surface-secondary"
-                  borderWidth="025"
-                  borderColor="border"
-                >
-                  <Text as="span" variant="bodySm" fontWeight="bold">VISA</Text>
-                </Box>
-                <BlockStack gap="0">
-                  <Text as="p" variant="bodySm" fontWeight="semibold">·· 4242</Text>
-                  <Text as="p" variant="bodySm" tone="subdued">Charged {order.orderDate}</Text>
-                </BlockStack>
-              </InlineStack>
-            </BlockStack>
-          </Card>
-        </BlockStack>
-      </div>
+            {tabIndex === 2 && <ActivityTab order={order} recipients={recipients} />}
+          </Box>
+        </Tabs>
+      </Card>
     </BlockStack>
   );
 }
 
-/* ─── Building blocks ─── */
+/* ─── Tab 1: Gift order (what the gifter pre-paid for) ─── */
 
-const BACK_LINK: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 4,
-  color: '#5c4dff',
-  fontSize: 13,
-  fontWeight: 500,
-  textDecoration: 'none',
-};
-
-const GIFT_GRID: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(2, 1fr)',
-  rowGap: 16,
-  columnGap: 24,
-};
-
-const CATEGORY_CHIP: React.CSSProperties = {
-  display: 'inline-block',
-  padding: '3px 9px',
-  fontSize: 12.5,
-  fontWeight: 500,
-  borderRadius: 6,
-  background: '#f3f3f5',
-  color: '#43434b',
-};
-
-function Field({ label, value, full = false }: { label: string; value: React.ReactNode; full?: boolean }) {
+function GiftOrderTab({ order }: { order: typeof ORDERS[number] }) {
   return (
-    <div style={{ gridColumn: full ? '1 / span 2' : 'auto' }}>
-      <Text as="p" variant="bodySm" tone="subdued">{label}</Text>
-      <div style={{ marginTop: 4 }}>
-        {typeof value === 'string' ? (
-          <Text as="span" variant="bodyMd" fontWeight="semibold">{value}</Text>
-        ) : (
-          value
-        )}
-      </div>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 24 }}>
+      <BlockStack gap="500">
+        <BlockStack gap="200">
+          <Text as="h2" variant="headingMd">What was ordered</Text>
+          <Text as="p" variant="bodySm" tone="subdued">
+            The gifter pre-paid for {order.recipients} gift{order.recipients === 1 ? '' : 's'}. Each recipient picks their own item from the allowed catalog.
+          </Text>
+        </BlockStack>
+        <div style={GIFT_GRID}>
+          <Field label="Recipients"            value={`${order.recipients}`} />
+          <Field label="Budget per recipient"  value={order.budgetPerRecipient} />
+          <Field label="Total pre-paid"        value={order.amount} />
+          <Field label="Target shipping"       value={order.targetShipping} />
+          <Field
+            label="Allowed categories"
+            value={
+              <InlineStack gap="100" wrap>
+                {order.categories.map((c) => (
+                  <span key={c} style={CATEGORY_CHIP}>{c}</span>
+                ))}
+              </InlineStack>
+            }
+            full
+          />
+          <Field label="Card theme" value={order.theme} full />
+          {order.message && (
+            <Field
+              label="Personal message from gifter"
+              value={
+                <Box padding="300" borderRadius="200" background="bg-surface-secondary">
+                  <Text as="p" variant="bodyMd">&ldquo;{order.message}&rdquo;</Text>
+                </Box>
+              }
+              full
+            />
+          )}
+        </div>
+      </BlockStack>
+
+      <BlockStack gap="400">
+        <Card>
+          <BlockStack gap="300">
+            <Text as="h3" variant="headingSm">Gifter</Text>
+            <BlockStack gap="050">
+              <Text as="p" variant="bodyMd" fontWeight="semibold">{order.sender}</Text>
+              <Text as="p" variant="bodySm" tone="subdued">{order.email}</Text>
+              <Text as="p" variant="bodySm" tone="subdued">{order.company}</Text>
+            </BlockStack>
+          </BlockStack>
+        </Card>
+        <Card>
+          <BlockStack gap="300">
+            <Text as="h3" variant="headingSm">Payment</Text>
+            <InlineStack gap="200" blockAlign="center">
+              <Box
+                padding="100"
+                borderRadius="100"
+                background="bg-surface-secondary"
+                borderWidth="025"
+                borderColor="border"
+              >
+                <Text as="span" variant="bodySm" fontWeight="bold">VISA</Text>
+              </Box>
+              <BlockStack gap="0">
+                <Text as="p" variant="bodySm" fontWeight="semibold">·· 4242</Text>
+                <Text as="p" variant="bodySm" tone="subdued">Charged {order.orderDate}</Text>
+              </BlockStack>
+            </InlineStack>
+          </BlockStack>
+        </Card>
+      </BlockStack>
     </div>
   );
 }
 
-function SummaryRow({
-  icon: IconComp,
-  label,
-  value,
+/* ─── Tab 2: Recipients (the sub-orders) ─── */
+
+function RecipientsTab({
+  recipients,
+  totalRecipients,
+  counts,
+  filter,
+  onFilter,
 }: {
-  icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
-  label: string;
-  value: string;
+  recipients: Recipient[];
+  totalRecipients: number;
+  counts: Record<string, number>;
+  filter: 'All' | Recipient['status'];
+  onFilter: (f: 'All' | Recipient['status']) => void;
 }) {
+  const claimedN = counts.Picked + counts.Shipped + counts.Delivered;
+  const inFlight = counts.Sent + counts.Opened;
+  const stuck    = counts.Bounced;
+
   return (
-    <InlineStack align="space-between" blockAlign="center">
-      <InlineStack gap="200" blockAlign="center">
-        <span style={{ width: 14, height: 14, color: '#8a8a93', display: 'inline-flex' }}>
-          <IconComp width={14} height={14} />
-        </span>
-        <Text as="span" variant="bodySm" tone="subdued">{label}</Text>
+    <BlockStack gap="400">
+      <BlockStack gap="100">
+        <Text as="h2" variant="headingMd">Recipient sub-orders</Text>
+        <Text as="p" variant="bodySm" tone="subdued">
+          One sub-order per recipient. Each picks their own product after they open their gift.
+        </Text>
+      </BlockStack>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+        <StatTile label="In flight"            value={inFlight}  total={totalRecipients} tone="attention" />
+        <StatTile label="Picked or delivered"  value={claimedN}  total={totalRecipients} tone="success" />
+        <StatTile label="Bounced"              value={stuck}     total={totalRecipients} tone="critical" />
+      </div>
+
+      <InlineStack gap="100" wrap>
+        {RECIPIENT_FILTERS.map((f) => (
+          <RecipientChip
+            key={f}
+            label={f}
+            count={counts[f] ?? 0}
+            active={filter === f}
+            onClick={() => onFilter(f)}
+          />
+        ))}
       </InlineStack>
-      <Text as="span" variant="bodySm" fontWeight="semibold">{value}</Text>
-    </InlineStack>
+
+      {recipients.length === 0 ? (
+        <Box padding="500">
+          <Text as="p" variant="bodyMd" tone="subdued" alignment="center">
+            No recipients with status &ldquo;{filter}&rdquo;.
+          </Text>
+        </Box>
+      ) : (
+        <RecipientTable recipients={recipients} />
+      )}
+    </BlockStack>
+  );
+}
+
+function StatTile({ label, value, total, tone }: {
+  label: string;
+  value: number;
+  total: number;
+  tone: 'success' | 'attention' | 'critical';
+}) {
+  const colors = {
+    success:   { fg: '#047857', bar: '#1F8A4C' },
+    attention: { fg: '#92590B', bar: '#E0A23E' },
+    critical:  { fg: '#B91C1C', bar: '#E04F4F' },
+  }[tone];
+  const pct = total ? (value / total) * 100 : 0;
+  return (
+    <Box padding="300" borderRadius="200" borderWidth="025" borderColor="border" background="bg-surface">
+      <BlockStack gap="200">
+        <Text as="p" variant="bodySm" tone="subdued">{label}</Text>
+        <Text as="p" variant="headingLg">{value}<Text as="span" variant="bodySm" tone="subdued"> of {total}</Text></Text>
+        <div style={{ height: 4, borderRadius: 999, background: '#f0f0f2', overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${pct}%`, background: colors.bar }} />
+        </div>
+      </BlockStack>
+    </Box>
   );
 }
 
@@ -356,16 +342,15 @@ function RecipientChip({
 
 function RecipientTable({ recipients }: { recipients: Recipient[] }) {
   return (
-    <div style={{ overflowX: 'auto' }}>
+    <div style={{ overflowX: 'auto', borderRadius: 10, border: '1px solid #ececef' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
         <thead>
-          <tr>
+          <tr style={{ background: '#fafafb' }}>
             <th style={TH}>Recipient</th>
             <th style={TH}>Status</th>
-            <th style={TH}>Picked</th>
+            <th style={TH}>Contents</th>
             <th style={TH}>Ship to</th>
             <th style={TH}>Tracking</th>
-            <th style={TH}>Subscribed</th>
           </tr>
         </thead>
         <tbody>
@@ -381,16 +366,11 @@ function RecipientTable({ recipients }: { recipients: Recipient[] }) {
                 <Badge tone={RECIPIENT_STATUS_TONE[r.status]}>{r.status}</Badge>
               </td>
               <td style={{ ...TD, color: '#43434b' }}>
-                {r.pickedProduct ?? <span style={{ color: '#b5b5bb' }}>Not yet</span>}
+                {r.pickedProduct ?? <span style={{ color: '#b5b5bb' }}>Not picked yet</span>}
               </td>
               <td style={{ ...TD, color: '#43434b' }}>{r.shippingTo}</td>
               <td style={{ ...TD, color: '#43434b', fontFamily: 'ui-monospace, monospace', fontSize: 12.5 }}>
                 {r.tracking ?? <span style={{ color: '#b5b5bb' }}>—</span>}
-              </td>
-              <td style={TD}>
-                {r.subscribed
-                  ? <Badge tone="success">Yes</Badge>
-                  : <span style={{ color: '#b5b5bb', fontSize: 12.5 }}>No</span>}
               </td>
             </tr>
           ))}
@@ -407,7 +387,7 @@ function RecipientTable({ recipients }: { recipients: Recipient[] }) {
 }
 
 const TH: React.CSSProperties = {
-  padding: '12px 16px',
+  padding: '11px 16px',
   textAlign: 'left',
   fontSize: 12.5,
   fontWeight: 600,
@@ -422,23 +402,31 @@ const TD: React.CSSProperties = {
   verticalAlign: 'middle',
 };
 
-/* ─── Activity timeline ─── */
+/* ─── Tab 3: Activity ─── */
 
-function Timeline({ order, recipients }: { order: typeof ORDERS[number]; recipients: Recipient[] }) {
-  type Event = { time: string; title: string; sub?: string; tone?: 'base' | 'subdued' };
+function ActivityTab({ order, recipients }: { order: typeof ORDERS[number]; recipients: Recipient[] }) {
+  type Event = { time: string; title: string; sub?: string };
   const events: Event[] = [];
 
-  events.push({ time: order.orderDate, title: `Order placed by ${order.sender}`, sub: `${order.recipients} recipient${order.recipients === 1 ? '' : 's'} . ${order.amount}` });
-  events.push({ time: order.orderDate, title: `Invitations sent`, sub: `${order.recipients} email${order.recipients === 1 ? '' : 's'} via ${order.email.split('@')[1]}` });
+  events.push({
+    time: order.orderDate,
+    title: `${order.sender} placed the order`,
+    sub: `${order.recipients} gift${order.recipients === 1 ? '' : 's'} pre-paid · ${order.amount}`,
+  });
+  events.push({
+    time: order.orderDate,
+    title: `${order.recipients} gift${order.recipients === 1 ? '' : 's'} sent to recipients`,
+    sub: `From gifts@${order.email.split('@')[1]}`,
+  });
 
   const openedN = recipients.filter((r) => r.status !== 'Sent' && r.status !== 'Bounced').length;
-  if (openedN > 0) events.push({ time: order.orderDate, title: `${openedN} recipient${openedN === 1 ? '' : 's'} opened the invitation` });
+  if (openedN > 0) events.push({ time: order.orderDate, title: `${openedN} recipient${openedN === 1 ? '' : 's'} opened their gift` });
 
   const pickedN = recipients.filter((r) => r.pickedProduct).length;
-  if (pickedN > 0) events.push({ time: order.targetShipping, title: `${pickedN} recipient${pickedN === 1 ? '' : 's'} picked their gift` });
+  if (pickedN > 0) events.push({ time: order.targetShipping, title: `${pickedN} recipient${pickedN === 1 ? '' : 's'} picked a product` });
 
   const shippedN = recipients.filter((r) => r.status === 'Shipped' || r.status === 'Delivered').length;
-  if (shippedN > 0) events.push({ time: order.targetShipping, title: `${shippedN} order${shippedN === 1 ? '' : 's'} shipped to recipients` });
+  if (shippedN > 0) events.push({ time: order.targetShipping, title: `${shippedN} order${shippedN === 1 ? '' : 's'} shipped` });
 
   const deliveredN = recipients.filter((r) => r.status === 'Delivered').length;
   if (deliveredN > 0) events.push({ time: order.targetShipping, title: `${deliveredN} order${deliveredN === 1 ? '' : 's'} delivered` });
@@ -447,36 +435,88 @@ function Timeline({ order, recipients }: { order: typeof ORDERS[number]; recipie
   if (subscribedN > 0) events.push({ time: order.targetShipping, title: `${subscribedN} recipient${subscribedN === 1 ? '' : 's'} subscribed to your store` });
 
   if (order.status === 'Cancelled') {
-    events.push({ time: order.targetShipping, title: 'Order cancelled', tone: 'subdued' });
+    events.push({ time: order.targetShipping, title: 'Order cancelled' });
   }
 
   return (
-    <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column' }}>
-      {events.map((e, i) => (
-        <li key={i} style={{
-          display: 'grid',
-          gridTemplateColumns: '110px 16px 1fr',
-          gap: 10,
-          alignItems: 'start',
-          padding: '8px 0',
-        }}>
-          <span style={{ fontSize: 12, color: '#8a8a93', paddingTop: 2 }}>{e.time}</span>
-          <span style={{
-            width: 10,
-            height: 10,
-            borderRadius: 999,
-            background: i === 0 ? '#5c4dff' : '#dcdcde',
-            marginTop: 5,
-            justifySelf: 'center',
-          }} />
-          <BlockStack gap="050">
-            <Text as="p" variant="bodyMd" fontWeight={i === 0 ? 'semibold' : 'regular'}>
-              {e.title}
-            </Text>
-            {e.sub && <Text as="p" variant="bodySm" tone="subdued">{e.sub}</Text>}
-          </BlockStack>
-        </li>
-      ))}
-    </ol>
+    <BlockStack gap="400">
+      <BlockStack gap="100">
+        <Text as="h2" variant="headingMd">Activity</Text>
+        <Text as="p" variant="bodySm" tone="subdued">
+          Lifecycle of this order, from placement to delivery.
+        </Text>
+      </BlockStack>
+      <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column' }}>
+        {events.map((e, i) => (
+          <li key={i} style={{
+            display: 'grid',
+            gridTemplateColumns: '120px 16px 1fr',
+            gap: 12,
+            alignItems: 'start',
+            padding: '10px 0',
+          }}>
+            <span style={{ fontSize: 12, color: '#8a8a93', paddingTop: 3 }}>{e.time}</span>
+            <span style={{
+              width: 10,
+              height: 10,
+              borderRadius: 999,
+              background: i === 0 ? '#5c4dff' : '#dcdcde',
+              marginTop: 6,
+              justifySelf: 'center',
+            }} />
+            <BlockStack gap="050">
+              <Text as="p" variant="bodyMd" fontWeight={i === 0 ? 'semibold' : 'regular'}>
+                {e.title}
+              </Text>
+              {e.sub && <Text as="p" variant="bodySm" tone="subdued">{e.sub}</Text>}
+            </BlockStack>
+          </li>
+        ))}
+      </ol>
+    </BlockStack>
+  );
+}
+
+/* ─── Bits ─── */
+
+const BACK_LINK: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 4,
+  color: '#5c4dff',
+  fontSize: 13,
+  fontWeight: 500,
+  textDecoration: 'none',
+};
+
+const GIFT_GRID: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(2, 1fr)',
+  rowGap: 16,
+  columnGap: 24,
+};
+
+const CATEGORY_CHIP: React.CSSProperties = {
+  display: 'inline-block',
+  padding: '3px 9px',
+  fontSize: 12.5,
+  fontWeight: 500,
+  borderRadius: 6,
+  background: '#f3f3f5',
+  color: '#43434b',
+};
+
+function Field({ label, value, full = false }: { label: string; value: React.ReactNode; full?: boolean }) {
+  return (
+    <div style={{ gridColumn: full ? '1 / span 2' : 'auto' }}>
+      <Text as="p" variant="bodySm" tone="subdued">{label}</Text>
+      <div style={{ marginTop: 4 }}>
+        {typeof value === 'string' ? (
+          <Text as="span" variant="bodyMd" fontWeight="semibold">{value}</Text>
+        ) : (
+          value
+        )}
+      </div>
+    </div>
   );
 }
