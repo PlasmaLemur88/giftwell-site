@@ -13,6 +13,7 @@ import {
   TextField,
   Icon,
   Divider,
+  Tabs,
 } from '@shopify/polaris';
 import {
   SearchIcon,
@@ -21,50 +22,51 @@ import {
   ChevronDownIcon,
   PackageIcon,
 } from '@shopify/polaris-icons';
-import { ORDERS, FILTERS, STATUS_TONE, type Order } from './data';
+import {
+  ORDERS,
+  STATUS_TONE,
+  RECIPIENT_STATUS_TONE,
+  getRecipients,
+  type Order,
+  type Recipient,
+  type RecipientStatus,
+  type Status,
+} from './data';
 
+type View = 'orders' | 'recipients';
 type SortKey = 'date' | 'amount' | 'status' | null;
 type SortDir = 'asc' | 'desc';
 
+const ORDER_FILTERS: ('All' | Status)[] = ['All', 'Pending', 'Shipped', 'Completed', 'Cancelled'];
+const RECIPIENT_FILTERS: ('All' | RecipientStatus)[] = ['All', 'Sent', 'Opened', 'Picked', 'Shipped', 'Delivered', 'Bounced'];
+
+type RecipientRow = Recipient & {
+  parentOrderId: string;
+  gifterName: string;
+  gifterCompany: string;
+};
+
 export default function OrdersPage() {
+  const [view, setView] = useState<View>('orders');
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<typeof FILTERS[number]>('All');
+  const [orderFilter, setOrderFilter] = useState<typeof ORDER_FILTERS[number]>('All');
+  const [recFilter, setRecFilter] = useState<typeof RECIPIENT_FILTERS[number]>('All');
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    const base = ORDERS.filter((o) => {
-      if (filter !== 'All' && o.status !== filter) return false;
-      if (!q) return true;
-      return (
-        o.id.toLowerCase().includes(q) ||
-        o.sender.toLowerCase().includes(q) ||
-        o.email.toLowerCase().includes(q) ||
-        o.status.toLowerCase().includes(q)
-      );
-    });
-    if (!sortKey) return base;
-    const sorted = [...base].sort((a, b) => {
-      let cmp = 0;
-      if (sortKey === 'date')        cmp = new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime();
-      else if (sortKey === 'amount') cmp = a.amountNum - b.amountNum;
-      else if (sortKey === 'status') cmp = a.status.localeCompare(b.status);
-      return sortDir === 'asc' ? cmp : -cmp;
-    });
-    return sorted;
-  }, [search, filter, sortKey, sortDir]);
+  /* Flatten all recipients across all orders, with parent metadata */
+  const allRecipients: RecipientRow[] = useMemo(() => {
+    return ORDERS.flatMap((o) =>
+      getRecipients(o).map((r) => ({
+        ...r,
+        parentOrderId: o.id,
+        gifterName: o.sender,
+        gifterCompany: o.company,
+      }))
+    );
+  }, []);
 
-  const toggleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortKey(key);
-      setSortDir('desc');
-    }
-  };
-
-  const counts = useMemo(() => ({
+  const orderCounts = useMemo(() => ({
     All:       ORDERS.length,
     Pending:   ORDERS.filter((o) => o.status === 'Pending').length,
     Shipped:   ORDERS.filter((o) => o.status === 'Shipped').length,
@@ -72,9 +74,71 @@ export default function OrdersPage() {
     Cancelled: ORDERS.filter((o) => o.status === 'Cancelled').length,
   }), []);
 
-  const isEmpty = filtered.length === 0;
-  const isSearchEmpty = isEmpty && (search.trim().length > 0 || filter !== 'All');
-  const isPristineEmpty = isEmpty && search.trim().length === 0 && filter === 'All';
+  const recipientCounts = useMemo(() => ({
+    All:       allRecipients.length,
+    Sent:      allRecipients.filter((r) => r.status === 'Sent').length,
+    Opened:    allRecipients.filter((r) => r.status === 'Opened').length,
+    Picked:    allRecipients.filter((r) => r.status === 'Picked').length,
+    Shipped:   allRecipients.filter((r) => r.status === 'Shipped').length,
+    Delivered: allRecipients.filter((r) => r.status === 'Delivered').length,
+    Bounced:   allRecipients.filter((r) => r.status === 'Bounced').length,
+  }), [allRecipients]);
+
+  const filteredOrders = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const base = ORDERS.filter((o) => {
+      if (orderFilter !== 'All' && o.status !== orderFilter) return false;
+      if (!q) return true;
+      return (
+        o.id.toLowerCase().includes(q) ||
+        o.sender.toLowerCase().includes(q) ||
+        o.email.toLowerCase().includes(q) ||
+        o.company.toLowerCase().includes(q) ||
+        o.status.toLowerCase().includes(q)
+      );
+    });
+    if (!sortKey) return base;
+    return [...base].sort((a, b) => {
+      let cmp = 0;
+      if (sortKey === 'date')        cmp = new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime();
+      else if (sortKey === 'amount') cmp = a.amountNum - b.amountNum;
+      else if (sortKey === 'status') cmp = a.status.localeCompare(b.status);
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+  }, [search, orderFilter, sortKey, sortDir]);
+
+  const filteredRecipients = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return allRecipients.filter((r) => {
+      if (recFilter !== 'All' && r.status !== recFilter) return false;
+      if (!q) return true;
+      return (
+        r.name.toLowerCase().includes(q) ||
+        r.email.toLowerCase().includes(q) ||
+        r.parentOrderId.toLowerCase().includes(q) ||
+        r.gifterName.toLowerCase().includes(q) ||
+        (r.pickedProduct?.toLowerCase().includes(q) ?? false) ||
+        r.status.toLowerCase().includes(q)
+      );
+    });
+  }, [allRecipients, search, recFilter]);
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    else { setSortKey(key); setSortDir('desc'); }
+  };
+
+  const viewTabs = [
+    { id: 'orders',     content: `Gift orders (${orderCounts.All})`,           panelID: 'p-orders' },
+    { id: 'recipients', content: `Recipient orders (${recipientCounts.All})`,  panelID: 'p-recipients' },
+  ];
+
+  const showingOrders = view === 'orders';
+  const total = showingOrders ? orderCounts.All : recipientCounts.All;
+  const filteredCount = showingOrders ? filteredOrders.length : filteredRecipients.length;
+  const isEmpty = filteredCount === 0;
+  const isSearchEmpty = isEmpty && (search.trim().length > 0 || (showingOrders ? orderFilter !== 'All' : recFilter !== 'All'));
+  const isPristineEmpty = isEmpty && !isSearchEmpty;
 
   return (
     <BlockStack gap="500">
@@ -82,7 +146,8 @@ export default function OrdersPage() {
         <BlockStack gap="100">
           <Text as="h1" variant="headingXl">Orders</Text>
           <Text as="p" variant="bodyMd" tone="subdued">
-            Every gift order placed through Giftwell. Search, sort, and drill into recipients.
+            <strong style={{ color: '#111' }}>Gift orders</strong> are the bulk pre-paid orders your gifters place.
+            Each contains one or more <strong style={{ color: '#111' }}>recipient orders</strong> — what each recipient picked, shipped to their address.
           </Text>
         </BlockStack>
         <InlineStack gap="200">
@@ -91,61 +156,87 @@ export default function OrdersPage() {
       </InlineStack>
 
       <Card padding="0">
-        <Box padding="400">
-          <BlockStack gap="300">
-            <TextField
-              label=""
-              labelHidden
-              value={search}
-              onChange={setSearch}
-              placeholder="Search by sender, email, order #, or status"
-              prefix={<Icon source={SearchIcon} />}
-              autoComplete="off"
-              clearButton
-              onClearButtonClick={() => setSearch('')}
-            />
-            <InlineStack gap="100" wrap>
-              {FILTERS.map((f) => (
-                <FilterChip
-                  key={f}
-                  label={f}
-                  count={counts[f]}
-                  active={filter === f}
-                  onClick={() => setFilter(f)}
-                />
-              ))}
-            </InlineStack>
-          </BlockStack>
-        </Box>
-
-        <Divider />
-
-        {isPristineEmpty ? (
-          <PristineEmpty />
-        ) : isSearchEmpty ? (
-          <SearchEmpty onReset={() => { setSearch(''); setFilter('All'); }} />
-        ) : (
-          <OrdersTable
-            orders={filtered}
-            sortKey={sortKey}
-            sortDir={sortDir}
-            onToggleSort={toggleSort}
-          />
-        )}
-
-        {!isEmpty && (
-          <Box padding="300">
-            <InlineStack align="space-between" blockAlign="center">
-              <Text as="span" variant="bodySm" tone="subdued">
-                {filtered.length} of {ORDERS.length} orders
-              </Text>
-              <InlineStack gap="100">
-                <Button disabled>Previous</Button>
-                <Button disabled>Next</Button>
+        <Tabs tabs={viewTabs} selected={showingOrders ? 0 : 1} onSelect={(i) => setView(i === 0 ? 'orders' : 'recipients')}>
+          <Box padding="400">
+            <BlockStack gap="300">
+              <TextField
+                label=""
+                labelHidden
+                value={search}
+                onChange={setSearch}
+                placeholder={showingOrders
+                  ? 'Search by gifter, company, order #, or status'
+                  : 'Search by recipient, gifter, order #, product, or status'
+                }
+                prefix={<Icon source={SearchIcon} />}
+                autoComplete="off"
+                clearButton
+                onClearButtonClick={() => setSearch('')}
+              />
+              <InlineStack gap="100" wrap>
+                {showingOrders ? (
+                  ORDER_FILTERS.map((f) => (
+                    <FilterChip
+                      key={f}
+                      label={f}
+                      count={orderCounts[f]}
+                      active={orderFilter === f}
+                      onClick={() => setOrderFilter(f)}
+                    />
+                  ))
+                ) : (
+                  RECIPIENT_FILTERS.map((f) => (
+                    <FilterChip
+                      key={f}
+                      label={f}
+                      count={recipientCounts[f]}
+                      active={recFilter === f}
+                      onClick={() => setRecFilter(f)}
+                    />
+                  ))
+                )}
               </InlineStack>
-            </InlineStack>
+            </BlockStack>
           </Box>
-        )}
+
+          <Divider />
+
+          {isPristineEmpty ? (
+            <PristineEmpty showingOrders={showingOrders} />
+          ) : isSearchEmpty ? (
+            <SearchEmpty
+              showingOrders={showingOrders}
+              onReset={() => {
+                setSearch('');
+                setOrderFilter('All');
+                setRecFilter('All');
+              }}
+            />
+          ) : showingOrders ? (
+            <OrdersTable
+              orders={filteredOrders}
+              sortKey={sortKey}
+              sortDir={sortDir}
+              onToggleSort={toggleSort}
+            />
+          ) : (
+            <RecipientOrdersTable rows={filteredRecipients} />
+          )}
+
+          {!isEmpty && (
+            <Box padding="300">
+              <InlineStack align="space-between" blockAlign="center">
+                <Text as="span" variant="bodySm" tone="subdued">
+                  {filteredCount} of {total} {showingOrders ? 'gift orders' : 'recipient orders'}
+                </Text>
+                <InlineStack gap="100">
+                  <Button disabled>Previous</Button>
+                  <Button disabled>Next</Button>
+                </InlineStack>
+              </InlineStack>
+            </Box>
+          )}
+        </Tabs>
       </Card>
     </BlockStack>
   );
@@ -258,7 +349,7 @@ function SortHeader({
   );
 }
 
-/* ─── Orders table ─── */
+/* ─── Gift orders table (parent records) ─── */
 
 function OrdersTable({
   orders,
@@ -273,20 +364,16 @@ function OrdersTable({
 }) {
   return (
     <div style={{ overflowX: 'auto' }}>
-      <table style={{
-        width: '100%',
-        borderCollapse: 'collapse',
-        fontSize: 13.5,
-      }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
         <thead>
           <tr>
-            <th style={STATIC_TH}>Order</th>
-            <th style={STATIC_TH}>Sender</th>
-            <SortHeader label="Order date"      sortKey="date"   activeKey={sortKey} dir={sortDir} onClick={() => onToggleSort('date')} />
+            <th style={STATIC_TH}>Gift order</th>
+            <th style={STATIC_TH}>Gifter</th>
+            <SortHeader label="Order date"   sortKey="date"   activeKey={sortKey} dir={sortDir} onClick={() => onToggleSort('date')} />
             <th style={STATIC_TH}>Target shipping</th>
-            <SortHeader label="Amount"          sortKey="amount" activeKey={sortKey} dir={sortDir} onClick={() => onToggleSort('amount')} align="right" />
+            <SortHeader label="Pre-paid"     sortKey="amount" activeKey={sortKey} dir={sortDir} onClick={() => onToggleSort('amount')} align="right" />
             <th style={{ ...STATIC_TH, textAlign: 'right' }}>Recipients</th>
-            <SortHeader label="Status"          sortKey="status" activeKey={sortKey} dir={sortDir} onClick={() => onToggleSort('status')} />
+            <SortHeader label="Status"       sortKey="status" activeKey={sortKey} dir={sortDir} onClick={() => onToggleSort('status')} />
             <th style={{ ...STATIC_TH, textAlign: 'right' }}>View</th>
           </tr>
         </thead>
@@ -294,14 +381,17 @@ function OrdersTable({
           {orders.map((o) => (
             <tr key={o.id} className="orders-row">
               <td style={TD}>
-                <Link href={`/admin-preview/orders/${o.id}`} style={{ color: '#5c4dff', textDecoration: 'none', fontWeight: 500 }}>
-                  #{o.id}
-                </Link>
+                <BlockStack gap="050">
+                  <Link href={`/admin-preview/orders/${o.id}`} style={{ color: '#5c4dff', textDecoration: 'none', fontWeight: 500 }}>
+                    #{o.id}
+                  </Link>
+                  <TypeChip kind="gift" recipients={o.recipients} />
+                </BlockStack>
               </td>
               <td style={TD}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <span style={{ color: '#111', fontWeight: 500 }}>{o.sender}</span>
-                  <span style={{ color: '#8a8a93', fontSize: 12 }}>{o.email}</span>
+                  <span style={{ color: '#8a8a93', fontSize: 12 }}>{o.company}</span>
                 </div>
               </td>
               <td style={{ ...TD, color: '#43434b' }}>{o.orderDate}</td>
@@ -341,20 +431,116 @@ function OrdersTable({
         </tbody>
       </table>
       <style jsx>{`
-        :global(.orders-row) {
-          transition: background 120ms ease;
-        }
-        :global(.orders-row:hover) {
-          background: #f9f9fb;
-        }
-        :global(.orders-row td) {
-          border-bottom: 1px solid #f0f0f2;
-        }
-        :global(.orders-row:last-child td) {
-          border-bottom: none;
-        }
+        :global(.orders-row) { transition: background 120ms ease; }
+        :global(.orders-row:hover) { background: #f9f9fb; }
+        :global(.orders-row td) { border-bottom: 1px solid #f0f0f2; vertical-align: top; padding-top: 14px; }
+        :global(.orders-row:last-child td) { border-bottom: none; }
       `}</style>
     </div>
+  );
+}
+
+/* ─── Recipient orders table (child records flattened across all parents) ─── */
+
+function RecipientOrdersTable({ rows }: { rows: RecipientRow[] }) {
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
+        <thead>
+          <tr>
+            <th style={STATIC_TH}>Recipient</th>
+            <th style={STATIC_TH}>From gift order</th>
+            <th style={STATIC_TH}>Contents</th>
+            <th style={STATIC_TH}>Ship to</th>
+            <th style={STATIC_TH}>Tracking</th>
+            <th style={STATIC_TH}>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.id} className="orders-row">
+              <td style={TD}>
+                <BlockStack gap="050">
+                  <span style={{ color: '#111', fontWeight: 500 }}>{r.name}</span>
+                  <span style={{ color: '#8a8a93', fontSize: 12 }}>{r.email}</span>
+                  <TypeChip kind="recipient" />
+                </BlockStack>
+              </td>
+              <td style={TD}>
+                <BlockStack gap="050">
+                  <Link href={`/admin-preview/orders/${r.parentOrderId}`} style={{ color: '#5c4dff', textDecoration: 'none', fontWeight: 500 }}>
+                    #{r.parentOrderId}
+                  </Link>
+                  <span style={{ color: '#43434b', fontSize: 12 }}>{r.gifterName}</span>
+                  <span style={{ color: '#8a8a93', fontSize: 12 }}>{r.gifterCompany}</span>
+                </BlockStack>
+              </td>
+              <td style={{ ...TD, color: '#43434b' }}>
+                {r.pickedProduct ?? <span style={{ color: '#b5b5bb' }}>Not picked yet</span>}
+              </td>
+              <td style={{ ...TD, color: '#43434b' }}>{r.shippingTo}</td>
+              <td style={{ ...TD, color: '#43434b', fontFamily: 'ui-monospace, monospace', fontSize: 12.5 }}>
+                {r.tracking ?? <span style={{ color: '#b5b5bb' }}>—</span>}
+              </td>
+              <td style={TD}>
+                <Badge tone={RECIPIENT_STATUS_TONE[r.status]}>{r.status}</Badge>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <style jsx>{`
+        :global(.orders-row) { transition: background 120ms ease; }
+        :global(.orders-row:hover) { background: #f9f9fb; }
+        :global(.orders-row td) { border-bottom: 1px solid #f0f0f2; vertical-align: top; padding-top: 14px; }
+        :global(.orders-row:last-child td) { border-bottom: none; }
+      `}</style>
+    </div>
+  );
+}
+
+/* ─── Type chip (Bulk gift / Recipient) ─── */
+
+function TypeChip({ kind, recipients }: { kind: 'gift' | 'recipient'; recipients?: number }) {
+  if (kind === 'gift') {
+    return (
+      <span style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        padding: '2px 7px',
+        borderRadius: 6,
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: '0.01em',
+        textTransform: 'uppercase',
+        background: '#EEF0FF',
+        color: '#4036A8',
+        width: 'fit-content',
+      }}>
+        Bulk gift
+        {recipients !== undefined && (
+          <span style={{ fontWeight: 500, opacity: 0.75 }}>· {recipients}</span>
+        )}
+      </span>
+    );
+  }
+  return (
+    <span style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      padding: '2px 7px',
+      borderRadius: 6,
+      fontSize: 11,
+      fontWeight: 600,
+      letterSpacing: '0.01em',
+      textTransform: 'uppercase',
+      background: '#F3F3F5',
+      color: '#5a5a62',
+      width: 'fit-content',
+    }}>
+      Recipient
+    </span>
   );
 }
 
@@ -371,26 +557,24 @@ const STATIC_TH: React.CSSProperties = {
 
 const TD: React.CSSProperties = {
   padding: '14px 16px',
-  verticalAlign: 'middle',
+  verticalAlign: 'top',
 };
 
 /* ─── Empty states ─── */
 
-function SearchEmpty({ onReset }: { onReset: () => void }) {
+function SearchEmpty({ showingOrders, onReset }: { showingOrders: boolean; onReset: () => void }) {
   return (
     <Box padding="600">
       <BlockStack gap="300" inlineAlign="center">
-        <Box
-          padding="300"
-          borderRadius="full"
-          background="bg-surface-secondary"
-        >
+        <Box padding="300" borderRadius="full" background="bg-surface-secondary">
           <Icon source={SearchIcon} tone="subdued" />
         </Box>
         <BlockStack gap="100" inlineAlign="center">
-          <Text as="p" variant="headingMd">No orders match</Text>
+          <Text as="p" variant="headingMd">
+            No {showingOrders ? 'gift orders' : 'recipient orders'} match
+          </Text>
           <Text as="p" variant="bodyMd" tone="subdued">
-            Try a different sender name, order number, or status.
+            Try a different name, order number, or status.
           </Text>
         </BlockStack>
         <Button onClick={onReset}>Clear filters</Button>
@@ -399,21 +583,21 @@ function SearchEmpty({ onReset }: { onReset: () => void }) {
   );
 }
 
-function PristineEmpty() {
+function PristineEmpty({ showingOrders }: { showingOrders: boolean }) {
   return (
     <Box padding="800">
       <BlockStack gap="300" inlineAlign="center">
-        <Box
-          padding="300"
-          borderRadius="full"
-          background="bg-surface-secondary"
-        >
+        <Box padding="300" borderRadius="full" background="bg-surface-secondary">
           <Icon source={PackageIcon} tone="subdued" />
         </Box>
         <BlockStack gap="100" inlineAlign="center">
-          <Text as="p" variant="headingMd">No orders yet</Text>
+          <Text as="p" variant="headingMd">
+            No {showingOrders ? 'gift orders' : 'recipient orders'} yet
+          </Text>
           <Text as="p" variant="bodyMd" tone="subdued">
-            When a gifter places their first order, it will show up here.
+            {showingOrders
+              ? 'When a gifter places their first order, it will show up here.'
+              : 'Once a gift is sent to a recipient, their order will show up here.'}
           </Text>
         </BlockStack>
         <Button variant="primary" url="/admin-preview/landing">
