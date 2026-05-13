@@ -25,7 +25,7 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
         <aside className="gd-sidebar">
           <div className="gd-sidebar-logo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/g-black-bold.png" alt="" className="gd-mark" />
+            <img src="/g-white-bold.png" alt="" className="gd-mark" />
             <span className="gd-wordmark">Giftwell</span>
           </div>
           <nav className="gd-sidebar-nav">
@@ -49,7 +49,7 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
             <header className="gd-mobile-header">
               <div className="gd-sidebar-logo" style={{ padding: 0 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/g-black-bold.png" alt="" className="gd-mark" />
+                <img src="/g-white-bold.png" alt="" className="gd-mark" />
                 <span className="gd-wordmark">Giftwell</span>
               </div>
               <div className="gd-avatar gd-avatar-sm">{GIFTER.fullName.split(' ').map((n) => n[0]).join('')}</div>
@@ -101,10 +101,7 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
 
         /* ─── Sidebar (desktop only) ─── */
         .gd-sidebar {
-          background: rgba(255, 255, 255, 0.7);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-right: 1px solid rgba(255, 255, 255, 0.4);
+          background: transparent;
           padding: 20px 12px 16px;
           display: flex;
           flex-direction: column;
@@ -119,7 +116,7 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
           display: inline-block;
           object-fit: contain;
         }
-        .gd-wordmark { font-size: 16px; font-weight: 700; letter-spacing: -0.005em; }
+        .gd-wordmark { font-size: 16px; font-weight: 700; letter-spacing: -0.005em; color: #fff; }
 
         .gd-sidebar-nav {
           display: flex; flex-direction: column; gap: 2px;
@@ -127,21 +124,29 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
         }
         .gd-nav-item {
           display: flex; align-items: center; gap: 10px;
-          padding: 9px 10px; border-radius: 8px;
+          padding: 10px 12px; border-radius: 10px;
           font-size: 14px; font-weight: 500;
-          color: #43434b; text-decoration: none;
-          transition: background 120ms ease, color 120ms ease;
+          color: rgba(255, 255, 255, 0.88); text-decoration: none;
+          transition: background 160ms ease, color 160ms ease;
         }
-        .gd-nav-item:hover { background: #f3f3f5; color: #1a1a1f; }
+        .gd-nav-item:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
         .gd-nav-item-active {
-          background: #1a1a1f; color: #fff;
+          background: rgba(255, 255, 255, 0.96);
+          color: ${BRAND_DARK};
+          box-shadow: 0 4px 14px -6px rgba(20, 14, 50, 0.25);
         }
-        .gd-nav-item-active:hover { background: #1a1a1f; color: #fff; }
+        .gd-nav-item-active:hover { background: #fff; color: ${BRAND_DARK}; }
         .gd-nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
 
         .gd-sidebar-foot {
           display: flex; align-items: center; gap: 10px;
-          padding: 8px 6px; border-top: 1px solid #ececef; padding-top: 14px;
+          padding: 10px 12px;
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.65);
+          border-radius: 12px;
+          box-shadow: 0 4px 18px -6px rgba(20, 14, 50, 0.12);
         }
         .gd-avatar {
           width: 34px; height: 34px;
