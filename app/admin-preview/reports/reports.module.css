@@ -1,0 +1,24 @@
+/* Reports landing. Polaris does all the styling.
+   This module only resets the next/link wrapper around each <Card>
+   so the whole card is clickable without underline / inherited color. */
+
+.cardLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+  min-height: 140px;
+}
+
+/* Make Polaris's Card fill the Link's height so all cards align uniformly,
+   regardless of description line count. */
+.cardLink > :global(.Polaris-ShadowBevel),
+.cardLink :global(.Polaris-Box) {
+  height: 100%;
+}
+
+.cardLink:focus-visible {
+  outline: 2px solid #2c6ecb;
+  outline-offset: 2px;
+  border-radius: 14px;
+}
