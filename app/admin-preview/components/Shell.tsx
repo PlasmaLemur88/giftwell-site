@@ -28,6 +28,7 @@ const APPS = [
 ];
 
 const GIFTWELL_SUB = [
+  { href: '/admin-preview/orders', label: 'Orders' },
   { href: '/admin-preview/reports', label: 'Reports' },
   { href: '/admin-preview/emails', label: 'Emails' },
   { href: '/admin-preview/products', label: 'Products' },
