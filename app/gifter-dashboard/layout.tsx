@@ -148,8 +148,8 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
         }
 
         /* ─── Main content ─── */
-        .gd-main { min-width: 0; padding: 28px 32px 60px; }
-        .gd-main-inner { max-width: 880px; margin: 0 auto; }
+        .gd-main { min-width: 0; padding: 36px 40px 88px; }
+        .gd-main-inner { max-width: 1040px; margin: 0 auto; }
 
         /* ─── Mobile header (hidden on desktop) ─── */
         .gd-mobile-header { display: none; }

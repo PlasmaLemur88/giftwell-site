@@ -97,18 +97,19 @@ export default function GifterHome() {
 
       <style jsx>{`
         .gd-home {
-          display: flex; flex-direction: column; gap: 24px;
+          display: flex; flex-direction: column; gap: 32px;
         }
 
         /* ─── Hero ─── */
         .gd-hero {
           background:
-            radial-gradient(ellipse 60% 50% at 18% 12%, rgba(167, 139, 250, 0.55) 0%, transparent 55%),
-            radial-gradient(ellipse 50% 45% at 88% 95%, rgba(91, 63, 224, 0.5) 0%, transparent 60%),
-            linear-gradient(135deg, ${BRAND_DARK} 0%, ${BRAND} 50%, #B197F2 100%);
+            radial-gradient(ellipse 65% 70% at 12% 18%, rgba(92, 63, 224, 0.85) 0%, transparent 60%),
+            radial-gradient(ellipse 55% 60% at 88% 88%, rgba(255, 255, 255, 0.55) 0%, transparent 60%),
+            radial-gradient(ellipse 70% 60% at 80% 20%, rgba(255, 220, 245, 0.4) 0%, transparent 55%),
+            linear-gradient(135deg, ${BRAND} 0%, #A68DF0 45%, #DDC8F0 80%, #F4E9FB 100%);
           color: #fff;
-          border-radius: 16px;
-          padding: 28px 28px 24px;
+          border-radius: 18px;
+          padding: 36px 36px 32px;
         }
         .gd-hero-greet { font-size: 13px; opacity: 0.85; letter-spacing: 0.02em; margin-bottom: 4px; }
         .gd-hero-name {
@@ -216,14 +217,15 @@ export default function GifterHome() {
 function StatTile({ label, value }: { label: string; value: string }) {
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.14)',
-      border: '1px solid rgba(255,255,255,0.18)',
+      background: 'rgba(30, 20, 60, 0.22)',
+      border: '1px solid rgba(255, 255, 255, 0.25)',
       borderRadius: 12,
       padding: '14px 14px 12px',
-      backdropFilter: 'blur(4px)',
+      backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
     }}>
       <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.015em', color: '#fff' }}>{value}</div>
-      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)', marginTop: 2 }}>{label}</div>
+      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', marginTop: 2 }}>{label}</div>
     </div>
   );
 }

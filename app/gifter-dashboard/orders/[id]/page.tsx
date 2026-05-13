@@ -161,12 +161,13 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
         /* Hero */
         .gd-order-hero {
           background:
-            radial-gradient(ellipse 60% 50% at 18% 12%, rgba(167, 139, 250, 0.55) 0%, transparent 55%),
-            radial-gradient(ellipse 50% 45% at 88% 95%, rgba(91, 63, 224, 0.5) 0%, transparent 60%),
-            linear-gradient(135deg, ${BRAND_DARK} 0%, ${BRAND} 100%);
+            radial-gradient(ellipse 65% 70% at 12% 18%, rgba(92, 63, 224, 0.85) 0%, transparent 60%),
+            radial-gradient(ellipse 55% 60% at 88% 88%, rgba(255, 255, 255, 0.55) 0%, transparent 60%),
+            radial-gradient(ellipse 70% 60% at 80% 20%, rgba(255, 220, 245, 0.4) 0%, transparent 55%),
+            linear-gradient(135deg, ${BRAND} 0%, #A68DF0 45%, #DDC8F0 80%, #F4E9FB 100%);
           color: #fff;
-          border-radius: 16px;
-          padding: 22px 24px 26px;
+          border-radius: 18px;
+          padding: 28px 32px 32px;
         }
         .gd-order-back {
           display: inline-flex; align-items: center;
