@@ -31,6 +31,7 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
   };
 
   return (
+    <div className="setup-card-wrap">
     <div className="setup-card">
       <div className="setup-illustration">
         <div className="setup-icon-block">
@@ -89,6 +90,70 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
       </div>
 
       <style jsx>{`
+        @property --setup-angle {
+          syntax: '<angle>';
+          initial-value: 0deg;
+          inherits: false;
+        }
+        .setup-card-wrap {
+          position: relative;
+          border-radius: 14px;
+          isolation: isolate;
+        }
+        .setup-card-wrap::before,
+        .setup-card-wrap::after {
+          content: '';
+          position: absolute;
+          pointer-events: none;
+          z-index: -1;
+        }
+        .setup-card-wrap::before {
+          inset: -2px;
+          border-radius: 16px;
+          padding: 2px;
+          background: conic-gradient(
+            from var(--setup-angle),
+            transparent 0deg,
+            transparent 240deg,
+            rgba(124, 92, 255, 0.45) 300deg,
+            #A78BFA 340deg,
+            #ffffff 352deg,
+            #A78BFA 4deg,
+            rgba(124, 92, 255, 0.45) 60deg,
+            transparent 120deg
+          );
+          -webkit-mask:
+            linear-gradient(#000 0 0) content-box,
+            linear-gradient(#000 0 0);
+          -webkit-mask-composite: xor;
+                  mask-composite: exclude;
+          animation: setup-rim-spin 5s linear infinite;
+        }
+        .setup-card-wrap::after {
+          inset: -10px;
+          padding: 10px;
+          border-radius: 24px;
+          background: conic-gradient(
+            from var(--setup-angle),
+            transparent 0deg,
+            transparent 230deg,
+            rgba(124, 92, 255, 0.4) 320deg,
+            rgba(167, 139, 250, 0.85) 350deg,
+            rgba(167, 139, 250, 0.4) 10deg,
+            transparent 100deg
+          );
+          -webkit-mask:
+            linear-gradient(#000 0 0) content-box,
+            linear-gradient(#000 0 0);
+          -webkit-mask-composite: xor;
+                  mask-composite: exclude;
+          filter: blur(12px);
+          opacity: 0.85;
+          animation: setup-rim-spin 5s linear infinite;
+        }
+        @keyframes setup-rim-spin {
+          to { --setup-angle: 360deg; }
+        }
         .setup-card {
           background: #fff;
           border: 1px solid #dcdcde;
@@ -97,42 +162,9 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
           display: flex;
           gap: 24px;
           align-items: flex-start;
-          box-shadow:
-            0 1px 2px rgba(15, 15, 25, 0.03),
-            0 0 80px -10px rgba(124, 92, 255, 0.28),
-            0 12px 30px -16px rgba(124, 92, 255, 0.22);
+          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
           position: relative;
-          overflow: hidden;
-          isolation: isolate;
-        }
-        .setup-card::before,
-        .setup-card::after {
-          content: '';
-          position: absolute;
-          top: -50%;
-          width: 22%;
-          height: 220%;
-          pointer-events: none;
-          filter: blur(3px);
-          z-index: -1;
-          opacity: 0;
-          animation: setup-beam-sweep 1800ms cubic-bezier(0.22, 0.61, 0.36, 1) 200ms forwards;
-        }
-        .setup-card::before {
-          left: 12%;
-          transform: rotate(-14deg);
-          background: linear-gradient(105deg, transparent 38%, rgba(124, 92, 255, 0.28) 50%, transparent 62%);
-        }
-        .setup-card::after {
-          right: 12%;
-          transform: rotate(14deg);
-          animation-delay: 380ms;
-          background: linear-gradient(-105deg, transparent 38%, rgba(168, 85, 247, 0.22) 50%, transparent 62%);
-        }
-        @keyframes setup-beam-sweep {
-          0%   { opacity: 0; }
-          35%  { opacity: 1; }
-          100% { opacity: 0; }
+          z-index: 1;
         }
         .setup-illustration {
           flex-shrink: 0;
@@ -264,6 +296,7 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
           .setup-actions-right { justify-content: flex-end; }
         }
       `}</style>
+    </div>
     </div>
   );
 }
