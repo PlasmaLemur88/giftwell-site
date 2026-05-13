@@ -31,7 +31,7 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
   };
 
   return (
-    <div className="setup-card-wrap">
+    <div className="rim-beam-wrap">
     <div className="setup-card">
       <div className="setup-illustration">
         <div className="setup-icon-block">
@@ -90,70 +90,6 @@ export function InlineSetupCard({ onComplete }: { onComplete?: () => void }) {
       </div>
 
       <style jsx>{`
-        @property --setup-angle {
-          syntax: '<angle>';
-          initial-value: 0deg;
-          inherits: false;
-        }
-        .setup-card-wrap {
-          position: relative;
-          border-radius: 14px;
-          isolation: isolate;
-        }
-        .setup-card-wrap::before,
-        .setup-card-wrap::after {
-          content: '';
-          position: absolute;
-          pointer-events: none;
-          z-index: -1;
-        }
-        .setup-card-wrap::before {
-          inset: -2px;
-          border-radius: 16px;
-          padding: 2px;
-          background: conic-gradient(
-            from var(--setup-angle),
-            transparent 0deg,
-            transparent 240deg,
-            rgba(124, 92, 255, 0.45) 300deg,
-            #A78BFA 340deg,
-            #ffffff 352deg,
-            #A78BFA 4deg,
-            rgba(124, 92, 255, 0.45) 60deg,
-            transparent 120deg
-          );
-          -webkit-mask:
-            linear-gradient(#000 0 0) content-box,
-            linear-gradient(#000 0 0);
-          -webkit-mask-composite: xor;
-                  mask-composite: exclude;
-          animation: setup-rim-spin 5s linear infinite;
-        }
-        .setup-card-wrap::after {
-          inset: -10px;
-          padding: 10px;
-          border-radius: 24px;
-          background: conic-gradient(
-            from var(--setup-angle),
-            transparent 0deg,
-            transparent 230deg,
-            rgba(124, 92, 255, 0.4) 320deg,
-            rgba(167, 139, 250, 0.85) 350deg,
-            rgba(167, 139, 250, 0.4) 10deg,
-            transparent 100deg
-          );
-          -webkit-mask:
-            linear-gradient(#000 0 0) content-box,
-            linear-gradient(#000 0 0);
-          -webkit-mask-composite: xor;
-                  mask-composite: exclude;
-          filter: blur(12px);
-          opacity: 0.85;
-          animation: setup-rim-spin 5s linear infinite;
-        }
-        @keyframes setup-rim-spin {
-          to { --setup-angle: 360deg; }
-        }
         .setup-card {
           background: #fff;
           border: 1px solid #dcdcde;
