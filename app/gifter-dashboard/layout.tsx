@@ -43,16 +43,18 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
 
         {/* Main content */}
         <main className="gd-main">
-          {/* Mobile header */}
-          <header className="gd-mobile-header">
-            <div className="gd-sidebar-logo" style={{ padding: 0 }}>
-              <span className="gd-mark">G</span>
-              <span className="gd-wordmark">Giftwell</span>
-            </div>
-            <div className="gd-avatar gd-avatar-sm">{GIFTER.fullName.split(' ').map((n) => n[0]).join('')}</div>
-          </header>
+          <div className="gd-main-inner">
+            {/* Mobile header */}
+            <header className="gd-mobile-header">
+              <div className="gd-sidebar-logo" style={{ padding: 0 }}>
+                <span className="gd-mark">G</span>
+                <span className="gd-wordmark">Giftwell</span>
+              </div>
+              <div className="gd-avatar gd-avatar-sm">{GIFTER.fullName.split(' ').map((n) => n[0]).join('')}</div>
+            </header>
 
-          {children}
+            {children}
+          </div>
         </main>
       </div>
 
@@ -147,6 +149,7 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
 
         /* ─── Main content ─── */
         .gd-main { min-width: 0; padding: 28px 32px 60px; }
+        .gd-main-inner { max-width: 880px; margin: 0 auto; }
 
         /* ─── Mobile header (hidden on desktop) ─── */
         .gd-mobile-header { display: none; }

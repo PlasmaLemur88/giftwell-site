@@ -32,16 +32,11 @@ export default function GifterHome() {
         </Link>
       )}
 
-      {/* Quick actions */}
-      <section className="gd-section">
-        <button className="gd-primary-cta">
-          <span className="gd-primary-cta-icon" aria-hidden>+</span>
-          Send a new gift
-        </button>
-        <div className="gd-quick-grid">
-          <QuickAction href="/gifter-dashboard/address-book" label="Address book"   sub="Saved recipients" icon={<PeopleIcon />} />
-          <QuickAction href="#"                              label="Receipts"       sub="Download invoices" icon={<ReceiptIcon />} />
-        </div>
+      {/* Quick actions — 3-col on desktop, stacks on mobile */}
+      <section className="gd-quick-grid">
+        <PrimaryAction href="#"                              label="Send a new gift" sub="Start a new order"   icon={<PlusIcon />} />
+        <QuickAction   href="/gifter-dashboard/address-book" label="Address book"    sub="Saved recipients"    icon={<PeopleIcon />} />
+        <QuickAction   href="/gifter-dashboard/help"         label="Receipts"        sub="Download invoices"   icon={<ReceiptIcon />} />
       </section>
 
       {/* Recent orders */}
@@ -159,34 +154,14 @@ export default function GifterHome() {
           text-decoration: none;
         }
 
-        /* ─── Primary CTA ─── */
-        .gd-primary-cta {
-          all: unset; cursor: pointer;
-          display: flex; align-items: center; justify-content: center; gap: 8px;
-          background: linear-gradient(135deg, ${BRAND_DARK}, ${BRAND});
-          color: #fff;
-          padding: 16px 20px;
-          border-radius: 12px;
-          font-size: 15px; font-weight: 600;
-          box-shadow: 0 6px 16px -6px rgba(124, 92, 255, 0.5);
-          transition: transform 120ms ease, box-shadow 120ms ease;
-        }
-        .gd-primary-cta:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 10px 22px -8px rgba(124, 92, 255, 0.55);
-        }
-        .gd-primary-cta-icon {
-          width: 20px; height: 20px; border-radius: 999px;
-          background: rgba(255,255,255,0.18);
-          display: inline-flex; align-items: center; justify-content: center;
-          font-size: 16px; font-weight: 400;
-        }
-
         /* ─── Quick action grid ─── */
         .gd-quick-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: repeat(3, 1fr);
           gap: 10px;
+        }
+        @media (max-width: 640px) {
+          .gd-quick-grid { grid-template-columns: 1fr; }
         }
 
         /* ─── Order list ─── */
@@ -253,6 +228,37 @@ function StatTile({ label, value }: { label: string; value: string }) {
   );
 }
 
+function PrimaryAction({ href, label, sub, icon }: { href: string; label: string; sub: string; icon: React.ReactNode }) {
+  return (
+    <Link href={href} style={{
+      background: `linear-gradient(135deg, ${BRAND_DARK}, ${BRAND})`,
+      borderRadius: 12,
+      padding: '14px 14px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      textDecoration: 'none',
+      color: '#fff',
+      transition: 'transform 120ms ease, box-shadow 120ms ease',
+      boxShadow: '0 6px 16px -6px rgba(124, 92, 255, 0.4)',
+    }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'none'; }}
+    >
+      <span style={{
+        width: 36, height: 36, borderRadius: 10,
+        background: 'rgba(255,255,255,0.18)',
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        color: '#fff', flexShrink: 0,
+      }}>{icon}</span>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 600 }}>{label}</div>
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)', marginTop: 1 }}>{sub}</div>
+      </div>
+    </Link>
+  );
+}
+
 function QuickAction({ href, label, sub, icon }: { href: string; label: string; sub: string; icon: React.ReactNode }) {
   return (
     <Link href={href} style={{
@@ -281,6 +287,15 @@ function QuickAction({ href, label, sub, icon }: { href: string; label: string; 
         <div style={{ fontSize: 12, color: '#8a8a93', marginTop: 1 }}>{sub}</div>
       </div>
     </Link>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
   );
 }
 
