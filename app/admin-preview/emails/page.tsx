@@ -12,6 +12,12 @@ import {
   Select,
   Divider,
   Modal,
+  ColorPicker,
+  TextField,
+  hexToRgb,
+  rgbToHsb,
+  hsbToHex,
+  type HSBAColor,
 } from '@shopify/polaris';
 import {
   GiftCardFilledIcon,
@@ -86,15 +92,26 @@ function lighten(hex: string, amount = 0.3): string {
   return `#${[mix(r), mix(g), mix(b)].map((c) => c.toString(16).padStart(2, '0')).join('')}`;
 }
 
-function MerchantLogo({ size = 44, radius = 8 }: { size?: number; radius?: number }) {
+function MerchantLogo({
+  size = 44,
+  radius = 8,
+  tone = 'dark',
+  letterColor,
+}: {
+  size?: number;
+  radius?: number;
+  tone?: 'dark' | 'light';
+  letterColor?: string;
+}) {
+  const isLight = tone === 'light';
   return (
     <span
       style={{
         width: size,
         height: size,
         borderRadius: radius,
-        background: '#1a1a1f',
-        color: '#fff',
+        background: isLight ? '#fff' : '#1a1a1f',
+        color: isLight ? (letterColor ?? '#1a1a1f') : '#fff',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -112,11 +129,11 @@ function MerchantLogo({ size = 44, radius = 8 }: { size?: number; radius?: numbe
   );
 }
 
-function GiftwellMark({ size = 40 }: { size?: number }) {
+function GiftwellMark({ size = 40, tone = 'dark' }: { size?: number; tone?: 'dark' | 'light' }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/g-black-bold.png"
+      src={tone === 'light' ? '/g-white-bold.png' : '/g-black-bold.png'}
       alt="Giftwell"
       style={{ width: size, height: size, display: 'block' }}
     />
@@ -240,8 +257,11 @@ const EMAIL_CONTENT: Record<string, EmailContent> = {
 export default function EmailsPage() {
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [brandColor, setBrandColor] = useState(DEFAULT_BRAND_COLOR);
+  const [colorModalOpen, setColorModalOpen] = useState(false);
   const previewRow =
     [...RECIPIENT_EMAILS, ...GIFTER_EMAILS].find((r) => r.id === previewId) ?? null;
+  const presetMatch = BRAND_SWATCHES.find((s) => s.value.toLowerCase() === brandColor.toLowerCase());
+  const colorLabel = presetMatch?.label ?? 'Custom';
 
   return (
     <>
@@ -261,32 +281,28 @@ export default function EmailsPage() {
             <BlockStack gap="050">
               <Text as="p" variant="bodyMd" fontWeight="semibold">Brand color</Text>
               <Text as="p" variant="bodySm" tone="subdued">
-                Used on the gradient CTA and accents in every email.
+                Tints the hero background and accents on every email.
               </Text>
             </BlockStack>
-            <InlineStack gap="200" blockAlign="center">
-              {BRAND_SWATCHES.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  aria-label={s.label}
-                  onClick={() => setBrandColor(s.value)}
+            <InlineStack gap="300" blockAlign="center">
+              <InlineStack gap="200" blockAlign="center">
+                <span
                   style={{
-                    all: 'unset',
-                    cursor: 'pointer',
                     width: 28,
                     height: 28,
                     borderRadius: '50%',
-                    background: s.value,
-                    outline:
-                      brandColor === s.value
-                        ? '2px solid var(--p-color-border-emphasis)'
-                        : '1px solid var(--p-color-border)',
-                    outlineOffset: brandColor === s.value ? 2 : 0,
-                    boxSizing: 'border-box',
+                    background: brandColor,
+                    border: '1px solid var(--p-color-border)',
+                    display: 'inline-block',
                   }}
+                  aria-hidden
                 />
-              ))}
+                <BlockStack gap="0">
+                  <Text as="span" variant="bodySm" fontWeight="semibold">{colorLabel}</Text>
+                  <Text as="span" variant="bodySm" tone="subdued">{brandColor.toUpperCase()}</Text>
+                </BlockStack>
+              </InlineStack>
+              <Button onClick={() => setColorModalOpen(true)}>Change</Button>
             </InlineStack>
           </InlineStack>
         </Card>
@@ -320,7 +336,143 @@ export default function EmailsPage() {
           </Modal.Section>
         )}
       </Modal>
+
+      <BrandColorModal
+        open={colorModalOpen}
+        initial={brandColor}
+        onClose={() => setColorModalOpen(false)}
+        onSave={(c) => {
+          setBrandColor(c);
+          setColorModalOpen(false);
+        }}
+      />
     </>
+  );
+}
+
+/* ─── Brand color modal (Polaris ColorPicker + hex + presets) ─── */
+
+function hexToHsb(hex: string): HSBAColor {
+  const clean = hex.startsWith('#') ? hex : `#${hex}`;
+  const rgb = hexToRgb(clean);
+  const hsb = rgbToHsb(rgb);
+  return { ...hsb, alpha: 1 };
+}
+
+function BrandColorModal({
+  open,
+  initial,
+  onClose,
+  onSave,
+}: {
+  open: boolean;
+  initial: string;
+  onClose: () => void;
+  onSave: (hex: string) => void;
+}) {
+  const [hsb, setHsb] = useState<HSBAColor>(() => hexToHsb(initial));
+  const [hexInput, setHexInput] = useState(() => initial.replace('#', '').toUpperCase());
+  const liveHex = hsbToHex(hsb).toUpperCase();
+
+  // When the modal re-opens with a new initial, reset state
+  const initialUpper = initial.replace('#', '').toUpperCase();
+  if (open && initialUpper !== liveHex.replace('#', '') && hexInput !== initialUpper) {
+    // no-op guard against false re-resets — keep state stable while user is editing
+  }
+
+  const handleHsb = (next: HSBAColor) => {
+    setHsb(next);
+    setHexInput(hsbToHex(next).replace('#', '').toUpperCase());
+  };
+  const handleHex = (raw: string) => {
+    const cleaned = raw.replace('#', '').toUpperCase().slice(0, 6);
+    setHexInput(cleaned);
+    if (/^[0-9A-F]{6}$/.test(cleaned)) {
+      setHsb(hexToHsb(cleaned));
+    }
+  };
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Brand color"
+      primaryAction={{ content: 'Save', onAction: () => onSave(`#${hexInput}`) }}
+      secondaryActions={[{ content: 'Cancel', onAction: onClose }]}
+    >
+      <Modal.Section>
+        <InlineStack gap="500" wrap={false} align="start">
+          <Box>
+            <ColorPicker color={hsb} onChange={handleHsb} />
+          </Box>
+          <BlockStack gap="400">
+            <BlockStack gap="100">
+              <TextField
+                label="Hex"
+                value={hexInput}
+                onChange={handleHex}
+                autoComplete="off"
+                prefix="#"
+                maxLength={6}
+              />
+              <Text as="p" variant="bodySm" tone="subdued">
+                Type any 6-character hex.
+              </Text>
+            </BlockStack>
+            <BlockStack gap="200">
+              <Text as="p" variant="bodySm" tone="subdued" fontWeight="semibold">Presets</Text>
+              <InlineStack gap="200" wrap>
+                {BRAND_SWATCHES.map((s) => {
+                  const selected = `#${hexInput}`.toUpperCase() === s.value.toUpperCase();
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      aria-label={s.label}
+                      title={s.label}
+                      onClick={() => {
+                        setHsb(hexToHsb(s.value));
+                        setHexInput(s.value.replace('#', '').toUpperCase());
+                      }}
+                      style={{
+                        all: 'unset',
+                        cursor: 'pointer',
+                        width: 32,
+                        height: 32,
+                        borderRadius: '50%',
+                        background: s.value,
+                        outline: selected
+                          ? '2px solid var(--p-color-border-emphasis)'
+                          : '1px solid var(--p-color-border)',
+                        outlineOffset: selected ? 2 : 0,
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  );
+                })}
+              </InlineStack>
+            </BlockStack>
+            <Box
+              padding="300"
+              borderRadius="200"
+              borderWidth="025"
+              borderColor="border"
+            >
+              <BlockStack gap="100">
+                <Text as="p" variant="bodySm" tone="subdued" fontWeight="semibold">Preview</Text>
+                <div
+                  style={{
+                    height: 40,
+                    borderRadius: 8,
+                    background: `linear-gradient(135deg, ${liveHex}, ${lighten(liveHex, 0.25)})`,
+                  }}
+                />
+              </BlockStack>
+            </Box>
+          </BlockStack>
+        </InlineStack>
+      </Modal.Section>
+    </Modal>
   );
 }
 
@@ -526,52 +678,53 @@ function EmailMockup({ content, brandColor }: { content: EmailContent; brandColo
         </div>
       </div>
 
-      {/* Hero */}
+      {/* Hero — brand gradient background, light text on top */}
       <div
         style={{
           padding: '44px 28px 36px',
-          background:
-            'radial-gradient(120% 80% at 50% 0%, #f5edff 0%, #fbf8ff 60%, #ffffff 100%)',
+          background: `linear-gradient(135deg, ${brandColor} 0%, ${brandLight} 100%)`,
           textAlign: 'center',
           position: 'relative',
           overflow: 'hidden',
+          color: '#ffffff',
         }}
       >
-        <Sparkle top={14} left={20} size={11} />
-        <Sparkle top={22} right={28} size={9} />
-        <Sparkle bottom={28} left={36} size={10} />
-        <Sparkle bottom={48} right={20} size={8} />
+        <Sparkle top={14} left={20} size={11} tone="light" />
+        <Sparkle top={22} right={28} size={9} tone="light" />
+        <Sparkle bottom={28} left={36} size={10} tone="light" />
+        <Sparkle bottom={48} right={20} size={8} tone="light" />
 
-        {/* Co-brand lockup: Giftwell × Merchant. Present on every email. */}
+        {/* Co-brand lockup: Giftwell × Merchant. Light variants on the brand bg. */}
         <div
           style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            gap: 10,
-            marginBottom: 18,
+            gap: 14,
+            marginBottom: 22,
           }}
         >
-          <GiftwellMark size={40} />
+          <GiftwellMark size={42} tone="light" />
           <span
             style={{
-              color: '#c4c4ca',
-              fontWeight: 300,
-              fontSize: 18,
+              color: 'rgba(255, 255, 255, 0.65)',
+              fontWeight: 200,
+              fontSize: 26,
               lineHeight: 1,
+              fontFamily: 'Georgia, "Times New Roman", serif',
             }}
             aria-hidden
           >
             ×
           </span>
-          <MerchantLogo size={40} radius={8} />
+          <MerchantLogo size={42} radius={9} tone="light" letterColor={brandColor} />
         </div>
 
         <div
           style={{
             fontSize: 11,
             fontWeight: 600,
-            color: brandColor,
+            color: 'rgba(255, 255, 255, 0.85)',
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
             marginBottom: 10,
@@ -584,7 +737,7 @@ function EmailMockup({ content, brandColor }: { content: EmailContent; brandColo
           style={{
             fontSize: 22,
             fontWeight: 700,
-            color: '#111',
+            color: '#ffffff',
             letterSpacing: '-0.015em',
             marginBottom: 10,
           }}
@@ -595,7 +748,7 @@ function EmailMockup({ content, brandColor }: { content: EmailContent; brandColo
         <div
           style={{
             fontSize: 13.5,
-            color: '#4a4a52',
+            color: 'rgba(255, 255, 255, 0.92)',
             lineHeight: 1.55,
             maxWidth: 320,
             margin: '0 auto 20px',
@@ -604,7 +757,7 @@ function EmailMockup({ content, brandColor }: { content: EmailContent; brandColo
           {content.body}
         </div>
 
-        {content.variant === 'milestone' && <ProgressBar percent={25} brandColor={brandColor} />}
+        {content.variant === 'milestone' && <ProgressBar percent={25} />}
         {content.variant === 'wrap' && <WrapupStats claimed={42} expired={8} total={50} />}
 
         <div
@@ -621,13 +774,13 @@ function EmailMockup({ content, brandColor }: { content: EmailContent; brandColo
             style={{
               all: 'unset',
               cursor: 'pointer',
-              background: `linear-gradient(135deg, ${brandColor}, ${brandLight})`,
-              color: '#fff',
+              background: '#ffffff',
+              color: brandColor,
               padding: '12px 26px',
               borderRadius: 999,
               fontSize: 14,
               fontWeight: 600,
-              boxShadow: `0 6px 16px ${brandColor}40`,
+              boxShadow: '0 6px 18px rgba(0, 0, 0, 0.18)',
             }}
           >
             {content.primaryCta}
@@ -637,13 +790,13 @@ function EmailMockup({ content, brandColor }: { content: EmailContent; brandColo
               style={{
                 all: 'unset',
                 cursor: 'pointer',
-                background: '#fff',
-                color: '#1a1a1f',
+                background: 'transparent',
+                color: '#ffffff',
                 padding: '11px 22px',
                 borderRadius: 999,
                 fontSize: 14,
                 fontWeight: 500,
-                border: '1px solid #dcdcde',
+                border: '1px solid rgba(255, 255, 255, 0.55)',
               }}
             >
               {content.secondaryCta}
@@ -651,7 +804,7 @@ function EmailMockup({ content, brandColor }: { content: EmailContent; brandColo
           )}
         </div>
 
-        <div style={{ marginTop: 18, fontSize: 11.5, color: '#8a8a93' }}>
+        <div style={{ marginTop: 18, fontSize: 11.5, color: 'rgba(255, 255, 255, 0.72)' }}>
           {content.footer}
         </div>
       </div>
@@ -678,12 +831,14 @@ function Sparkle({
   right,
   bottom,
   size,
+  tone = 'dark',
 }: {
   top?: number;
   left?: number;
   right?: number;
   bottom?: number;
   size: number;
+  tone?: 'dark' | 'light';
 }) {
   return (
     <div
@@ -694,7 +849,8 @@ function Sparkle({
         right,
         bottom,
         fontSize: size,
-        opacity: 0.75,
+        opacity: tone === 'light' ? 0.7 : 0.75,
+        filter: tone === 'light' ? 'brightness(0) invert(1)' : undefined,
         pointerEvents: 'none',
       }}
       aria-hidden
@@ -704,12 +860,12 @@ function Sparkle({
   );
 }
 
-function ProgressBar({ percent, brandColor }: { percent: number; brandColor: string }) {
+function ProgressBar({ percent }: { percent: number }) {
   return (
     <div style={{ maxWidth: 280, margin: '0 auto 4px' }}>
       <div
         style={{
-          background: lighten(brandColor, 0.85),
+          background: 'rgba(255, 255, 255, 0.25)',
           height: 8,
           borderRadius: 999,
           overflow: 'hidden',
@@ -719,7 +875,7 @@ function ProgressBar({ percent, brandColor }: { percent: number; brandColor: str
           style={{
             width: `${percent}%`,
             height: '100%',
-            background: `linear-gradient(90deg, ${brandColor}, ${lighten(brandColor, 0.25)})`,
+            background: '#ffffff',
             borderRadius: 999,
           }}
         />
@@ -728,7 +884,7 @@ function ProgressBar({ percent, brandColor }: { percent: number; brandColor: str
         style={{
           marginTop: 6,
           fontSize: 11,
-          color: '#8a8a93',
+          color: 'rgba(255, 255, 255, 0.78)',
           display: 'flex',
           justifyContent: 'space-between',
         }}
@@ -750,18 +906,36 @@ function WrapupStats({ claimed, expired, total }: { claimed: number; expired: nu
         margin: '4px 0',
       }}
     >
-      <Stat label="Claimed" value={claimed.toString()} accent="#16A34A" />
-      <Stat label="Expired" value={expired.toString()} accent="#8a8a93" />
-      <Stat label="Total" value={total.toString()} accent="#111" />
+      <Stat label="Claimed" value={claimed.toString()} />
+      <Stat label="Expired" value={expired.toString()} dim />
+      <Stat label="Total" value={total.toString()} />
     </div>
   );
 }
 
-function Stat({ label, value, accent }: { label: string; value: string; accent: string }) {
+function Stat({ label, value, dim }: { label: string; value: string; dim?: boolean }) {
   return (
     <div style={{ textAlign: 'center', minWidth: 64 }}>
-      <div style={{ fontSize: 22, fontWeight: 700, color: accent, letterSpacing: '-0.01em' }}>{value}</div>
-      <div style={{ fontSize: 11, color: '#8a8a93', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
+      <div
+        style={{
+          fontSize: 22,
+          fontWeight: 700,
+          color: dim ? 'rgba(255, 255, 255, 0.7)' : '#ffffff',
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {value}
+      </div>
+      <div
+        style={{
+          fontSize: 11,
+          color: 'rgba(255, 255, 255, 0.7)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+        }}
+      >
+        {label}
+      </div>
     </div>
   );
 }
