@@ -1,43 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { BRAND, avatarGradient } from '../data';
+import { BRAND, avatarGradient, ORDERS, getRecipients, getAllPeople, type Recipient } from '../data';
 
-type Contact = {
-  id: string;
-  name: string;
-  email: string;
-  company: string;
-  tag: 'Clients' | 'Team' | 'Vendors' | 'Personal';
-};
-
-const CONTACTS: Contact[] = [
-  { id: '1', name: 'John Doe',     email: 'john@acme.com',          company: 'Acme Corp',       tag: 'Clients' },
-  { id: '2', name: 'Jane Smith',   email: 'jane@corp.com',          company: 'Corp Industries', tag: 'Clients' },
-  { id: '3', name: 'Maya Greene',  email: 'maya@northglobe.com',    company: 'NorthGlobe',      tag: 'Clients' },
-  { id: '4', name: 'Mike Wilson',  email: 'mike@example.com',       company: 'Example LLC',     tag: 'Clients' },
-  { id: '5', name: 'Sarah Jones',  email: 'sarah@company.com',      company: 'Company Inc',     tag: 'Team' },
-  { id: '6', name: 'Lisa Chen',    email: 'lisa@startup.io',        company: 'Startup IO',      tag: 'Team' },
-  { id: '7', name: 'Diego Rivera', email: 'd.rivera@coppermint.co', company: 'Coppermint',      tag: 'Team' },
-  { id: '8', name: 'Tom Davis',    email: 'tom@truebay.co',         company: 'Truebay',         tag: 'Vendors' },
-];
-
-const TAGS = ['Clients', 'Team', 'Vendors', 'Personal'] as const;
-type Tag = typeof TAGS[number];
-
-const TAG_COLORS: Record<Tag, { bg: string; fg: string; ring: string }> = {
-  Clients:  { bg: '#EEF0FF', fg: '#4036A8', ring: '#7C5CFF' },
-  Team:     { bg: '#ECFDF5', fg: '#047857', ring: '#1F8A4C' },
-  Vendors:  { bg: '#FFF7E6', fg: '#92590B', ring: '#E0A23E' },
-  Personal: { bg: '#FEF2F2', fg: '#B91C1C', ring: '#E04F4F' },
-};
-
-function formatForCopy(contacts: Contact[]): string {
-  return contacts.map((c) => `${c.name} <${c.email}>`).join('\n');
-}
-
-function initialsOf(name: string): string {
-  return name.split(' ').map((s) => s[0]).join('').slice(0, 2).toUpperCase();
+function formatForCopy(recipients: Recipient[]): string {
+  return recipients.map((r) => `${r.name} <${r.email}>`).join('\n');
 }
 
 export default function PeoplePage() {
@@ -45,40 +12,34 @@ export default function PeoplePage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
 
-  const handleCopy = (id: string, contacts: Contact[]) => {
-    const text = formatForCopy(contacts);
-    void navigator.clipboard?.writeText(text).catch(() => {});
+  const handleCopy = (id: string, recipients: Recipient[]) => {
+    void navigator.clipboard?.writeText(formatForCopy(recipients)).catch(() => {});
     setCopiedId(id);
     setTimeout(() => setCopiedId((curr) => (curr === id ? null : curr)), 1800);
   };
 
-  const grouped: Record<Tag, Contact[]> = {
-    Clients:  CONTACTS.filter((c) => c.tag === 'Clients'),
-    Team:     CONTACTS.filter((c) => c.tag === 'Team'),
-    Vendors:  CONTACTS.filter((c) => c.tag === 'Vendors'),
-    Personal: CONTACTS.filter((c) => c.tag === 'Personal'),
-  };
-
+  const allPeople = getAllPeople();
   const filteredDirectory = !search.trim()
-    ? CONTACTS
-    : CONTACTS.filter((c) => {
+    ? allPeople
+    : allPeople.filter((r) => {
         const q = search.toLowerCase();
-        return c.name.toLowerCase().includes(q) ||
-               c.email.toLowerCase().includes(q) ||
-               c.company.toLowerCase().includes(q);
+        return r.name.toLowerCase().includes(q) || r.email.toLowerCase().includes(q);
       });
 
   return (
     <div className="gd-people">
       <header className="gd-page-header">
         <h1>People</h1>
-        <p>Your saved lists. Copy any group and paste it into a Giftwell gifting flow on any merchant's store.</p>
+        <p>
+          Everyone you've ever gifted to, grouped by the campaign you sent them in.
+          Copy any list and paste it into a Giftwell gifting flow on any merchant's store.
+        </p>
       </header>
 
-      {/* Lists — primary, copy-out */}
+      {/* Recent campaigns — one card per past order */}
       <section className="gd-lists-section">
         <div className="gd-lists-head">
-          <h2 className="gd-section-title">Your circles</h2>
+          <h2 className="gd-section-title">Your campaigns</h2>
           <button className="gd-add-link" onClick={() => setAddOpen(!addOpen)}>
             {addOpen ? '× Close' : '+ Add or import people'}
           </button>
@@ -99,34 +60,40 @@ export default function PeoplePage() {
         )}
 
         <div className="gd-lists-grid">
-          <ListCard
+          {/* Everyone card — primary */}
+          <CampaignCard
             id="everyone"
             label="Everyone"
-            sublabel={`${CONTACTS.length} people across all lists`}
-            contacts={CONTACTS}
+            sublabel={`${allPeople.length} unique people across all campaigns`}
+            recipients={allPeople}
             primary
             copied={copiedId === 'everyone'}
-            onCopy={() => handleCopy('everyone', CONTACTS)}
+            onCopy={() => handleCopy('everyone', allPeople)}
           />
-          {TAGS.map((tag) => grouped[tag].length > 0 && (
-            <ListCard
-              key={tag}
-              id={tag}
-              label={tag}
-              sublabel={`${grouped[tag].length} ${grouped[tag].length === 1 ? 'person' : 'people'}`}
-              contacts={grouped[tag]}
-              tagColor={TAG_COLORS[tag]}
-              copied={copiedId === tag}
-              onCopy={() => handleCopy(tag, grouped[tag])}
-            />
-          ))}
+
+          {/* One card per past order */}
+          {ORDERS.map((o) => {
+            const recipients = getRecipients(o);
+            return (
+              <CampaignCard
+                key={o.id}
+                id={o.id}
+                label={o.name}
+                sublabel={`${recipients.length} ${recipients.length === 1 ? 'person' : 'people'} · ${o.status}`}
+                recipients={recipients}
+                copied={copiedId === o.id}
+                onCopy={() => handleCopy(o.id, recipients)}
+              />
+            );
+          })}
         </div>
       </section>
 
-      {/* Directory — secondary, individual lookup + copy */}
+      {/* Directory — searchable + individual copy */}
       <section className="gd-directory">
         <div className="gd-directory-head">
-          <h2 className="gd-section-title">Everyone</h2>
+          <h2 className="gd-section-title">All people</h2>
+          <p className="gd-directory-sub">{allPeople.length} unique recipients across all campaigns</p>
         </div>
 
         <div className="gd-search">
@@ -134,34 +101,30 @@ export default function PeoplePage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, email, or company"
+            placeholder="Search by name or email"
           />
         </div>
 
         <div className="gd-directory-list">
           {filteredDirectory.length === 0 ? (
             <div className="gd-empty">No one matches that search.</div>
-          ) : filteredDirectory.map((c) => {
-            const tone = TAG_COLORS[c.tag];
-            return (
-              <div key={c.id} className="gd-contact-row">
-                <span className="gd-contact-avatar" style={{
-                  background: avatarGradient(c.name),
-                }}>{initialsOf(c.name)}</span>
-                <div className="gd-contact-meta">
-                  <div className="gd-contact-name">{c.name}</div>
-                  <div className="gd-contact-sub">{c.email} · {c.company}</div>
-                </div>
-                <span className="gd-contact-tag" style={{ background: tone.bg, color: tone.fg }}>{c.tag}</span>
-                <button
-                  className={`gd-row-copy ${copiedId === c.id ? 'gd-row-copy-done' : ''}`}
-                  onClick={() => handleCopy(c.id, [c])}
-                >
-                  {copiedId === c.id ? '✓ Copied' : <><CopyIcon /> Copy</>}
-                </button>
+          ) : filteredDirectory.map((r) => (
+            <div key={r.email} className="gd-contact-row">
+              <span className="gd-contact-avatar" style={{ background: avatarGradient(r.name) }}>
+                {r.initials}
+              </span>
+              <div className="gd-contact-meta">
+                <div className="gd-contact-name">{r.name}</div>
+                <div className="gd-contact-sub">{r.email}</div>
               </div>
-            );
-          })}
+              <button
+                className={`gd-row-copy ${copiedId === r.email ? 'gd-row-copy-done' : ''}`}
+                onClick={() => handleCopy(r.email, [r])}
+              >
+                {copiedId === r.email ? '✓ Copied' : <><CopyIcon /> Copy</>}
+              </button>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -178,7 +141,7 @@ export default function PeoplePage() {
         }
         .gd-page-header p {
           font-size: 14.5px; color: #fff;
-          margin: 0; max-width: 580px; line-height: 1.5;
+          margin: 0; max-width: 600px; line-height: 1.5;
           font-weight: 500;
           text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
         }
@@ -189,7 +152,7 @@ export default function PeoplePage() {
           color: #1a1a1f; margin: 0; letter-spacing: -0.015em;
         }
 
-        /* Lists section */
+        /* Campaigns section */
         .gd-lists-section { display: flex; flex-direction: column; gap: 14px; }
         .gd-lists-head {
           display: flex; justify-content: space-between; align-items: baseline;
@@ -208,7 +171,6 @@ export default function PeoplePage() {
         }
         .gd-add-link:hover { background: #fff; }
 
-        /* Add card (collapsible) */
         .gd-add-card {
           background: #fff;
           border: 1px solid rgba(15, 15, 25, 0.06);
@@ -241,16 +203,16 @@ export default function PeoplePage() {
           font-size: 13px; font-weight: 600;
         }
 
-        /* Lists grid */
         .gd-lists-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
           gap: 12px;
         }
 
         /* Directory */
         .gd-directory { display: flex; flex-direction: column; gap: 12px; }
         .gd-directory-head { padding: 0 4px; }
+        .gd-directory-sub { font-size: 12.5px; color: #43434b; margin: 4px 0 0; }
 
         .gd-search input {
           width: 100%; box-sizing: border-box;
@@ -272,7 +234,7 @@ export default function PeoplePage() {
         }
         .gd-contact-row {
           display: grid;
-          grid-template-columns: 44px 1fr auto auto;
+          grid-template-columns: 44px 1fr auto;
           align-items: center;
           gap: 14px;
           padding: 13px 18px;
@@ -291,10 +253,6 @@ export default function PeoplePage() {
         .gd-contact-sub {
           font-size: 12.5px; color: #43434b; margin-top: 2px;
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .gd-contact-tag {
-          font-size: 11px; font-weight: 600;
-          padding: 3px 9px; border-radius: 999px;
         }
         .gd-row-copy {
           all: unset; cursor: pointer;
@@ -315,43 +273,30 @@ export default function PeoplePage() {
         .gd-row-copy :global(svg) { width: 13px; height: 13px; }
 
         .gd-empty { padding: 40px; text-align: center; color: #5a5a62; font-size: 14px; }
-
-        @media (max-width: 640px) {
-          .gd-contact-row {
-            grid-template-columns: 44px 1fr auto;
-            grid-template-areas: 'avatar meta copy' 'avatar tag tag';
-            row-gap: 6px;
-          }
-          .gd-contact-row > :nth-child(1) { grid-area: avatar; }
-          .gd-contact-meta { grid-area: meta; }
-          .gd-contact-tag { grid-area: tag; justify-self: start; }
-          .gd-row-copy { grid-area: copy; }
-        }
       `}</style>
     </div>
   );
 }
 
-/* ─── List card ─── */
+/* ─── Campaign card (one per past order, plus Everyone) ─── */
 
-function ListCard({
-  id, label, sublabel, contacts, tagColor, primary, copied, onCopy,
+function CampaignCard({
+  id, label, sublabel, recipients, primary, copied, onCopy,
 }: {
   id: string;
   label: string;
   sublabel: string;
-  contacts: Contact[];
-  tagColor?: { bg: string; fg: string; ring: string };
+  recipients: Recipient[];
   primary?: boolean;
   copied: boolean;
   onCopy: () => void;
 }) {
-  const previewCount = Math.min(4, contacts.length);
-  const remainder = contacts.length - previewCount;
+  const previewCount = Math.min(4, recipients.length);
+  const remainder = recipients.length - previewCount;
   return (
     <div style={{
       background: '#fff',
-      border: '1px solid rgba(15, 15, 25, 0.06)',
+      border: `1px solid ${primary ? 'rgba(124, 92, 255, 0.35)' : 'rgba(15, 15, 25, 0.06)'}`,
       borderRadius: 14,
       padding: '16px 18px',
       display: 'flex',
@@ -360,35 +305,37 @@ function ListCard({
       boxShadow: primary
         ? '0 10px 28px -10px rgba(124, 92, 255, 0.35)'
         : '0 6px 18px -10px rgba(20, 14, 50, 0.18)',
-      ...(primary ? { borderColor: 'rgba(124, 92, 255, 0.35)' } : null),
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <div style={{
-            fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
-            color: tagColor?.fg ?? '#5C3FE0', marginBottom: 4,
-          }}>
-            {label}
-          </div>
-          <div style={{ fontSize: 13, color: '#5a5a62' }}>{sublabel}</div>
+      <div>
+        <div style={{
+          fontFamily: '"Georgia", "Times New Roman", serif',
+          fontSize: 16,
+          fontWeight: 500,
+          fontStyle: 'italic',
+          color: '#1a1a1f',
+          letterSpacing: '-0.01em',
+          marginBottom: 3,
+        }}>
+          {label}
         </div>
+        <div style={{ fontSize: 12.5, color: '#5a5a62' }}>{sublabel}</div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        {contacts.slice(0, previewCount).map((c, i) => (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minHeight: 28 }}>
+        {recipients.slice(0, previewCount).map((r, i) => (
           <span
-            key={c.id}
-            title={c.name}
+            key={r.email + i}
+            title={r.name}
             style={{
               width: 28, height: 28, borderRadius: '50%',
-              background: avatarGradient(c.name),
+              background: avatarGradient(r.name),
               color: '#fff', fontSize: 10.5, fontWeight: 600,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               border: '2px solid #fff',
               marginLeft: i === 0 ? 0 : -8,
               zIndex: previewCount - i,
             }}
-          >{initialsOf(c.name)}</span>
+          >{r.initials}</span>
         ))}
         {remainder > 0 && (
           <span style={{
@@ -415,13 +362,11 @@ function ListCard({
         onMouseEnter={(e) => { if (!copied) (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'none'; }}
       >
-        {copied ? '✓ Copied to clipboard' : <><CopyIcon /> Copy {contacts.length} {contacts.length === 1 ? 'person' : 'people'}</>}
+        {copied ? '✓ Copied to clipboard' : <><CopyIcon /> Copy {recipients.length} {recipients.length === 1 ? 'person' : 'people'}</>}
       </button>
     </div>
   );
 }
-
-/* ─── Icon ─── */
 
 function CopyIcon() {
   return (

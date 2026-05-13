@@ -15,10 +15,23 @@ export const STATS = {
 };
 
 export function avatarGradient(seed: string): string {
-  const code = seed.charCodeAt(0) || 100;
-  const h1 = (code * 7) % 360;
-  const h2 = (h1 + 42) % 360;
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0;
+  h = Math.abs(h);
+  const h1 = h % 360;
+  const h2 = (h1 + 38 + (h % 30)) % 360;
   return `linear-gradient(135deg, hsl(${h1}, 70%, 58%), hsl(${h2}, 70%, 48%))`;
+}
+
+/* All distinct recipients across all past orders, keyed by email. */
+export function getAllPeople(): Recipient[] {
+  const seen = new Map<string, Recipient>();
+  for (const order of ORDERS) {
+    for (const r of getRecipients(order)) {
+      if (!seen.has(r.email)) seen.set(r.email, r);
+    }
+  }
+  return Array.from(seen.values());
 }
 
 export type GifterOrderStatus = 'Sent' | 'Scheduled' | 'Draft' | 'Completed';
