@@ -50,7 +50,11 @@ export default function Help() {
           letter-spacing: -0.02em; margin: 0 0 4px;
           color: #fff;
         }
-        .gd-page-header p { font-size: 14.5px; color: rgba(255, 255, 255, 0.85); margin: 0; }
+        .gd-page-header p {
+          font-size: 14.5px; color: #fff;
+          margin: 0; font-weight: 500;
+          text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
+        }
 
         .gd-faq {
           background: #fff;

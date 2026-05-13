@@ -1,10 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { BRAND, BRAND_DARK, GIFTER, STATS, ORDERS, ORDER_STATUS_COLORS, getRecipients } from './data';
+import { BRAND, GIFTER, STATS, ORDERS, ORDER_STATUS_COLORS, getRecipients } from './data';
 
 const PEACH = '#FFD6C2';
-const PEACH_SOFT = 'rgba(255, 214, 194, 0.5)';
 
 export default function GifterHome() {
   return (
@@ -29,35 +28,6 @@ export default function GifterHome() {
 
         {/* Decorative gift box illustration, corner */}
         <GiftBoxIllustration />
-      </section>
-
-      {/* Primary CTA — standalone, unmissable */}
-      <Link href="/landing-preview" className="gd-primary-cta">
-        <span className="gd-primary-cta-glow" aria-hidden />
-        <span className="gd-primary-cta-icon" aria-hidden><PlusIcon /></span>
-        <span className="gd-primary-cta-text">
-          <span className="gd-primary-cta-label">Send something thoughtful</span>
-          <span className="gd-primary-cta-sub">Pick a budget. We do the rest.</span>
-        </span>
-        <span className="gd-primary-cta-arrow" aria-hidden>→</span>
-      </Link>
-
-      {/* Two secondary actions */}
-      <section className="gd-quick-grid">
-        <QuickAction
-          href="/gifter-dashboard/people"
-          label="People"
-          sub="Friends & favorites"
-          icon={<PeopleIcon />}
-          accent={BRAND}
-        />
-        <QuickAction
-          href="#"
-          label="Browse gifts"
-          sub="Inspiration for what to send"
-          icon={<SparklesIcon />}
-          accent={'#E07A5F'}
-        />
       </section>
 
       {/* Recent orders */}
@@ -212,66 +182,6 @@ export default function GifterHome() {
           .gd-hero-stats { gap: 8px; }
         }
 
-        /* ─── Primary CTA — standalone, big, unmissable ─── */
-        .gd-primary-cta {
-          position: relative;
-          display: flex;
-          align-items: center;
-          gap: 18px;
-          padding: 22px 26px;
-          background-color: #15151a;
-          background-image:
-            radial-gradient(circle at 0% 100%, rgba(124, 92, 255, 0.45) 0%, transparent 40%),
-            radial-gradient(circle at 100% 0%, ${PEACH_SOFT} 0%, transparent 45%);
-          color: #fff;
-          border-radius: 16px;
-          text-decoration: none;
-          overflow: hidden;
-          transition: transform 160ms cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 160ms ease;
-          box-shadow: 0 12px 32px -12px rgba(20, 14, 50, 0.6), 0 0 0 1px rgba(20, 14, 50, 0.08);
-        }
-        .gd-primary-cta:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 18px 40px -14px rgba(20, 14, 50, 0.7), 0 0 0 1px rgba(20, 14, 50, 0.12);
-        }
-        .gd-primary-cta-glow { display: none; }
-        .gd-primary-cta-icon {
-          width: 44px; height: 44px;
-          border-radius: 14px;
-          background: linear-gradient(135deg, ${BRAND}, ${BRAND_DARK});
-          display: inline-flex; align-items: center; justify-content: center;
-          flex-shrink: 0;
-          box-shadow: 0 4px 12px -2px rgba(124, 92, 255, 0.6);
-        }
-        .gd-primary-cta-text {
-          display: flex; flex-direction: column; gap: 2px;
-          flex: 1; min-width: 0;
-        }
-        .gd-primary-cta-label {
-          font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
-        }
-        .gd-primary-cta-sub {
-          font-size: 13px; color: rgba(255, 255, 255, 0.65);
-        }
-        .gd-primary-cta-arrow {
-          font-size: 22px; color: rgba(255, 255, 255, 0.55);
-          transition: transform 160ms ease, color 160ms ease;
-          flex-shrink: 0;
-        }
-        .gd-primary-cta:hover .gd-primary-cta-arrow {
-          transform: translateX(4px);
-          color: #fff;
-        }
-
-        /* ─── Secondary actions ─── */
-        .gd-quick-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-        }
-        @media (max-width: 540px) {
-          .gd-quick-grid { grid-template-columns: 1fr; }
-        }
 
         /* ─── Section ─── */
         .gd-section { display: flex; flex-direction: column; gap: 14px; }
@@ -381,50 +291,6 @@ function StatTile({ big, sub }: { big: string; sub: string }) {
   );
 }
 
-function QuickAction({ href, label, sub, icon, accent }: {
-  href: string; label: string; sub: string; icon: React.ReactNode; accent: string;
-}) {
-  return (
-    <Link href={href} style={{
-      background: '#fff',
-      border: '1px solid #ececef',
-      borderRadius: 14,
-      padding: '16px 18px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 14,
-      textDecoration: 'none',
-      color: 'inherit',
-      transition: 'border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease',
-    }}
-      onMouseEnter={(e) => {
-        const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = '#c4c4ca';
-        el.style.transform = 'translateY(-1px)';
-        el.style.boxShadow = '0 6px 18px -8px rgba(15, 15, 25, 0.1)';
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = '#ececef';
-        el.style.transform = 'none';
-        el.style.boxShadow = 'none';
-      }}
-    >
-      <span style={{
-        width: 40, height: 40, borderRadius: 12,
-        background: `${accent}15`,
-        color: accent,
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0,
-      }}>{icon}</span>
-      <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 14.5, fontWeight: 600, letterSpacing: '-0.005em' }}>{label}</div>
-        <div style={{ fontSize: 12, color: '#8a8a93', marginTop: 2 }}>{sub}</div>
-      </div>
-    </Link>
-  );
-}
-
 /* ─── Decorative gift-box SVG, floats in hero corner ─── */
 
 function GiftBoxIllustration() {
@@ -481,33 +347,3 @@ function GiftBoxIllustration() {
   );
 }
 
-/* ─── Icons ─── */
-
-function PlusIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <line x1="12" y1="5" x2="12" y2="19" />
-      <line x1="5" y1="12" x2="19" y2="12" />
-    </svg>
-  );
-}
-
-function PeopleIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-
-function SparklesIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M12 3l2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5z" />
-      <path d="M19 3l1 2 2 1-2 1-1 2-1-2-2-1 2-1z" opacity="0.7" />
-    </svg>
-  );
-}

@@ -165,10 +165,13 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
         }
         .gd-order-back {
           display: inline-flex; align-items: center;
-          color: rgba(255,255,255,0.85); text-decoration: none;
+          color: #fff; text-decoration: none;
           font-size: 13.5px; margin-bottom: 14px;
+          font-weight: 500;
+          opacity: 0.9;
+          text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
         }
-        .gd-order-back:hover { color: #fff; }
+        .gd-order-back:hover { opacity: 1; }
         .gd-order-title {
           font-family: 'Georgia', 'Times New Roman', serif;
           font-size: 38px; font-weight: 400; font-style: italic;
@@ -176,7 +179,9 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
           color: #fff;
         }
         .gd-order-meta {
-          font-size: 14px; color: rgba(255,255,255,0.85);
+          font-size: 14px; color: #fff;
+          font-weight: 500;
+          text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
         }
 
         /* Health */

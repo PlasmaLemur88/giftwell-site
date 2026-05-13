@@ -137,13 +137,15 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
           display: flex; align-items: center; gap: 10px;
           padding: 10px 12px; border-radius: 10px;
           font-size: 14px; font-weight: 500;
-          color: rgba(255, 255, 255, 0.88); text-decoration: none;
+          color: #fff; text-decoration: none;
+          text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
           transition: background 160ms ease, color 160ms ease;
         }
-        .gd-nav-item:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
+        .gd-nav-item:hover { background: rgba(255, 255, 255, 0.18); }
         .gd-nav-item-active {
           background: rgba(255, 255, 255, 0.96);
           color: ${BRAND_DARK};
+          text-shadow: none;
           box-shadow: 0 4px 14px -6px rgba(20, 14, 50, 0.25);
         }
         .gd-nav-item-active:hover { background: #fff; color: ${BRAND_DARK}; }
