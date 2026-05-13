@@ -68,25 +68,26 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
       </nav>
 
       <style jsx global>{`
-        body { background: #fafafb; margin: 0; }
+        body { background: #F6F2FA; margin: 0; }
 
         .gd-shell {
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
           color: #1a1a1f;
           min-height: 100vh;
           background:
-            radial-gradient(ellipse 70% 35% at 15% 0%, ${BRAND_DARK} 0%, transparent 60%) no-repeat,
-            radial-gradient(ellipse 80% 40% at 85% 4%, rgba(255, 214, 194, 0.55) 0%, transparent 65%) no-repeat,
+            radial-gradient(ellipse 75% 240px at 50% 0%, rgba(255, 214, 194, 0.32) 0%, transparent 75%) no-repeat,
             linear-gradient(180deg,
-              ${BRAND} 0%,
-              #B59DEC 6%,
-              #D6C2EE 16%,
-              #EDE2F4 28%,
-              #F7F2FA 40%,
-              #fafafb 55%
+              ${BRAND_DARK} 0px,
+              ${BRAND} 60px,
+              #9B7FEC 170px,
+              #BFA6F0 290px,
+              #DCC8F0 420px,
+              #ECDFF3 540px,
+              #F2E9F6 640px,
+              #F6F2FA 760px,
+              #F6F2FA 100%
             ) no-repeat;
-          background-size: 100% 720px, 100% 720px, 100% 100%;
-          background-color: #fafafb;
+          background-color: #F6F2FA;
         }
         .gd-notice {
           background: #1a1a1f; color: #fff;

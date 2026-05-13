@@ -167,11 +167,12 @@ export default function GifterHome() {
         }
         .gd-hero-tagline {
           font-size: 15px;
-          color: rgba(255, 255, 255, 0.92);
+          color: #fff;
           margin: 0 0 28px;
-          font-weight: 400;
+          font-weight: 500;
+          text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
         }
-        .gd-hero-tagline strong { font-weight: 600; color: #fff; }
+        .gd-hero-tagline strong { font-weight: 700; color: #fff; }
         .gd-sparkle {
           display: inline-block;
           margin-left: 4px;
@@ -201,27 +202,22 @@ export default function GifterHome() {
           align-items: center;
           gap: 18px;
           padding: 22px 26px;
-          background: linear-gradient(135deg, #1a1a1f 0%, #2a2a32 100%);
+          background-color: #15151a;
+          background-image:
+            radial-gradient(circle at 0% 100%, rgba(124, 92, 255, 0.45) 0%, transparent 40%),
+            radial-gradient(circle at 100% 0%, ${PEACH_SOFT} 0%, transparent 45%);
           color: #fff;
           border-radius: 16px;
           text-decoration: none;
           overflow: hidden;
           transition: transform 160ms cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 160ms ease;
-          box-shadow: 0 8px 24px -10px rgba(20, 14, 50, 0.4);
+          box-shadow: 0 12px 32px -12px rgba(20, 14, 50, 0.6), 0 0 0 1px rgba(20, 14, 50, 0.08);
         }
         .gd-primary-cta:hover {
           transform: translateY(-2px);
-          box-shadow: 0 16px 36px -12px rgba(20, 14, 50, 0.55);
+          box-shadow: 0 18px 40px -14px rgba(20, 14, 50, 0.7), 0 0 0 1px rgba(20, 14, 50, 0.12);
         }
-        .gd-primary-cta-glow {
-          position: absolute;
-          inset: 0;
-          background:
-            radial-gradient(circle at 0% 100%, rgba(124, 92, 255, 0.45) 0%, transparent 40%),
-            radial-gradient(circle at 100% 0%, ${PEACH_SOFT} 0%, transparent 45%);
-          pointer-events: none;
-        }
-        .gd-primary-cta > * { position: relative; z-index: 1; }
+        .gd-primary-cta-glow { display: none; }
         .gd-primary-cta-icon {
           width: 44px; height: 44px;
           border-radius: 14px;
