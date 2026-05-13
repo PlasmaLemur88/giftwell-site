@@ -54,11 +54,11 @@ export const FRAMES: FrameDef[] = [
   { id: 'goals',            phase: 'Welcome',      title: 'What are you hoping to achieve?', helper: 'Select all that apply.' },
   { id: 'buyers',           phase: 'Welcome',      title: 'Do you have corporate buyers already?' },
   { id: 'volume',           phase: 'Welcome',      title: 'Expected monthly volume?' },
-  // Billing
-  { id: 'payment-method',   phase: 'Billing',      title: 'Add a payment method', helper: 'We only charge when gifts send — never up front.' },
   // Pricing
   { id: 'pricing-fee',      phase: 'Pricing',      title: 'How should the experience fee be handled?' },
   { id: 'pricing-volume',   phase: 'Pricing',      title: 'Offer volume discounts?' },
+  // Billing (after pricing decisions)
+  { id: 'payment-method',   phase: 'Billing',      title: 'Add a payment method', helper: 'We only charge when gifts send — never up front.' },
   // Catalog
   { id: 'catalog-approach', phase: 'Catalog',      title: 'How do you want gifters to choose products?' },
   { id: 'catalog-products', phase: 'Catalog',      title: 'Pick gifts from your store', helper: 'Select the products gifters can include in a gift.' },
@@ -208,16 +208,24 @@ function FrameVolume({ answers, onChange }: FrameProps) {
   );
 }
 
-function FramePaymentMethod(_: FrameProps) {
+function FramePaymentMethod({ answers }: FrameProps) {
+  const handling = answers.feeHandling ?? 'pass';
+  const volumeOn = answers.enableVolumeDiscounts ?? true;
+  const feeLine =
+    handling === 'pass'   ? '10% experience fee added at gifter’s checkout'
+  : handling === 'absorb' ? '10% experience fee deducted from your revenue'
+  :                          '5% added at checkout, 5% from your margin';
+  const summary = `${feeLine}${volumeOn ? ', with volume discounts active' : ''}.`;
+
   return (
     <BlockStack gap="500">
       <Card padding="400">
         <BlockStack gap="200">
-          <Text as="p" variant="bodyMd" fontWeight="semibold">How charging works</Text>
+          <Text as="p" variant="bodyMd" fontWeight="semibold">Based on your choices</Text>
+          <Text as="p" variant="bodySm" tone="subdued">{summary}</Text>
           <Text as="p" variant="bodySm" tone="subdued">
-            We charge a 10% experience fee per gift sent. Volume discounts apply to larger
-            orders. Your card is only charged when gifts go out — never up front. Product
-            costs are still billed through your Shopify checkout.
+            Your card is only charged when gifts go out — never up front. Product costs are
+            still billed through your Shopify checkout.
           </Text>
         </BlockStack>
       </Card>
