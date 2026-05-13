@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import {
   BlockStack,
   InlineStack,
@@ -20,44 +21,7 @@ import {
   ChevronDownIcon,
   PackageIcon,
 } from '@shopify/polaris-icons';
-
-type Status = 'Completed' | 'Shipped' | 'Pending' | 'Cancelled';
-
-type Order = {
-  id: string;
-  sender: string;
-  email: string;
-  orderDate: string;
-  targetShipping: string;
-  amount: string;
-  amountNum: number;
-  recipients: number;
-  status: Status;
-};
-
-const ORDERS: Order[] = [
-  { id: '33931', sender: 'Tom Reyes',        email: 'tom@summitcg.co',     orderDate: 'Apr 03, 2026', targetShipping: 'Apr 04, 2026', amount: '$343.90',   amountNum: 343.90,  recipients: 1,  status: 'Completed' },
-  { id: '33912', sender: 'Sarah Chen',       email: 'sarah@halcyon.io',    orderDate: 'Apr 02, 2026', targetShipping: 'Apr 04, 2026', amount: '$684.50',   amountNum: 684.50,  recipients: 2,  status: 'Shipped'   },
-  { id: '32933', sender: 'Riley Lopez',      email: 'riley@northforge.co', orderDate: 'Mar 22, 2026', targetShipping: 'Mar 23, 2026', amount: '$453.90',   amountNum: 453.90,  recipients: 1,  status: 'Completed' },
-  { id: '32826', sender: 'Robert Schox',     email: 'rs@parallelpath.com', orderDate: 'Mar 20, 2026', targetShipping: 'Mar 21, 2026', amount: '$1,827.03', amountNum: 1827.03, recipients: 3,  status: 'Completed' },
-  { id: '32702', sender: 'Marcus Liu',       email: 'marcus@truebay.co',   orderDate: 'Mar 18, 2026', targetShipping: 'Mar 24, 2026', amount: '$1,212.40', amountNum: 1212.40, recipients: 4,  status: 'Pending'   },
-  { id: '32445', sender: 'Priya Patel',      email: 'priya@orbitlabs.io',  orderDate: 'Mar 14, 2026', targetShipping: 'Mar 18, 2026', amount: '$5,840.00', amountNum: 5840.00, recipients: 12, status: 'Completed' },
-  { id: '32102', sender: 'Jordan Park',      email: 'jp@flintstudio.co',   orderDate: 'Mar 09, 2026', targetShipping: 'Mar 10, 2026', amount: '$135.50',   amountNum: 135.50,  recipients: 1,  status: 'Cancelled' },
-  { id: '31872', sender: 'Alex Kim',         email: 'alex@brightway.so',   orderDate: 'Mar 05, 2026', targetShipping: 'Mar 06, 2026', amount: '$894.20',   amountNum: 894.20,  recipients: 2,  status: 'Completed' },
-  { id: '31077', sender: 'Haipeng Wei',      email: 'haipeng@arclite.co',  orderDate: 'Feb 23, 2026', targetShipping: 'Feb 24, 2026', amount: '$294.40',   amountNum: 294.40,  recipients: 1,  status: 'Completed' },
-  { id: '30822', sender: 'Lauren Mitchell',  email: 'lm@everbloom.shop',   orderDate: 'Feb 18, 2026', targetShipping: 'Feb 19, 2026', amount: '$2,418.60', amountNum: 2418.60, recipients: 6,  status: 'Completed' },
-  { id: '30501', sender: 'Diego Vargas',     email: 'diego@meridian.co',   orderDate: 'Feb 12, 2026', targetShipping: 'Feb 13, 2026', amount: '$748.90',   amountNum: 748.90,  recipients: 2,  status: 'Shipped'   },
-  { id: '28789', sender: 'Daniel Seminara',  email: 'daniel@seminara.io',  orderDate: 'Jan 27, 2026', targetShipping: 'Jan 28, 2026', amount: '$312.06',   amountNum: 312.06,  recipients: 1,  status: 'Completed' },
-];
-
-const FILTERS: ('All' | Status)[] = ['All', 'Pending', 'Shipped', 'Completed', 'Cancelled'];
-
-const STATUS_TONE: Record<Status, 'success' | 'info' | 'attention' | 'critical'> = {
-  Completed: 'success',
-  Shipped:   'info',
-  Pending:   'attention',
-  Cancelled: 'critical',
-};
+import { ORDERS, FILTERS, STATUS_TONE, type Order } from './data';
 
 type SortKey = 'date' | 'amount' | 'status' | null;
 type SortDir = 'asc' | 'desc';
@@ -330,9 +294,9 @@ function OrdersTable({
           {orders.map((o) => (
             <tr key={o.id} className="orders-row">
               <td style={TD}>
-                <a href={`#${o.id}`} style={{ color: '#111', textDecoration: 'none', fontWeight: 500 }}>
+                <Link href={`/admin-preview/orders/${o.id}`} style={{ color: '#5c4dff', textDecoration: 'none', fontWeight: 500 }}>
                   #{o.id}
-                </a>
+                </Link>
               </td>
               <td style={TD}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -354,11 +318,10 @@ function OrdersTable({
                 </Badge>
               </td>
               <td style={{ ...TD, textAlign: 'right' }}>
-                <button
-                  type="button"
+                <Link
+                  href={`/admin-preview/orders/${o.id}`}
                   aria-label={`View order ${o.id}`}
                   style={{
-                    all: 'unset',
                     cursor: 'pointer',
                     width: 28,
                     height: 28,
@@ -371,7 +334,7 @@ function OrdersTable({
                   }}
                 >
                   <ViewIcon width={16} height={16} />
-                </button>
+                </Link>
               </td>
             </tr>
           ))}
