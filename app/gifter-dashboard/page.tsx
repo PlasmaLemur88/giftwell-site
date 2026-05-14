@@ -64,7 +64,6 @@ export default function GifterHome() {
               ? getRecipients(o).slice(0, 5)
               : [];
             const allClaimed = pct === 100 && previewRecipients.length > 0;
-            const ribbonColor = allClaimed ? '#D4A640' : (tone.fg);
             return (
               <Link
                 key={o.id}
@@ -74,7 +73,7 @@ export default function GifterHome() {
                   background: '#fff',
                   border: '1px solid rgba(15, 15, 25, 0.06)',
                   borderRadius: 16,
-                  padding: '20px 22px 20px 24px',
+                  padding: '20px 22px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 14,
@@ -88,14 +87,6 @@ export default function GifterHome() {
                   transition: 'border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease',
                 }}
               >
-                {/* Status ribbon on the left edge */}
-                <span style={{
-                  position: 'absolute', left: 0, top: 0, bottom: 0,
-                  width: 4,
-                  background: ribbonColor,
-                  opacity: 0.85,
-                }} aria-hidden />
-
                 <div className="gd-order-card-top">
                   <div>
                     <div className="gd-order-name">{o.name}</div>

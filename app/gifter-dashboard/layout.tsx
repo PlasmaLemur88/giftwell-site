@@ -39,17 +39,16 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
               <SidebarLink key={item.href} {...item} />
             ))}
           </nav>
-          <div className="gd-sidebar-foot-wrap">
-            <Link href="/gifter-dashboard/account" className="gd-sidebar-foot">
-              <div className="gd-avatar">{GIFTER.fullName.split(' ').map((n) => n[0]).join('')}</div>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div className="gd-user-name">{GIFTER.fullName}</div>
-                <div className="gd-user-company">{GIFTER.company}</div>
-              </div>
-              <span aria-hidden style={{ color: '#8a8a93', fontSize: 16 }}>›</span>
-            </Link>
-          </div>
         </aside>
+
+        {/* Top-right profile (desktop only) */}
+        <Link href="/gifter-dashboard/account" className="gd-profile-tr" aria-label="Account">
+          <div className="gd-profile-tr-meta">
+            <div className="gd-profile-tr-name">{GIFTER.fullName}</div>
+            <div className="gd-profile-tr-company">{GIFTER.company}</div>
+          </div>
+          <div className="gd-avatar">{GIFTER.fullName.split(' ').map((n) => n[0]).join('')}</div>
+        </Link>
 
         {/* Main content */}
         <main className="gd-main">
@@ -171,19 +170,6 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
         .gd-nav-item-active:hover { background: var(--gd-nav-pill-bg); color: var(--gd-nav-pill-text); }
         .gd-nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
 
-        .gd-sidebar-foot {
-          display: flex; align-items: center; gap: 10px;
-          padding: 10px 12px;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.65);
-          border-radius: 12px;
-          box-shadow: 0 4px 18px -6px rgba(20, 14, 50, 0.12);
-          text-decoration: none; color: inherit;
-          transition: background 120ms ease, transform 120ms ease;
-        }
-        .gd-sidebar-foot:hover { background: rgba(255, 255, 255, 0.95); transform: translateY(-1px); }
         .gd-avatar-sm { text-decoration: none; }
         .gd-avatar {
           width: 34px; height: 34px;
@@ -194,13 +180,36 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
           letter-spacing: -0.005em;
         }
         .gd-avatar-sm { width: 28px; height: 28px; font-size: 11.5px; }
-        .gd-user-name {
-          font-size: 13.5px; font-weight: 600;
-          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+
+        /* Top-right profile pill (desktop) */
+        .gd-profile-tr {
+          position: fixed;
+          top: 46px; right: 28px;
+          display: inline-flex; align-items: center; gap: 10px;
+          padding: 6px 8px 6px 14px;
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.65);
+          border-radius: 999px;
+          box-shadow: 0 4px 18px -6px rgba(20, 14, 50, 0.18);
+          text-decoration: none; color: inherit;
+          z-index: 55;
+          transition: background 120ms ease, transform 120ms ease, box-shadow 120ms ease;
         }
-        .gd-user-company {
-          font-size: 12px; color: #8a8a93;
-          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        .gd-profile-tr:hover {
+          background: rgba(255, 255, 255, 0.95);
+          transform: translateY(-1px);
+          box-shadow: 0 8px 22px -8px rgba(20, 14, 50, 0.22);
+        }
+        .gd-profile-tr-meta { text-align: right; min-width: 0; }
+        .gd-profile-tr-name {
+          font-size: 13px; font-weight: 600; color: #1a1a1f;
+          white-space: nowrap;
+        }
+        .gd-profile-tr-company {
+          font-size: 11.5px; color: #6b6b73;
+          white-space: nowrap; margin-top: 1px;
         }
 
         /* ─── Main content ─── */
@@ -216,6 +225,7 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
         @media (max-width: 900px) {
           .gd-grid { grid-template-columns: 1fr; }
           .gd-sidebar { display: none; }
+          .gd-profile-tr { display: none; }
           .gd-main { padding: 12px 16px 80px; }
           .gd-mobile-header {
             display: flex;
