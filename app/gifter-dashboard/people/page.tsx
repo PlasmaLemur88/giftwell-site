@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { BRAND, avatarGradient, ORDERS, getRecipients, getAllPeople, type Recipient } from '../data';
-import { LiquidGlassCard } from '@/components/ui/liquid-weather-glass';
+import { GlassButton } from '@/components/ui/apple-tahoe-liquid-glass-button';
 
 function formatForCopy(recipients: Recipient[]): string {
   return recipients.map((r) => `${r.name} <${r.email}>`).join('\n');
@@ -295,19 +295,17 @@ function CampaignCard({
   const previewCount = Math.min(4, recipients.length);
   const remainder = recipients.length - previewCount;
   return (
-    <LiquidGlassCard
-      draggable={false}
-      blurIntensity="xl"
-      shadowIntensity={primary ? "lg" : "sm"}
-      glowIntensity={primary ? "md" : "xs"}
-      borderRadius="14px"
-      className={primary ? "bg-white/35" : "bg-white/55"}
-    >
     <div style={{
+      background: '#fff',
+      border: `1px solid ${primary ? 'rgba(124, 92, 255, 0.35)' : 'rgba(15, 15, 25, 0.06)'}`,
+      borderRadius: 14,
       padding: '16px 18px',
       display: 'flex',
       flexDirection: 'column',
       gap: 12,
+      boxShadow: primary
+        ? '0 10px 28px -10px rgba(124, 92, 255, 0.35)'
+        : '0 6px 18px -10px rgba(20, 14, 50, 0.18)',
     }}>
       <div>
         <div style={{
@@ -351,24 +349,17 @@ function CampaignCard({
         )}
       </div>
 
-      <button
+      <GlassButton
+        size="sm"
         onClick={onCopy}
-        style={{
-          all: 'unset', cursor: 'pointer',
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-          padding: '10px 14px', borderRadius: 10,
-          background: copied ? '#1F8A4C' : (primary ? BRAND : '#15151a'),
-          color: '#fff',
-          fontSize: 13, fontWeight: 600,
-          transition: 'background 160ms ease, transform 120ms ease',
-        }}
-        onMouseEnter={(e) => { if (!copied) (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
-        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'none'; }}
+        glassColor={copied
+          ? 'rgba(31, 138, 76, 0.95)'
+          : (primary ? 'rgba(124, 92, 255, 0.85)' : 'rgba(21, 21, 26, 0.9)')}
+        className="w-full !text-white"
       >
         {copied ? '✓ Copied to clipboard' : <><CopyIcon /> Copy {recipients.length} {recipients.length === 1 ? 'person' : 'people'}</>}
-      </button>
+      </GlassButton>
     </div>
-    </LiquidGlassCard>
   );
 }
 

@@ -313,3 +313,29 @@ body {
   color: var(--gw-gray-900);
   border-bottom-left-radius: 4px;
 }
+
+/* ── Aurora background (gifter dashboard) ── */
+
+:root {
+  --white: #ffffff;
+  --black: #000000;
+  --transparent: transparent;
+  /* Brand-tinted aurora palette (purple-violet-peach) */
+  --aurora-1: #5C3FE0;
+  --aurora-2: #7C5CFF;
+  --aurora-3: #A78BFA;
+  --aurora-4: #C5ADF5;
+  --aurora-5: #FFD6C2;
+  /* shadcn-style foreground/background tokens used by GlassButton */
+  --foreground: oklch(0.145 0 0);
+  --background: oklch(1 0 0);
+}
+
+@keyframes aurora {
+  from { background-position: 50% 50%, 50% 50%; }
+  to   { background-position: 350% 50%, 350% 50%; }
+}
+
+@theme {
+  --animate-aurora: aurora 60s linear infinite;
+}
