@@ -26,7 +26,10 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
         {/* Desktop sidebar */}
         <aside className="gd-sidebar">
           <Link href="/gifter-dashboard" className="gd-sidebar-logo">
-            <span className="gd-mark" aria-hidden>✦</span>
+            <span className="gd-mark" aria-hidden>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/g-black-bold.png" alt="" />
+            </span>
             <span className="gd-wordmark">Giftwell</span>
           </Link>
           <nav className="gd-sidebar-nav">
@@ -55,7 +58,10 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
           <div className="gd-main-inner">
             <header className="gd-mobile-header">
               <Link href="/gifter-dashboard" className="gd-sidebar-logo" style={{ padding: 0 }}>
-                <span className="gd-mark" aria-hidden>✦</span>
+                <span className="gd-mark" aria-hidden>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/g-black-bold.png" alt="" />
+                </span>
                 <span className="gd-wordmark">Giftwell</span>
               </Link>
               <Link href="/gifter-dashboard/account" className="gd-avatar gd-avatar-sm" aria-label="Account">
@@ -153,17 +159,19 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
           text-decoration: none; color: var(--gd-ink);
         }
         .gd-mark {
-          width: 32px; height: 32px;
+          width: 34px; height: 34px;
           border-radius: 10px;
           background: var(--gd-lime);
           border: var(--gd-border);
           box-shadow: var(--gd-sticker-sm);
           display: inline-flex; align-items: center; justify-content: center;
-          font-family: var(--gd-display);
-          font-style: italic;
-          font-size: 18px;
-          color: var(--gd-ink);
           transform: rotate(-4deg);
+          flex-shrink: 0;
+        }
+        .gd-mark img {
+          width: 20px; height: 20px;
+          object-fit: contain;
+          display: block;
         }
         .gd-wordmark {
           font-family: var(--gd-display);
