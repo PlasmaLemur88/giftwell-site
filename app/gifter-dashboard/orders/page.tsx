@@ -1,93 +1,162 @@
 'use client';
 
 import Link from 'next/link';
-import { BRAND, ORDERS, ORDER_STATUS_COLORS } from '../data';
+import { ORDERS } from '../data';
 
-const CARD_STYLE: React.CSSProperties = {
-  background: '#fff',
-  border: '1px solid rgba(15, 15, 25, 0.06)',
-  borderRadius: 14,
-  padding: '16px 20px',
-  display: 'grid',
-  gridTemplateColumns: '1fr 200px auto 16px',
-  alignItems: 'center',
-  gap: 16,
-  textDecoration: 'none',
-  color: 'inherit',
-  boxShadow: '0 4px 14px -8px rgba(20, 14, 50, 0.15)',
-  transition: 'border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease',
-};
+const ROW_TINTS = ['var(--gd-paper)', 'var(--gd-peach)', 'var(--gd-sky)', 'var(--gd-pink-soft)'];
 
 export default function GifterOrders() {
   return (
     <div className="gd-orders-page">
       <header className="gd-page-header">
-        <h1>Orders</h1>
-        <p>All gift orders you've placed.</p>
+        <span className="gd-eyebrow">All orders</span>
+        <h1>
+          Every <em>gift</em> you&rsquo;ve sent.
+        </h1>
       </header>
 
       <div className="gd-orders-list">
-        {ORDERS.map((o) => {
+        {ORDERS.map((o, idx) => {
           const claimedTotal = o.claimed + o.delivered;
           const pct = o.recipients > 0 ? Math.round((claimedTotal / o.recipients) * 100) : 0;
-          const tone = ORDER_STATUS_COLORS[o.status];
           return (
             <Link
               key={o.id}
               href={`/gifter-dashboard/orders/${o.id}`}
-              style={CARD_STYLE}
               className="gd-order-row"
+              style={{ background: ROW_TINTS[idx % ROW_TINTS.length] }}
             >
-              <div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1f' }}>{o.name}</div>
-                <div style={{ fontSize: 13, color: '#43434b', marginTop: 3 }}>
+              <div className="gd-row-main">
+                <div className="gd-row-name">{o.name}</div>
+                <div className="gd-row-sub">
                   {o.recipients} recipients · {o.budgetPerRecipient}/person
                 </div>
               </div>
-              <div>
+
+              <div className="gd-row-progress">
                 {(o.status === 'Sent' || o.status === 'Completed') && (
                   <>
-                    <div style={{ fontSize: 12, color: '#43434b', marginBottom: 5, fontWeight: 500 }}>
-                      {pct}% claimed
-                    </div>
-                    <div style={{ height: 4, borderRadius: 999, background: '#f0f0f2', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${pct}%`, background: '#1F8A4C' }} />
+                    <div className="gd-row-pct"><strong>{pct}%</strong> claimed</div>
+                    <div className="gd-row-bar">
+                      <div className="gd-row-bar-fill" style={{ width: `${pct}%` }} />
                     </div>
                   </>
                 )}
               </div>
-              <span style={{
-                fontSize: 11.5, fontWeight: 600,
-                padding: '3px 9px', borderRadius: 999,
-                background: tone.bg, color: tone.fg, whiteSpace: 'nowrap',
-              }}>
-                {o.status}
-              </span>
-              <span style={{ color: '#c4c4ca', fontSize: 22 }} aria-hidden>›</span>
+
+              <span className="gd-row-status">{o.status}</span>
+              <span className="gd-row-arrow" aria-hidden>→</span>
             </Link>
           );
         })}
       </div>
 
       <style jsx>{`
-        .gd-orders-page { display: flex; flex-direction: column; gap: 20px; }
-        .gd-page-header { padding: 4px 8px 8px; color: var(--gd-text); }
+        .gd-orders-page { display: flex; flex-direction: column; gap: 28px; }
+
+        .gd-page-header { padding: 8px 4px 4px; }
+        .gd-eyebrow {
+          display: inline-flex; align-items: center;
+          font-size: 11.5px; font-weight: 700;
+          color: var(--gd-ink); text-transform: uppercase;
+          letter-spacing: 0.14em;
+          background: var(--gd-lime);
+          border: var(--gd-border);
+          padding: 5px 12px;
+          border-radius: 999px;
+          box-shadow: var(--gd-sticker-sm);
+          margin-bottom: 18px;
+        }
         .gd-page-header h1 {
-          font-family: 'Georgia', 'Times New Roman', serif;
-          font-size: 38px; font-weight: 400; font-style: italic;
-          letter-spacing: -0.02em; margin: 0 0 4px;
-          color: var(--gd-text);
+          font-family: var(--gd-display);
+          font-size: clamp(36px, 5.5vw, 52px);
+          font-weight: 500;
+          letter-spacing: -0.025em;
+          line-height: 1.02;
+          margin: 0;
+          color: var(--gd-ink);
         }
-        .gd-page-header p {
-          font-size: 14.5px; color: var(--gd-text);
-          margin: 0; font-weight: 500;
-          text-shadow: var(--gd-text-shadow);
+        .gd-page-header h1 em {
+          font-style: italic; color: var(--gd-pink);
         }
-        .gd-orders-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .gd-orders-list {
+          display: flex; flex-direction: column;
+          gap: 18px;
+          padding: 4px 6px 16px;
+        }
+        :global(.gd-order-row) {
+          display: grid;
+          grid-template-columns: 1fr 200px auto 20px;
+          align-items: center;
+          gap: 18px;
+          padding: 18px 22px;
+          border: var(--gd-border);
+          border-radius: var(--gd-radius-lg);
+          box-shadow: var(--gd-sticker);
+          text-decoration: none;
+          color: var(--gd-ink);
+          transition: transform 160ms ease, box-shadow 160ms ease;
+        }
         :global(.gd-order-row:hover) {
-          border-color: rgba(15, 15, 25, 0.18) !important;
-          transform: translateY(-1px);
-          box-shadow: 0 10px 24px -10px rgba(20, 14, 50, 0.25) !important;
+          transform: translate(-3px, -3px);
+          box-shadow: 7px 7px 0 var(--gd-ink);
+        }
+        .gd-row-main { min-width: 0; }
+        .gd-row-name {
+          font-family: var(--gd-display);
+          font-size: 20px; font-weight: 500; font-style: italic;
+          letter-spacing: -0.015em;
+          color: var(--gd-ink);
+        }
+        .gd-row-sub {
+          font-size: 13px; color: var(--gd-ink-soft);
+          margin-top: 4px; font-weight: 500;
+        }
+        .gd-row-progress { min-width: 0; }
+        .gd-row-pct {
+          font-family: var(--gd-display);
+          font-size: 14px; font-style: italic;
+          color: var(--gd-ink); margin-bottom: 6px;
+        }
+        .gd-row-pct strong { font-weight: 600; color: var(--gd-pink); }
+        .gd-row-bar {
+          height: 8px;
+          border: 1.5px solid var(--gd-ink);
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.5);
+          overflow: hidden;
+        }
+        .gd-row-bar-fill {
+          height: 100%;
+          background: var(--gd-lime);
+          border-right: 1.5px solid var(--gd-ink);
+        }
+        .gd-row-status {
+          font-size: 11px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.08em;
+          padding: 5px 11px; border-radius: 999px;
+          background: var(--gd-ink); color: var(--gd-cream);
+          white-space: nowrap;
+        }
+        .gd-row-arrow {
+          font-family: var(--gd-display);
+          font-size: 22px; font-style: italic;
+          color: var(--gd-ink); font-weight: 500;
+        }
+
+        @media (max-width: 720px) {
+          :global(.gd-order-row) {
+            grid-template-columns: 1fr auto;
+            grid-template-areas:
+              "name status"
+              "progress progress";
+            gap: 12px 14px;
+          }
+          .gd-row-main { grid-area: name; }
+          .gd-row-progress { grid-area: progress; }
+          .gd-row-status { grid-area: status; }
+          .gd-row-arrow { display: none; }
         }
       `}</style>
     </div>

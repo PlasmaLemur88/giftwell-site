@@ -2,15 +2,22 @@
 
 import { use, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { BRAND, BRAND_DARK, ORDERS, getRecipients, STATUS_COLORS, avatarGradient, type RecipientStatus } from '../../data';
+import { ORDERS, getRecipients, avatarGradient, type RecipientStatus } from '../../data';
 
 const FILTERS: ('All' | RecipientStatus)[] = ['All', 'Claimed', 'Delivered', 'Pending', 'Bounced'];
 
 const SEGMENT_COLORS: Record<RecipientStatus, string> = {
-  Claimed:   '#1F8A4C',
-  Delivered: '#3A6EE0',
-  Pending:   '#E0A23E',
-  Bounced:   '#E04F4F',
+  Claimed:   'var(--gd-lime)',
+  Delivered: 'var(--gd-sky)',
+  Pending:   'var(--gd-peach)',
+  Bounced:   'var(--gd-pink-soft)',
+};
+
+const STATUS_PILL_BG: Record<RecipientStatus, string> = {
+  Claimed:   'var(--gd-lime)',
+  Delivered: 'var(--gd-sky)',
+  Pending:   'var(--gd-peach)',
+  Bounced:   'var(--gd-pink-soft)',
 };
 
 export default function GifterOrderDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -22,9 +29,9 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
   if (!order) {
     return (
       <div style={{ padding: 24 }}>
-        <Link href="/gifter-dashboard/orders" style={{ color: BRAND, textDecoration: 'none' }}>← Back to orders</Link>
-        <h1 style={{ marginTop: 16 }}>Order not found</h1>
-        <p style={{ color: '#8a8a93' }}>No order matches #{id}.</p>
+        <Link href="/gifter-dashboard/orders" style={{ color: 'var(--gd-pink)', textDecoration: 'none', fontWeight: 600 }}>← back to orders</Link>
+        <h1 style={{ marginTop: 16, fontFamily: 'var(--gd-display)', fontStyle: 'italic' }}>Order not found</h1>
+        <p style={{ color: 'var(--gd-ink-muted)' }}>No order matches #{id}.</p>
       </div>
     );
   }
@@ -50,16 +57,18 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
 
   return (
     <div className="gd-order">
-      {/* Hero */}
       <section className="gd-order-hero">
-        <Link href="/gifter-dashboard" className="gd-order-back">← Back</Link>
+        <Link href="/gifter-dashboard/orders" className="gd-order-back">
+          <span aria-hidden>←</span> back to orders
+        </Link>
         <h1 className="gd-order-title">{order.name}</h1>
         <div className="gd-order-meta">
-          {order.recipients} recipients · {order.budgetPerRecipient}/person · {order.status}
+          <span className="gd-meta-chip">{order.recipients} recipients</span>
+          <span className="gd-meta-chip">{order.budgetPerRecipient}/person</span>
+          <span className="gd-meta-chip gd-meta-chip-pink">{order.status}</span>
         </div>
       </section>
 
-      {/* Aggregate health bar */}
       <section className="gd-health">
         <div className="gd-health-bar">
           {(['Claimed', 'Delivered', 'Pending', 'Bounced'] as RecipientStatus[]).map((status) => {
@@ -72,6 +81,7 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
                   width: `${pct}%`,
                   background: SEGMENT_COLORS[status],
                   height: '100%',
+                  borderRight: '1.5px solid var(--gd-ink)',
                 }}
                 title={`${status}: ${counts[status]}`}
               />
@@ -89,7 +99,6 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
         </div>
       </section>
 
-      {/* Filter chips */}
       <div className="gd-filters">
         {FILTERS.map((f) => (
           <button
@@ -103,10 +112,9 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
         ))}
       </div>
 
-      {/* Search */}
       <div className="gd-search">
         <span className="gd-search-icon" aria-hidden>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
@@ -119,15 +127,11 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
         />
       </div>
 
-      {/* Recipient list */}
       <div className="gd-recipients">
         {filtered.length === 0 ? (
-          <div className="gd-empty">
-            No recipients match.
-          </div>
+          <div className="gd-empty">No recipients match.</div>
         ) : (
           filtered.map((r) => {
-            const tone = STATUS_COLORS[r.status];
             const isStuck = r.status === 'Pending';
             return (
               <div key={r.id} className="gd-recipient-row">
@@ -138,11 +142,11 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
                   <div className="gd-recipient-name">{r.name}</div>
                   <div className="gd-recipient-email">{r.email}</div>
                   {r.picked && (
-                    <div className="gd-recipient-picked">Picked: {r.picked}{r.tracking ? ` · ${r.tracking}` : ''}</div>
+                    <div className="gd-recipient-picked">picked: {r.picked}{r.tracking ? ` · ${r.tracking}` : ''}</div>
                   )}
                 </div>
                 <div className="gd-recipient-right">
-                  <span className="gd-recipient-status" style={{ background: tone.bg, color: tone.fg }}>
+                  <span className="gd-recipient-status" style={{ background: STATUS_PILL_BG[r.status] }}>
                     {r.status}
                   </span>
                   {isStuck && (
@@ -156,164 +160,200 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
       </div>
 
       <style jsx>{`
-        .gd-order { display: flex; flex-direction: column; gap: 18px; }
+        .gd-order { display: flex; flex-direction: column; gap: 22px; }
 
-        /* Hero — sits on the body atmosphere, no card */
-        .gd-order-hero {
-          color: var(--gd-text);
-          padding: 4px 8px 12px;
-        }
+        .gd-order-hero { padding: 8px 4px 4px; }
         .gd-order-back {
-          display: inline-flex; align-items: center;
-          color: var(--gd-text); text-decoration: none;
-          font-size: 13.5px; margin-bottom: 14px;
-          font-weight: 500;
-          opacity: 0.9;
-          text-shadow: var(--gd-text-shadow);
+          display: inline-flex; align-items: center; gap: 6px;
+          color: var(--gd-ink); text-decoration: none;
+          font-size: 12px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.12em;
+          background: var(--gd-paper);
+          border: var(--gd-border);
+          padding: 5px 12px; border-radius: 999px;
+          box-shadow: var(--gd-sticker-sm);
+          margin-bottom: 18px;
+          transition: transform 140ms ease, box-shadow 140ms ease;
         }
-        .gd-order-back:hover { opacity: 1; }
+        .gd-order-back:hover {
+          transform: translate(-2px, -2px);
+          box-shadow: 5px 5px 0 var(--gd-ink);
+        }
         .gd-order-title {
-          font-family: 'Georgia', 'Times New Roman', serif;
-          font-size: 38px; font-weight: 400; font-style: italic;
-          letter-spacing: -0.02em; margin: 0 0 6px;
-          color: var(--gd-text);
+          font-family: var(--gd-display);
+          font-size: clamp(38px, 6vw, 54px);
+          font-weight: 500; font-style: italic;
+          letter-spacing: -0.025em;
+          margin: 0 0 16px;
+          color: var(--gd-ink);
+          line-height: 1;
         }
         .gd-order-meta {
-          font-size: 14px; color: var(--gd-text);
-          font-weight: 500;
-          text-shadow: var(--gd-text-shadow);
+          display: flex; flex-wrap: wrap; gap: 8px;
         }
+        .gd-meta-chip {
+          font-size: 12px; font-weight: 600;
+          color: var(--gd-ink);
+          background: var(--gd-paper);
+          border: var(--gd-border);
+          padding: 4px 11px;
+          border-radius: 999px;
+          box-shadow: var(--gd-sticker-sm);
+        }
+        .gd-meta-chip-pink { background: var(--gd-pink); color: var(--gd-cream); }
 
-        /* Health */
         .gd-health {
-          background: #fff;
-          border: 1px solid #ececef;
-          border-radius: 14px;
-          padding: 16px 18px;
+          background: var(--gd-paper);
+          border: var(--gd-border);
+          border-radius: var(--gd-radius);
+          box-shadow: var(--gd-sticker);
+          padding: 18px 20px;
         }
         .gd-health-bar {
-          height: 10px; border-radius: 999px; overflow: hidden;
-          background: #f0f0f2;
+          height: 14px; border-radius: 999px; overflow: hidden;
+          background: rgba(255, 255, 255, 0.5);
+          border: 1.5px solid var(--gd-ink);
           display: flex;
-          margin-bottom: 14px;
+          margin-bottom: 16px;
         }
         .gd-health-legend {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 8px;
+          gap: 12px;
         }
         .gd-health-legend-item {
           display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
         }
         .gd-health-dot {
-          width: 8px; height: 8px; border-radius: 999px;
+          width: 12px; height: 12px; border-radius: 999px;
+          border: 1.5px solid var(--gd-ink);
         }
         .gd-health-num {
-          font-size: 18px; font-weight: 700; color: #1a1a1f;
-          letter-spacing: -0.01em;
+          font-family: var(--gd-display);
+          font-size: 24px; font-weight: 600; font-style: italic;
+          color: var(--gd-ink);
+          letter-spacing: -0.015em;
+          line-height: 1;
         }
         .gd-health-label {
-          font-size: 11.5px; color: #8a8a93;
+          font-size: 11px; color: var(--gd-ink); font-weight: 600;
+          text-transform: uppercase; letter-spacing: 0.1em;
         }
         @media (min-width: 901px) {
-          .gd-health-legend { grid-template-columns: repeat(4, max-content); gap: 24px; }
+          .gd-health-legend { grid-template-columns: repeat(4, max-content); gap: 32px; }
         }
 
-        /* Filter chips */
-        .gd-filters {
-          display: flex; gap: 8px; flex-wrap: wrap;
-        }
+        .gd-filters { display: flex; gap: 8px; flex-wrap: wrap; }
         .gd-chip {
           all: unset; cursor: pointer;
-          display: inline-flex; align-items: center; gap: 6px;
-          padding: 7px 12px; border-radius: 999px;
-          background: #fff; color: #1a1a1f;
-          border: 1px solid #dcdcde;
-          font-size: 13px; font-weight: 500;
-          transition: all 120ms ease;
+          display: inline-flex; align-items: center; gap: 7px;
+          padding: 7px 13px; border-radius: 999px;
+          background: var(--gd-paper);
+          color: var(--gd-ink);
+          border: var(--gd-border);
+          font-size: 13px; font-weight: 600;
+          box-shadow: var(--gd-sticker-sm);
+          transition: transform 140ms ease, box-shadow 140ms ease;
+        }
+        .gd-chip:hover {
+          transform: translate(-1px, -1px);
+          box-shadow: 4px 4px 0 var(--gd-ink);
         }
         .gd-chip-active {
-          background: ${BRAND}; color: #fff; border-color: ${BRAND};
+          background: var(--gd-ink); color: var(--gd-cream);
         }
         .gd-chip-count {
-          font-size: 11.5px; font-weight: 600;
+          font-size: 11px; font-weight: 700;
           padding: 1px 7px; border-radius: 999px;
-          background: rgba(0,0,0,0.06); color: #5a5a62;
+          background: rgba(0, 0, 0, 0.08);
         }
         .gd-chip-active .gd-chip-count {
-          background: rgba(255,255,255,0.18); color: #fff;
+          background: var(--gd-lime); color: var(--gd-ink);
         }
 
-        /* Search */
         .gd-search {
           position: relative;
-          background: #fff;
-          border: 1px solid #dcdcde;
-          border-radius: 10px;
+          background: var(--gd-paper);
+          border: var(--gd-border);
+          border-radius: 12px;
+          box-shadow: var(--gd-sticker-sm);
           display: flex; align-items: center;
         }
         .gd-search-icon {
-          padding: 0 10px 0 14px; color: #8a8a93;
+          padding: 0 8px 0 14px; color: var(--gd-ink);
           display: inline-flex; align-items: center;
         }
         .gd-search input {
           flex: 1;
-          padding: 11px 14px 11px 0;
+          padding: 12px 16px 12px 4px;
           border: none; background: transparent;
-          font-size: 14px; outline: none; color: #1a1a1f;
-          font-family: inherit;
+          font-size: 14px; outline: none; color: var(--gd-ink);
+          font-family: inherit; font-weight: 500;
         }
-        .gd-search input::placeholder { color: #8a8a93; }
+        .gd-search input::placeholder { color: var(--gd-ink-muted); }
 
-        /* Recipients */
         .gd-recipients {
-          background: #fff;
-          border: 1px solid #ececef;
-          border-radius: 14px;
+          background: var(--gd-paper);
+          border: var(--gd-border);
+          border-radius: var(--gd-radius-lg);
+          box-shadow: var(--gd-sticker);
           overflow: hidden;
         }
         .gd-recipient-row {
-          display: flex; align-items: center; gap: 12px;
-          padding: 14px 16px;
-          border-bottom: 1px solid #f0f0f2;
+          display: flex; align-items: center; gap: 14px;
+          padding: 15px 18px;
+          border-bottom: 1px solid rgba(15, 15, 18, 0.1);
         }
         .gd-recipient-row:last-child { border-bottom: none; }
         .gd-recipient-avatar {
-          width: 38px; height: 38px; border-radius: 50%;
-          color: #fff; font-size: 12.5px; font-weight: 600;
+          width: 40px; height: 40px; border-radius: 50%;
+          border: 1.5px solid var(--gd-ink);
+          color: #fff; font-size: 13px; font-weight: 700;
           display: inline-flex; align-items: center; justify-content: center;
           flex-shrink: 0;
         }
         .gd-recipient-meta { flex: 1; min-width: 0; }
-        .gd-recipient-name { font-size: 14px; font-weight: 600; color: #1a1a1f; }
+        .gd-recipient-name {
+          font-size: 14.5px; font-weight: 600; color: var(--gd-ink);
+        }
         .gd-recipient-email {
-          font-size: 12.5px; color: #8a8a93; margin-top: 1px;
+          font-size: 12.5px; color: var(--gd-ink-muted); margin-top: 1px;
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .gd-recipient-picked {
-          font-size: 12px; color: #43434b; margin-top: 4px;
+          font-size: 12px; color: var(--gd-ink-soft); margin-top: 4px;
           font-family: ui-monospace, monospace;
         }
         .gd-recipient-right {
           display: flex; align-items: center; gap: 10px; flex-shrink: 0;
         }
         .gd-recipient-status {
-          font-size: 11.5px; font-weight: 600;
-          padding: 3px 9px; border-radius: 999px;
-          letter-spacing: -0.005em;
+          font-size: 11px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.08em;
+          padding: 4px 11px; border-radius: 999px;
+          color: var(--gd-ink);
+          border: 1.5px solid var(--gd-ink);
         }
         .gd-recipient-resend {
           all: unset; cursor: pointer;
-          font-size: 12.5px; font-weight: 600;
-          color: #1a1a1f; padding: 6px 12px;
-          border: 1px solid #1a1a1f; border-radius: 8px;
-          transition: background 120ms ease, color 120ms ease;
+          font-size: 12px; font-weight: 700;
+          color: var(--gd-ink); padding: 6px 12px;
+          border-radius: 999px;
+          background: var(--gd-lime);
+          border: 1.5px solid var(--gd-ink);
+          box-shadow: 3px 3px 0 var(--gd-ink);
+          text-transform: uppercase; letter-spacing: 0.05em;
+          transition: transform 140ms ease, box-shadow 140ms ease;
         }
-        .gd-recipient-resend:hover { background: #1a1a1f; color: #fff; }
+        .gd-recipient-resend:hover {
+          transform: translate(-1px, -1px);
+          box-shadow: 4px 4px 0 var(--gd-ink);
+        }
 
         .gd-empty {
-          padding: 32px; text-align: center;
-          color: #8a8a93; font-size: 14px;
+          padding: 36px; text-align: center;
+          color: var(--gd-ink-muted); font-size: 14px;
+          font-family: var(--gd-display); font-style: italic;
         }
       `}</style>
     </div>

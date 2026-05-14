@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BRAND, GIFTER, STATS, ORDERS, ORDER_STATUS_COLORS, getRecipients, avatarGradient } from './data';
+import { GIFTER, STATS, ORDERS, getRecipients, avatarGradient } from './data';
 
-const PEACH = '#FFD6C2';
-
-function useCountUp(target: number, duration = 1200): number {
+function useCountUp(target: number, duration = 1400): number {
   const [value, setValue] = useState(0);
   useEffect(() => {
     let raf = 0;
@@ -24,42 +22,69 @@ function useCountUp(target: number, duration = 1200): number {
   return value;
 }
 
+const ROTATIONS = ['-1.2deg', '0.8deg', '-0.4deg'];
+const CARD_TINTS = ['var(--gd-paper)', 'var(--gd-peach)', 'var(--gd-sky)'];
+
 export default function GifterHome() {
+  const smiles = useCountUp(220);
+
   return (
     <div className="gd-home">
-      {/* Hero */}
+      {/* Magazine-style hero */}
       <section className="gd-hero">
-        <div className="gd-hero-content">
-          <h1 className="gd-hero-name">
-            <span className="gd-hero-name-italic">{GIFTER.name}</span>
-            <span className="gd-hero-name-stop">.</span>
-          </h1>
-          <p className="gd-hero-tagline">
-            You've made <strong>220 people</strong> smile this year. <span className="gd-sparkle" aria-hidden>✦</span>
-          </p>
-
-          <div className="gd-hero-stats">
-            <StatTile target={STATS.giftsSent.value}  format={STATS.giftsSent.format}  sub="gifts sent" />
-            <StatTile target={STATS.claimRate.value}  format={STATS.claimRate.format}  sub="claimed and counting" />
-            <StatTile target={STATS.totalSpent.value} format={STATS.totalSpent.format} sub="in generosity" />
-          </div>
+        <div className="gd-hero-eyebrow">
+          <span className="gd-eyebrow-dot" />
+          Hi, {GIFTER.name}
         </div>
+        <h1 className="gd-hero-headline">
+          You&rsquo;ve made&nbsp;
+          <span className="gd-hero-number">{Math.round(smiles)}</span>
+          <br />
+          <em>people smile</em>
+          <span className="gd-hero-trail">&nbsp;this year.</span>
+          <span className="gd-hero-sparkle" aria-hidden>✦</span>
+        </h1>
 
-        {/* Decorative gift box illustration, corner */}
-        <GiftBoxIllustration />
+        <div className="gd-hero-stats">
+          <MiniStat
+            target={STATS.giftsSent.value}
+            format={STATS.giftsSent.format}
+            label="gifts sent"
+            color="var(--gd-lime)"
+            rotation="-1.5deg"
+          />
+          <MiniStat
+            target={STATS.claimRate.value}
+            format={STATS.claimRate.format}
+            label="claim rate"
+            color="var(--gd-peach)"
+            rotation="1.2deg"
+          />
+          <MiniStat
+            target={STATS.totalSpent.value}
+            format={STATS.totalSpent.format}
+            label="given so far"
+            color="var(--gd-pink-soft)"
+            rotation="-0.6deg"
+          />
+        </div>
       </section>
 
       {/* Recent orders */}
       <section className="gd-section">
-        <div className="gd-section-header">
-          <h2 className="gd-section-title">Recently sent</h2>
-          <Link href="/gifter-dashboard/orders" className="gd-section-link">See all →</Link>
+        <div className="gd-section-head">
+          <h2 className="gd-section-title">
+            <em>Recently</em> sent
+          </h2>
+          <Link href="/gifter-dashboard/orders" className="gd-section-link">
+            See all <span aria-hidden>→</span>
+          </Link>
         </div>
+
         <div className="gd-orders-list">
-          {ORDERS.slice(0, 3).map((o) => {
+          {ORDERS.slice(0, 3).map((o, idx) => {
             const claimedTotal = o.claimed + o.delivered;
             const pct = o.recipients > 0 ? Math.round((claimedTotal / o.recipients) * 100) : 0;
-            const tone = ORDER_STATUS_COLORS[o.status];
             const previewRecipients = o.status !== 'Scheduled' && o.status !== 'Draft'
               ? getRecipients(o).slice(0, 5)
               : [];
@@ -70,21 +95,8 @@ export default function GifterHome() {
                 href={`/gifter-dashboard/orders/${o.id}`}
                 className="gd-order-card"
                 style={{
-                  background: '#fff',
-                  border: '1px solid rgba(15, 15, 25, 0.06)',
-                  borderRadius: 16,
-                  padding: '20px 22px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 14,
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  boxShadow: allClaimed
-                    ? '0 6px 18px -10px rgba(212, 166, 64, 0.45), 0 0 0 1px rgba(212, 166, 64, 0.25)'
-                    : '0 6px 18px -10px rgba(20, 14, 50, 0.18)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  transition: 'border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease',
+                  background: CARD_TINTS[idx % CARD_TINTS.length],
+                  transform: `rotate(${ROTATIONS[idx % ROTATIONS.length]})`,
                 }}
               >
                 <div className="gd-order-card-top">
@@ -96,12 +108,10 @@ export default function GifterHome() {
                   </div>
                   {allClaimed ? (
                     <span className="gd-celebration">
-                      <span aria-hidden>🎉</span> All claimed
+                      <span aria-hidden>🎉</span> all claimed
                     </span>
                   ) : (
-                    <span className="gd-order-status" style={{ background: tone.bg, color: tone.fg }}>
-                      {o.status}
-                    </span>
+                    <span className="gd-order-status">{o.status}</span>
                   )}
                 </div>
 
@@ -124,25 +134,22 @@ export default function GifterHome() {
                         </span>
                       )}
                     </div>
-                    <span className="gd-recipients-pct">{pct}% have unwrapped</span>
+                    <span className="gd-recipients-pct">
+                      <strong>{pct}%</strong> unwrapped
+                    </span>
                   </div>
                 )}
 
                 {o.status !== 'Scheduled' && o.status !== 'Draft' && (
                   <div className="gd-progress">
-                    <div className="gd-progress-fill" style={{
-                      width: `${pct}%`,
-                      background: allClaimed
-                        ? 'linear-gradient(90deg, #D4A640, #F4C76C)'
-                        : 'linear-gradient(90deg, #1F8A4C, #34B561)',
-                    }} />
+                    <div className="gd-progress-fill" style={{ width: `${pct}%` }} />
                   </div>
                 )}
 
                 {o.status === 'Scheduled' && (
                   <div className="gd-order-footer">
-                    <span>{o.recipients} recipients · {o.budgetPerRecipient}/person</span>
-                    <span style={{ color: BRAND, fontWeight: 600 }}>Edit →</span>
+                    <span>Scheduled · {o.recipients} recipients</span>
+                    <span className="gd-edit-link">edit →</span>
                   </div>
                 )}
               </Link>
@@ -153,7 +160,7 @@ export default function GifterHome() {
 
       <style jsx>{`
         .gd-home {
-          display: flex; flex-direction: column; gap: 28px;
+          display: flex; flex-direction: column; gap: 36px;
           animation: gd-fadeup 360ms cubic-bezier(0.22, 0.61, 0.36, 1);
         }
         @keyframes gd-fadeup {
@@ -161,234 +168,255 @@ export default function GifterHome() {
           to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ─── Hero — no card, just content on the body atmosphere ─── */
+        /* ─── Magazine hero ─── */
         .gd-hero {
           position: relative;
-          color: var(--gd-text);
-          padding: 8px 8px 24px;
+          padding: 20px 4px 8px;
         }
-        .gd-hero-content { position: relative; z-index: 2; }
-        .gd-hero-name {
-          font-size: 44px;
-          font-weight: 600;
-          letter-spacing: -0.02em;
-          line-height: 1;
-          margin: 0 0 8px;
-          color: var(--gd-text);
+        .gd-hero-eyebrow {
+          display: inline-flex; align-items: center; gap: 8px;
+          font-size: 12px; font-weight: 600;
+          color: var(--gd-ink); text-transform: uppercase;
+          letter-spacing: 0.12em;
+          margin-bottom: 18px;
+          background: var(--gd-lime);
+          border: var(--gd-border);
+          padding: 5px 12px 5px 10px;
+          border-radius: 999px;
+          box-shadow: var(--gd-sticker-sm);
         }
-        .gd-hero-name-italic {
-          font-family: 'Georgia', 'Times New Roman', serif;
-          font-style: italic;
-          font-weight: 400;
-          letter-spacing: -0.015em;
+        .gd-eyebrow-dot {
+          width: 8px; height: 8px; border-radius: 50%;
+          background: var(--gd-ink);
         }
-        .gd-hero-name-stop {
-          opacity: 0.5;
-        }
-        .gd-hero-tagline {
-          font-size: 15px;
-          color: var(--gd-text);
-          margin: 0 0 28px;
+        .gd-hero-headline {
+          font-family: var(--gd-display);
+          font-size: clamp(40px, 7vw, 64px);
           font-weight: 500;
-          text-shadow: var(--gd-text-shadow);
+          letter-spacing: -0.025em;
+          line-height: 1.02;
+          color: var(--gd-ink);
+          margin: 0 0 32px;
+          position: relative;
         }
-        .gd-hero-tagline strong { font-weight: 700; color: var(--gd-text); }
-        .gd-sparkle {
+        .gd-hero-headline em {
+          font-style: italic; font-weight: 500;
+          color: var(--gd-ink);
+        }
+        .gd-hero-number {
+          font-style: italic; font-weight: 600;
+          color: var(--gd-pink);
+          font-variant-numeric: tabular-nums;
+          padding: 0 6px;
+          background: var(--gd-lime);
+          border: var(--gd-border);
+          border-radius: 12px;
+          box-shadow: var(--gd-sticker-sm);
           display: inline-block;
-          margin-left: 4px;
-          color: ${PEACH};
-          font-size: 13px;
+          line-height: 0.9;
+          transform: rotate(-1.5deg) translateY(-4px);
+          margin: 0 4px;
+        }
+        .gd-hero-trail {
+          font-style: italic;
+          color: var(--gd-ink);
+        }
+        .gd-hero-sparkle {
+          font-family: var(--gd-display);
+          color: var(--gd-pink);
+          font-size: 0.7em;
+          margin-left: 8px;
+          display: inline-block;
           animation: gd-shimmer 2.4s ease-in-out infinite;
         }
         @keyframes gd-shimmer {
-          0%, 100% { opacity: 0.6; transform: scale(1); }
-          50%      { opacity: 1;   transform: scale(1.15); }
+          0%, 100% { transform: scale(1) rotate(0deg);   opacity: 0.85; }
+          50%      { transform: scale(1.2) rotate(20deg); opacity: 1;   }
         }
+
         .gd-hero-stats {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 10px;
+          gap: 14px;
+          margin-top: 12px;
         }
         @media (max-width: 640px) {
-          .gd-hero { padding: 28px 22px 24px; }
-          .gd-hero-name { font-size: 36px; }
-          .gd-hero-stats { gap: 8px; }
+          .gd-hero-stats { gap: 10px; }
         }
-
 
         /* ─── Section ─── */
-        .gd-section { display: flex; flex-direction: column; gap: 14px; }
-        .gd-section-header {
+        .gd-section { display: flex; flex-direction: column; gap: 22px; }
+        .gd-section-head {
           display: flex; justify-content: space-between; align-items: baseline;
+          padding: 0 4px;
         }
         .gd-section-title {
-          font-family: 'Georgia', 'Times New Roman', serif;
-          font-size: 22px;
-          font-weight: 400;
-          font-style: italic;
-          color: #1a1a1f;
-          margin: 0;
-          letter-spacing: -0.015em;
+          font-family: var(--gd-display);
+          font-size: 28px; font-weight: 500;
+          color: var(--gd-ink);
+          margin: 0; letter-spacing: -0.015em;
+        }
+        .gd-section-title em {
+          font-style: italic; font-weight: 500;
+          color: var(--gd-pink);
         }
         .gd-section-link {
-          font-size: 13px; font-weight: 500;
-          color: ${BRAND}; text-decoration: none;
+          display: inline-flex; align-items: center; gap: 6px;
+          font-size: 13px; font-weight: 600;
+          color: var(--gd-ink); text-decoration: none;
+          background: var(--gd-paper);
+          border: var(--gd-border);
+          padding: 6px 14px; border-radius: 999px;
+          box-shadow: var(--gd-sticker-sm);
+          transition: transform 140ms ease, box-shadow 140ms ease;
+        }
+        .gd-section-link:hover {
+          transform: translate(-2px, -2px);
+          box-shadow: 5px 5px 0 var(--gd-ink);
         }
 
-        /* ─── Order list ─── */
-        .gd-orders-list { display: flex; flex-direction: column; gap: 14px; }
+        /* ─── Order list (sticker cards) ─── */
+        .gd-orders-list {
+          display: flex; flex-direction: column;
+          gap: 26px;
+          padding: 8px 6px 16px;
+        }
+        :global(.gd-order-card) {
+          display: flex; flex-direction: column; gap: 14px;
+          padding: 22px 26px;
+          border: var(--gd-border);
+          border-radius: var(--gd-radius-lg);
+          box-shadow: var(--gd-sticker);
+          text-decoration: none;
+          color: var(--gd-ink);
+          transition: transform 160ms ease, box-shadow 160ms ease;
+        }
         :global(.gd-order-card:hover) {
-          border-color: rgba(15, 15, 25, 0.18) !important;
-          transform: translateY(-1px);
-          box-shadow: 0 12px 28px -10px rgba(20, 14, 50, 0.25) !important;
+          transform: translate(-3px, -3px) rotate(0deg) !important;
+          box-shadow: 7px 7px 0 var(--gd-ink) !important;
         }
         .gd-order-card-top {
-          display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+          display: flex; justify-content: space-between; align-items: flex-start; gap: 14px;
         }
-        .gd-order-name { font-size: 16px; font-weight: 600; letter-spacing: -0.005em; color: #1a1a1f; }
-        .gd-order-sub { font-size: 13px; color: #43434b; margin-top: 3px; }
+        .gd-order-name {
+          font-family: var(--gd-display);
+          font-size: 22px; font-weight: 500; font-style: italic;
+          color: var(--gd-ink); letter-spacing: -0.015em;
+        }
+        .gd-order-sub {
+          font-size: 13px; color: var(--gd-ink-soft);
+          margin-top: 4px; font-weight: 500;
+        }
         .gd-order-status {
-          font-size: 11.5px; font-weight: 600; padding: 3px 9px;
-          border-radius: 999px;
+          font-size: 11px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.08em;
+          padding: 5px 11px; border-radius: 999px;
+          background: var(--gd-ink); color: var(--gd-cream);
           white-space: nowrap;
         }
         .gd-celebration {
-          font-size: 11.5px; font-weight: 600;
-          padding: 4px 10px;
+          font-size: 11px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.08em;
+          padding: 5px 12px;
           border-radius: 999px;
-          background: linear-gradient(135deg, #F4C76C, #D4A640);
-          color: #5a3d00;
+          background: var(--gd-lime);
+          color: var(--gd-ink);
+          border: var(--gd-border);
           white-space: nowrap;
-          box-shadow: 0 4px 12px -4px rgba(212, 166, 64, 0.55);
-          display: inline-flex; align-items: center; gap: 4px;
+          display: inline-flex; align-items: center; gap: 5px;
         }
 
-        /* Recipient avatars */
+        /* Avatars */
         .gd-recipients-row {
-          display: flex; align-items: center; gap: 12px;
+          display: flex; align-items: center; gap: 14px;
         }
         .gd-avatars { display: flex; }
         .gd-avatar-mini, .gd-avatar-more {
-          width: 30px; height: 30px;
+          width: 32px; height: 32px;
           border-radius: 50%;
-          border: 2px solid #fff;
+          border: 1.5px solid var(--gd-ink);
           color: #fff;
-          font-size: 11px; font-weight: 600;
+          font-size: 11px; font-weight: 700;
           display: inline-flex; align-items: center; justify-content: center;
-          margin-left: -8px;
+          margin-left: -9px;
         }
         .gd-avatar-mini:first-child { margin-left: 0; }
         .gd-avatar-more {
-          background: #f0f0f2; color: #5a5a62;
-          font-weight: 500;
-          font-size: 10.5px;
+          background: var(--gd-paper); color: var(--gd-ink);
         }
         .gd-recipients-pct {
-          font-size: 12.5px; color: #6b6b73;
-          font-family: 'Georgia', serif; font-style: italic;
+          font-size: 13px; color: var(--gd-ink);
+          font-family: var(--gd-display);
+          font-style: italic;
+        }
+        .gd-recipients-pct strong {
+          font-weight: 600; color: var(--gd-pink);
         }
 
         /* Progress bar */
         .gd-progress {
-          height: 4px; border-radius: 999px;
-          background: #f0f0f2; overflow: hidden;
+          height: 8px;
+          border: 1.5px solid var(--gd-ink);
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.5);
+          overflow: hidden;
         }
         .gd-progress-fill {
           height: 100%;
-          background: linear-gradient(90deg, #1F8A4C, #34B561);
+          background: var(--gd-lime);
+          border-right: 1.5px solid var(--gd-ink);
           transition: width 240ms ease;
         }
 
         .gd-order-footer {
           display: flex; justify-content: space-between; align-items: center;
-          font-size: 12.5px; color: #8a8a93;
+          font-size: 12.5px; color: var(--gd-ink-soft);
+          font-weight: 500;
         }
+        .gd-edit-link { color: var(--gd-pink); font-weight: 700; }
       `}</style>
     </div>
   );
 }
 
-/* ─── Components ─── */
-
-function StatTile({ target, format, sub }: { target: number; format: (n: number) => string; sub: string }) {
+function MiniStat({
+  target, format, label, color, rotation,
+}: {
+  target: number;
+  format: (n: number) => string;
+  label: string;
+  color: string;
+  rotation: string;
+}) {
   const animated = useCountUp(target);
   return (
     <div style={{
-      background: 'rgba(255, 255, 255, 0.85)',
-      border: '1px solid rgba(255, 255, 255, 0.7)',
+      background: color,
+      border: '1.5px solid var(--gd-ink)',
       borderRadius: 14,
       padding: '14px 16px 12px',
-      backdropFilter: 'blur(14px)',
-      WebkitBackdropFilter: 'blur(14px)',
-      boxShadow: '0 6px 22px -8px rgba(20, 14, 50, 0.18)',
+      boxShadow: 'var(--gd-sticker-sm)',
+      transform: `rotate(${rotation})`,
+      transition: 'transform 160ms ease',
     }}>
       <div style={{
-        fontFamily: '"Georgia", "Times New Roman", serif',
-        fontSize: 26,
-        fontWeight: 500,
+        fontFamily: 'var(--gd-display)',
+        fontStyle: 'italic',
+        fontSize: 32,
+        fontWeight: 600,
         letterSpacing: '-0.02em',
-        color: '#1a1a1f',
-        lineHeight: 1.1,
+        color: 'var(--gd-ink)',
+        lineHeight: 1,
         fontVariantNumeric: 'tabular-nums',
       }}>{format(animated)}</div>
-      <div style={{ fontSize: 12, color: '#6b6b73', marginTop: 4 }}>{sub}</div>
+      <div style={{
+        fontSize: 11.5,
+        color: 'var(--gd-ink)',
+        marginTop: 6,
+        fontWeight: 600,
+        textTransform: 'uppercase',
+        letterSpacing: '0.08em',
+      }}>{label}</div>
     </div>
   );
 }
-
-/* ─── Decorative gift-box SVG, floats in hero corner ─── */
-
-function GiftBoxIllustration() {
-  return (
-    <div style={{
-      position: 'absolute',
-      top: 18, right: 22,
-      pointerEvents: 'none',
-      animation: 'gd-float 5s ease-in-out infinite',
-      zIndex: 1,
-    }}>
-      <style jsx>{`
-        @keyframes gd-float {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50%      { transform: translateY(-6px) rotate(2deg); }
-        }
-        @media (max-width: 640px) {
-          div { display: none !important; }
-        }
-      `}</style>
-      <svg width="110" height="120" viewBox="0 0 110 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-        {/* Box shadow */}
-        <ellipse cx="55" cy="112" rx="32" ry="3" fill="rgba(20, 14, 50, 0.18)" />
-
-        {/* Box body */}
-        <rect x="14" y="48" width="82" height="62" rx="6" fill="rgba(255, 255, 255, 0.92)" />
-
-        {/* Box lid */}
-        <rect x="10" y="44" width="90" height="14" rx="3" fill="#fff" />
-
-        {/* Vertical ribbon */}
-        <rect x="50" y="44" width="10" height="66" fill={PEACH} />
-
-        {/* Horizontal ribbon */}
-        <rect x="10" y="48" width="90" height="10" fill={PEACH} />
-
-        {/* Bow left loop */}
-        <ellipse cx="42" cy="42" rx="14" ry="11" fill={PEACH} />
-        <ellipse cx="42" cy="42" rx="6" ry="5" fill="rgba(255, 255, 255, 0.55)" />
-
-        {/* Bow right loop */}
-        <ellipse cx="68" cy="42" rx="14" ry="11" fill={PEACH} />
-        <ellipse cx="68" cy="42" rx="6" ry="5" fill="rgba(255, 255, 255, 0.55)" />
-
-        {/* Bow center knot */}
-        <rect x="50" y="36" width="10" height="14" rx="2" fill="#FFB89D" />
-
-        {/* Sparkles */}
-        <text x="2" y="14" fill="#fff" fontSize="14" opacity="0.9">✦</text>
-        <text x="92" y="22" fill={PEACH} fontSize="11" opacity="0.95">✦</text>
-        <text x="100" y="78" fill="#fff" fontSize="10" opacity="0.85">✦</text>
-      </svg>
-    </div>
-  );
-}
-

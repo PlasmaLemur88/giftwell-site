@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
 @import "tailwindcss";
 
 /* ── Giftwell Design System — Partiful-inspired ── */
@@ -338,4 +339,53 @@ body {
 
 @theme {
   --animate-aurora: aurora 60s linear infinite;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Gifter Dashboard — Partiful-style tokens
+   Cream paper base · ink black borders · sticker shadows ·
+   peach + lime + hot pink accents · Fraunces display italic
+   ─────────────────────────────────────────────────────────── */
+
+.gd-shell {
+  /* Surfaces */
+  --gd-cream:        #F1ECDE;
+  --gd-cream-deep:   #E6DFCB;
+  --gd-paper:        #FFF8EC;
+  --gd-ink:          #0F0F12;
+  --gd-ink-soft:     #2A2A30;
+  --gd-ink-muted:    #5E5E68;
+
+  /* Accent palette */
+  --gd-peach:        #FFD6C2;
+  --gd-peach-deep:   #FFB89D;
+  --gd-lime:         #D4F542;
+  --gd-lime-deep:    #B8E024;
+  --gd-pink:         #FF4D8D;
+  --gd-pink-soft:    #FFC2D6;
+  --gd-sky:          #C8E6FF;
+
+  /* Status (kept calmer than accents so data stays scannable) */
+  --gd-success:      #1F8A4C;
+  --gd-info:         #3A6EE0;
+  --gd-warn:         #E0A23E;
+  --gd-danger:       #E04F4F;
+
+  /* Sticker tokens */
+  --gd-border:       1.5px solid var(--gd-ink);
+  --gd-sticker:      4px 4px 0 var(--gd-ink);
+  --gd-sticker-lg:   6px 6px 0 var(--gd-ink);
+  --gd-sticker-sm:   3px 3px 0 var(--gd-ink);
+  --gd-radius:       14px;
+  --gd-radius-lg:    18px;
+
+  /* Typography */
+  --gd-display: 'Fraunces', 'Georgia', 'Times New Roman', serif;
+  --gd-body:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Sticker animation: lift on hover */
+@keyframes gd-sticker-pop {
+  from { transform: translate(0, 0);   box-shadow: 4px 4px 0 var(--gd-ink); }
+  to   { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--gd-ink); }
 }

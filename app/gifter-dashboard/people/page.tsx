@@ -1,12 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { BRAND, avatarGradient, ORDERS, getRecipients, getAllPeople, type Recipient } from '../data';
-import { GlassButton } from '@/components/ui/apple-tahoe-liquid-glass-button';
+import { avatarGradient, ORDERS, getRecipients, getAllPeople, type Recipient } from '../data';
 
 function formatForCopy(recipients: Recipient[]): string {
   return recipients.map((r) => `${r.name} <${r.email}>`).join('\n');
 }
+
+const CARD_TINTS = [
+  'var(--gd-paper)',
+  'var(--gd-peach)',
+  'var(--gd-sky)',
+  'var(--gd-pink-soft)',
+];
+const CARD_ROTATIONS = ['-1.2deg', '0.8deg', '-0.4deg', '1.4deg'];
 
 export default function PeoplePage() {
   const [search, setSearch] = useState('');
@@ -30,19 +37,20 @@ export default function PeoplePage() {
   return (
     <div className="gd-people">
       <header className="gd-page-header">
-        <h1>People</h1>
+        <span className="gd-eyebrow">Your people</span>
+        <h1>
+          Everyone you&rsquo;ve <em>gifted</em>.
+        </h1>
         <p>
-          Everyone you've ever gifted to, grouped by the campaign you sent them in.
-          Copy any list and paste it into a Giftwell gifting flow on any merchant's store.
+          Grouped by the campaign you sent them in. Copy any list and paste it into a Giftwell flow.
         </p>
       </header>
 
-      {/* Recent campaigns — one card per past order */}
       <section className="gd-lists-section">
         <div className="gd-lists-head">
-          <h2 className="gd-section-title">Your campaigns</h2>
+          <h2 className="gd-section-title"><em>Past</em> campaigns</h2>
           <button className="gd-add-link" onClick={() => setAddOpen(!addOpen)}>
-            {addOpen ? '× Close' : '+ Add or import people'}
+            {addOpen ? '× close' : '+ add people'}
           </button>
         </div>
 
@@ -55,25 +63,25 @@ export default function PeoplePage() {
             />
             <div className="gd-add-actions">
               <button className="gd-add-secondary" onClick={() => setAddOpen(false)}>Cancel</button>
-              <button className="gd-add-primary">Save to list</button>
+              <button className="gd-add-primary">Save</button>
             </div>
           </div>
         )}
 
         <div className="gd-lists-grid">
-          {/* Everyone card — primary */}
           <CampaignCard
             id="everyone"
             label="Everyone"
-            sublabel={`${allPeople.length} unique people across all campaigns`}
+            sublabel={`${allPeople.length} unique people`}
             recipients={allPeople}
+            tint="var(--gd-lime)"
+            rotation="-1.5deg"
             primary
             copied={copiedId === 'everyone'}
             onCopy={() => handleCopy('everyone', allPeople)}
           />
 
-          {/* One card per past order */}
-          {ORDERS.map((o) => {
+          {ORDERS.map((o, idx) => {
             const recipients = getRecipients(o);
             return (
               <CampaignCard
@@ -82,6 +90,8 @@ export default function PeoplePage() {
                 label={o.name}
                 sublabel={`${recipients.length} ${recipients.length === 1 ? 'person' : 'people'} · ${o.status}`}
                 recipients={recipients}
+                tint={CARD_TINTS[idx % CARD_TINTS.length]}
+                rotation={CARD_ROTATIONS[idx % CARD_ROTATIONS.length]}
                 copied={copiedId === o.id}
                 onCopy={() => handleCopy(o.id, recipients)}
               />
@@ -90,14 +100,13 @@ export default function PeoplePage() {
         </div>
       </section>
 
-      {/* Directory — searchable + individual copy */}
       <section className="gd-directory">
         <div className="gd-directory-head">
-          <h2 className="gd-section-title">All people</h2>
-          <p className="gd-directory-sub">{allPeople.length} unique recipients across all campaigns</p>
+          <h2 className="gd-section-title"><em>All</em> people</h2>
+          <p className="gd-directory-sub">{allPeople.length} unique recipients</p>
         </div>
 
-        <div className="gd-search">
+        <div className="gd-search-wrap">
           <input
             type="text"
             value={search}
@@ -108,7 +117,7 @@ export default function PeoplePage() {
 
         <div className="gd-directory-list">
           {filteredDirectory.length === 0 ? (
-            <div className="gd-empty">No one matches that search.</div>
+            <div className="gd-empty">No one matches.</div>
           ) : filteredDirectory.map((r) => (
             <div key={r.email} className="gd-contact-row">
               <span className="gd-contact-avatar" style={{ background: avatarGradient(r.name) }}>
@@ -122,7 +131,7 @@ export default function PeoplePage() {
                 className={`gd-row-copy ${copiedId === r.email ? 'gd-row-copy-done' : ''}`}
                 onClick={() => handleCopy(r.email, [r])}
               >
-                {copiedId === r.email ? '✓ Copied' : <><CopyIcon /> Copy</>}
+                {copiedId === r.email ? '✓ copied' : <><CopyIcon /> copy</>}
               </button>
             </div>
           ))}
@@ -130,108 +139,152 @@ export default function PeoplePage() {
       </section>
 
       <style jsx>{`
-        .gd-people { display: flex; flex-direction: column; gap: 26px; }
+        .gd-people { display: flex; flex-direction: column; gap: 36px; }
 
-        /* Header */
-        .gd-page-header { padding: 4px 8px 8px; color: var(--gd-text); }
-        .gd-page-header h1 {
-          font-family: 'Georgia', 'Times New Roman', serif;
-          font-size: 38px; font-weight: 400; font-style: italic;
-          letter-spacing: -0.02em; margin: 0 0 6px;
-          color: var(--gd-text);
+        .gd-page-header { padding: 8px 4px 4px; }
+        .gd-eyebrow {
+          display: inline-flex;
+          font-size: 11.5px; font-weight: 700;
+          color: var(--gd-ink); text-transform: uppercase;
+          letter-spacing: 0.14em;
+          background: var(--gd-lime);
+          border: var(--gd-border);
+          padding: 5px 12px;
+          border-radius: 999px;
+          box-shadow: var(--gd-sticker-sm);
+          margin-bottom: 18px;
         }
-        .gd-page-header p {
-          font-size: 14.5px; color: var(--gd-text);
-          margin: 0; max-width: 600px; line-height: 1.5;
+        .gd-page-header h1 {
+          font-family: var(--gd-display);
+          font-size: clamp(36px, 5.5vw, 52px);
           font-weight: 500;
-          text-shadow: var(--gd-text-shadow);
+          letter-spacing: -0.025em;
+          line-height: 1.02;
+          margin: 0 0 14px;
+          color: var(--gd-ink);
+        }
+        .gd-page-header h1 em { font-style: italic; color: var(--gd-pink); }
+        .gd-page-header p {
+          font-size: 14.5px; color: var(--gd-ink-soft);
+          margin: 0; max-width: 540px; line-height: 1.5;
+          font-weight: 500;
         }
 
         .gd-section-title {
-          font-family: 'Georgia', 'Times New Roman', serif;
-          font-size: 22px; font-weight: 400; font-style: italic;
-          color: #1a1a1f; margin: 0; letter-spacing: -0.015em;
+          font-family: var(--gd-display);
+          font-size: 26px; font-weight: 500;
+          color: var(--gd-ink);
+          margin: 0; letter-spacing: -0.015em;
+        }
+        .gd-section-title em {
+          font-style: italic; color: var(--gd-pink);
         }
 
-        /* Campaigns section */
-        .gd-lists-section { display: flex; flex-direction: column; gap: 14px; }
+        .gd-lists-section { display: flex; flex-direction: column; gap: 18px; }
         .gd-lists-head {
           display: flex; justify-content: space-between; align-items: baseline;
           padding: 0 4px;
         }
         .gd-add-link {
           all: unset; cursor: pointer;
-          font-size: 13px; font-weight: 600;
-          color: #1a1a1f;
-          padding: 6px 12px;
+          font-size: 12px; font-weight: 700;
+          color: var(--gd-ink);
+          text-transform: uppercase; letter-spacing: 0.06em;
+          padding: 7px 14px;
           border-radius: 999px;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.7);
-          transition: background 120ms ease;
+          background: var(--gd-paper);
+          border: var(--gd-border);
+          box-shadow: var(--gd-sticker-sm);
+          transition: transform 140ms ease, box-shadow 140ms ease;
         }
-        .gd-add-link:hover { background: #fff; }
+        .gd-add-link:hover {
+          transform: translate(-2px, -2px);
+          box-shadow: 5px 5px 0 var(--gd-ink);
+        }
 
         .gd-add-card {
-          background: #fff;
-          border: 1px solid rgba(15, 15, 25, 0.06);
-          border-radius: 14px;
-          padding: 16px 18px;
-          display: flex; flex-direction: column; gap: 12px;
-          box-shadow: 0 6px 18px -8px rgba(20, 14, 50, 0.18);
+          background: var(--gd-paper);
+          border: var(--gd-border);
+          border-radius: var(--gd-radius);
+          box-shadow: var(--gd-sticker);
+          padding: 18px 20px;
+          display: flex; flex-direction: column; gap: 14px;
         }
-        .gd-add-title { font-size: 14px; font-weight: 600; color: #1a1a1f; }
+        .gd-add-title {
+          font-family: var(--gd-display);
+          font-size: 17px; font-weight: 500; font-style: italic;
+          color: var(--gd-ink);
+        }
         .gd-add-card textarea {
           width: 100%; box-sizing: border-box;
-          padding: 11px 14px; border-radius: 10px;
-          border: 1px solid #ececef; background: #fafafb;
+          padding: 12px 14px; border-radius: 10px;
+          border: 1.5px solid var(--gd-ink);
+          background: var(--gd-cream);
           font-family: ui-monospace, monospace; font-size: 13px;
-          outline: none; color: #1a1a1f; resize: vertical;
+          outline: none; color: var(--gd-ink); resize: vertical;
           line-height: 1.6;
         }
-        .gd-add-card textarea:focus { border-color: ${BRAND}; background: #fff; }
-        .gd-add-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .gd-add-card textarea:focus {
+          background: #fff;
+          box-shadow: 3px 3px 0 var(--gd-ink);
+        }
+        .gd-add-actions { display: flex; justify-content: flex-end; gap: 10px; }
         .gd-add-secondary {
           all: unset; cursor: pointer;
-          padding: 8px 14px; border-radius: 8px;
-          font-size: 13px; font-weight: 500; color: #5a5a62;
+          padding: 8px 16px; border-radius: 999px;
+          font-size: 12px; font-weight: 700;
+          color: var(--gd-ink);
+          text-transform: uppercase; letter-spacing: 0.06em;
         }
-        .gd-add-secondary:hover { background: #f3f3f5; }
+        .gd-add-secondary:hover { background: rgba(0,0,0,0.05); }
         .gd-add-primary {
           all: unset; cursor: pointer;
-          background: ${BRAND}; color: #fff;
-          padding: 8px 16px; border-radius: 8px;
-          font-size: 13px; font-weight: 600;
+          background: var(--gd-lime); color: var(--gd-ink);
+          padding: 8px 18px; border-radius: 999px;
+          border: var(--gd-border);
+          box-shadow: var(--gd-sticker-sm);
+          font-size: 12px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.06em;
+          transition: transform 140ms ease, box-shadow 140ms ease;
+        }
+        .gd-add-primary:hover {
+          transform: translate(-2px, -2px);
+          box-shadow: 5px 5px 0 var(--gd-ink);
         }
 
         .gd-lists-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-          gap: 12px;
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+          gap: 26px;
+          padding: 12px 6px 8px;
         }
 
-        /* Directory */
-        .gd-directory { display: flex; flex-direction: column; gap: 12px; }
+        .gd-directory { display: flex; flex-direction: column; gap: 14px; }
         .gd-directory-head { padding: 0 4px; }
-        .gd-directory-sub { font-size: 12.5px; color: #43434b; margin: 4px 0 0; }
-
-        .gd-search input {
-          width: 100%; box-sizing: border-box;
-          padding: 12px 16px; border-radius: 12px;
-          border: 1px solid rgba(15, 15, 25, 0.08);
-          background: rgba(255, 255, 255, 0.95);
-          font-size: 14px; outline: none; font-family: inherit; color: #1a1a1f;
-          box-shadow: 0 4px 14px -8px rgba(20, 14, 50, 0.12);
+        .gd-directory-sub {
+          font-size: 13px; color: var(--gd-ink-soft);
+          margin: 6px 0 0; font-weight: 500;
         }
-        .gd-search input::placeholder { color: #8a8a93; }
-        .gd-search input:focus { border-color: ${BRAND}; background: #fff; }
+
+        .gd-search-wrap input {
+          width: 100%; box-sizing: border-box;
+          padding: 13px 18px; border-radius: 12px;
+          border: var(--gd-border);
+          background: var(--gd-paper);
+          font-size: 14px; outline: none;
+          font-family: inherit; color: var(--gd-ink);
+          font-weight: 500;
+          box-shadow: var(--gd-sticker-sm);
+        }
+        .gd-search-wrap input::placeholder { color: var(--gd-ink-muted); }
+        .gd-search-wrap input:focus { background: #fff; }
 
         .gd-directory-list {
-          background: #fff;
-          border: 1px solid rgba(15, 15, 25, 0.06);
-          border-radius: 14px;
+          background: var(--gd-paper);
+          border: var(--gd-border);
+          border-radius: var(--gd-radius-lg);
+          box-shadow: var(--gd-sticker);
           overflow: hidden;
-          box-shadow: 0 4px 14px -8px rgba(20, 14, 50, 0.12);
         }
         .gd-contact-row {
           display: grid;
@@ -239,55 +292,62 @@ export default function PeoplePage() {
           align-items: center;
           gap: 14px;
           padding: 13px 18px;
-          border-bottom: 1px solid #f0f0f2;
-          transition: background 120ms ease;
+          border-bottom: 1px solid rgba(15, 15, 18, 0.08);
         }
-        .gd-contact-row:hover { background: #fafafb; }
         .gd-contact-row:last-child { border-bottom: none; }
         .gd-contact-avatar {
           width: 40px; height: 40px; border-radius: 50%;
-          color: #fff; font-size: 13px; font-weight: 600;
+          color: #fff; font-size: 13px; font-weight: 700;
           display: inline-flex; align-items: center; justify-content: center;
+          border: 1.5px solid var(--gd-ink);
         }
         .gd-contact-meta { min-width: 0; }
-        .gd-contact-name { font-size: 14.5px; font-weight: 600; color: #1a1a1f; }
+        .gd-contact-name { font-size: 14.5px; font-weight: 600; color: var(--gd-ink); }
         .gd-contact-sub {
-          font-size: 12.5px; color: #43434b; margin-top: 2px;
+          font-size: 12.5px; color: var(--gd-ink-muted); margin-top: 2px;
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .gd-row-copy {
           all: unset; cursor: pointer;
-          display: inline-flex; align-items: center; gap: 5px;
-          padding: 7px 12px; border-radius: 8px;
-          font-size: 12.5px; font-weight: 600;
-          color: #1a1a1f;
-          border: 1px solid #ececef;
-          background: #fff;
-          transition: all 120ms ease;
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 7px 13px; border-radius: 999px;
+          font-size: 11.5px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.06em;
+          color: var(--gd-ink);
+          border: 1.5px solid var(--gd-ink);
+          background: var(--gd-cream);
+          box-shadow: 3px 3px 0 var(--gd-ink);
+          transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
         }
-        .gd-row-copy:hover { background: #1a1a1f; color: #fff; border-color: #1a1a1f; }
+        .gd-row-copy:hover {
+          transform: translate(-1px, -1px);
+          box-shadow: 4px 4px 0 var(--gd-ink);
+          background: var(--gd-lime);
+        }
         .gd-row-copy-done {
-          background: #ECFDF5 !important;
-          color: #047857 !important;
-          border-color: #ECFDF5 !important;
+          background: var(--gd-lime) !important;
         }
         .gd-row-copy :global(svg) { width: 13px; height: 13px; }
 
-        .gd-empty { padding: 40px; text-align: center; color: #5a5a62; font-size: 14px; }
+        .gd-empty {
+          padding: 40px; text-align: center;
+          color: var(--gd-ink-muted); font-size: 14px;
+          font-family: var(--gd-display); font-style: italic;
+        }
       `}</style>
     </div>
   );
 }
 
-/* ─── Campaign card (one per past order, plus Everyone) ─── */
-
 function CampaignCard({
-  id, label, sublabel, recipients, primary, copied, onCopy,
+  label, sublabel, recipients, primary, copied, onCopy, tint, rotation,
 }: {
   id: string;
   label: string;
   sublabel: string;
   recipients: Recipient[];
+  tint: string;
+  rotation: string;
   primary?: boolean;
   copied: boolean;
   onCopy: () => void;
@@ -295,44 +355,53 @@ function CampaignCard({
   const previewCount = Math.min(4, recipients.length);
   const remainder = recipients.length - previewCount;
   return (
-    <div style={{
-      background: '#fff',
-      border: `1px solid ${primary ? 'rgba(124, 92, 255, 0.35)' : 'rgba(15, 15, 25, 0.06)'}`,
-      borderRadius: 14,
-      padding: '16px 18px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 12,
-      boxShadow: primary
-        ? '0 10px 28px -10px rgba(124, 92, 255, 0.35)'
-        : '0 6px 18px -10px rgba(20, 14, 50, 0.18)',
-    }}>
+    <div
+      className="gd-campaign-card"
+      style={{
+        background: tint,
+        border: '1.5px solid var(--gd-ink)',
+        borderRadius: 18,
+        padding: '18px 20px',
+        boxShadow: 'var(--gd-sticker)',
+        transform: `rotate(${rotation})`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 14,
+      }}
+    >
       <div>
         <div style={{
-          fontFamily: '"Georgia", "Times New Roman", serif',
-          fontSize: 16,
+          fontFamily: 'var(--gd-display)',
+          fontSize: 22,
           fontWeight: 500,
           fontStyle: 'italic',
-          color: '#1a1a1f',
-          letterSpacing: '-0.01em',
-          marginBottom: 3,
+          color: 'var(--gd-ink)',
+          letterSpacing: '-0.015em',
+          marginBottom: 4,
+          lineHeight: 1.05,
         }}>
           {label}
         </div>
-        <div style={{ fontSize: 12.5, color: '#5a5a62' }}>{sublabel}</div>
+        <div style={{
+          fontSize: 12,
+          color: 'var(--gd-ink)',
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+        }}>{sublabel}</div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minHeight: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minHeight: 30 }}>
         {recipients.slice(0, previewCount).map((r, i) => (
           <span
             key={r.email + i}
             title={r.name}
             style={{
-              width: 28, height: 28, borderRadius: '50%',
+              width: 30, height: 30, borderRadius: '50%',
               background: avatarGradient(r.name),
-              color: '#fff', fontSize: 10.5, fontWeight: 600,
+              color: '#fff', fontSize: 10.5, fontWeight: 700,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              border: '2px solid #fff',
+              border: '1.5px solid var(--gd-ink)',
               marginLeft: i === 0 ? 0 : -8,
               zIndex: previewCount - i,
             }}
@@ -340,32 +409,54 @@ function CampaignCard({
         ))}
         {remainder > 0 && (
           <span style={{
-            width: 28, height: 28, borderRadius: '50%',
-            background: '#f0f0f2', color: '#5a5a62',
-            fontSize: 10.5, fontWeight: 500,
+            width: 30, height: 30, borderRadius: '50%',
+            background: 'var(--gd-cream)', color: 'var(--gd-ink)',
+            fontSize: 10.5, fontWeight: 700,
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            border: '2px solid #fff', marginLeft: -8,
+            border: '1.5px solid var(--gd-ink)', marginLeft: -8,
           }}>+{remainder}</span>
         )}
       </div>
 
-      <GlassButton
-        size="sm"
+      <button
         onClick={onCopy}
-        glassColor={copied
-          ? 'rgba(31, 138, 76, 0.95)'
-          : (primary ? 'rgba(124, 92, 255, 0.85)' : 'rgba(21, 21, 26, 0.9)')}
-        className="w-full !text-white"
+        className="gd-campaign-copy"
+        style={{
+          all: 'unset',
+          cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 6,
+          padding: '10px 16px',
+          borderRadius: 999,
+          background: copied ? 'var(--gd-lime)' : (primary ? 'var(--gd-ink)' : 'var(--gd-cream)'),
+          color: copied ? 'var(--gd-ink)' : (primary ? 'var(--gd-cream)' : 'var(--gd-ink)'),
+          border: '1.5px solid var(--gd-ink)',
+          boxShadow: '3px 3px 0 var(--gd-ink)',
+          fontSize: 12,
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+          transition: 'transform 140ms ease, box-shadow 140ms ease',
+        }}
       >
-        {copied ? '✓ Copied to clipboard' : <><CopyIcon /> Copy {recipients.length} {recipients.length === 1 ? 'person' : 'people'}</>}
-      </GlassButton>
+        {copied ? '✓ copied to clipboard' : <><CopyIcon /> copy {recipients.length} {recipients.length === 1 ? 'person' : 'people'}</>}
+      </button>
+
+      <style jsx>{`
+        :global(.gd-campaign-copy:hover) {
+          transform: translate(-1px, -1px);
+          box-shadow: 4px 4px 0 var(--gd-ink) !important;
+        }
+      `}</style>
     </div>
   );
 }
 
 function CopyIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <rect x="9" y="9" width="13" height="13" rx="2" />
       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
     </svg>
