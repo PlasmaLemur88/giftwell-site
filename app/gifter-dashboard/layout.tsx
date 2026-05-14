@@ -4,7 +4,6 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BRAND, BRAND_DARK, GIFTER } from './data';
-import { RandomBackground } from './components/RandomBackground';
 
 const NAV = [
   { href: '/gifter-dashboard',                label: 'Home',         icon: HomeIcon },
@@ -16,8 +15,6 @@ const NAV = [
 export default function GifterDashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div className="gd-shell">
-      <RandomBackground />
-
       {/* Top notice */}
       <div className="gd-notice">
         Preview of the Giftwell gifter dashboard . hosted on <strong>account.giftwell.io</strong> in production
@@ -89,10 +86,22 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
         body { background: #F6F2FA; margin: 0; }
 
         .gd-shell {
-          position: relative;
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
           color: #1a1a1f;
           min-height: 100vh;
+          background:
+            radial-gradient(ellipse 75% 240px at 50% 0%, rgba(255, 214, 194, 0.32) 0%, transparent 75%) no-repeat,
+            linear-gradient(180deg,
+              ${BRAND_DARK} 0px,
+              ${BRAND} 60px,
+              #9B7FEC 170px,
+              #BFA6F0 290px,
+              #DCC8F0 420px,
+              #ECDFF3 540px,
+              #F2E9F6 640px,
+              #F6F2FA 760px,
+              #F6F2FA 100%
+            ) no-repeat;
           background-color: #F6F2FA;
         }
         .gd-notice {
