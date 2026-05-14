@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { BRAND, GIFTER, STATS, ORDERS, ORDER_STATUS_COLORS, getRecipients, avatarGradient } from './data';
+import { LiquidGlassCard } from '@/components/ui/liquid-weather-glass';
 
 const PEACH = '#FFD6C2';
 
@@ -322,26 +323,28 @@ export default function GifterHome() {
 function StatTile({ target, format, sub }: { target: number; format: (n: number) => string; sub: string }) {
   const animated = useCountUp(target);
   return (
-    <div style={{
-      background: 'rgba(255, 255, 255, 0.92)',
-      border: '1px solid rgba(255, 255, 255, 0.7)',
-      borderRadius: 14,
-      padding: '14px 16px 12px',
-      backdropFilter: 'blur(10px)',
-      WebkitBackdropFilter: 'blur(10px)',
-      boxShadow: '0 4px 18px -6px rgba(20, 14, 50, 0.18)',
-    }}>
-      <div style={{
-        fontFamily: '"Georgia", "Times New Roman", serif',
-        fontSize: 26,
-        fontWeight: 500,
-        letterSpacing: '-0.02em',
-        color: '#1a1a1f',
-        lineHeight: 1.1,
-        fontVariantNumeric: 'tabular-nums',
-      }}>{format(animated)}</div>
-      <div style={{ fontSize: 12, color: '#6b6b73', marginTop: 4 }}>{sub}</div>
-    </div>
+    <LiquidGlassCard
+      draggable={false}
+      blurIntensity="lg"
+      shadowIntensity="md"
+      glowIntensity="sm"
+      borderRadius="14px"
+      className="bg-white/25"
+    >
+      <div style={{ padding: '14px 16px 12px' }}>
+        <div style={{
+          fontFamily: '"Georgia", "Times New Roman", serif',
+          fontSize: 26,
+          fontWeight: 500,
+          letterSpacing: '-0.02em',
+          color: '#fff',
+          textShadow: '0 1px 3px rgba(20, 14, 50, 0.35)',
+          lineHeight: 1.1,
+          fontVariantNumeric: 'tabular-nums',
+        }}>{format(animated)}</div>
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.92)', marginTop: 4, textShadow: '0 1px 2px rgba(20,14,50,0.3)' }}>{sub}</div>
+      </div>
+    </LiquidGlassCard>
   );
 }
 
