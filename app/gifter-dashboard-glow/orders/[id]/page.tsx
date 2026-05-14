@@ -3,6 +3,7 @@
 import { use, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ORDERS, getRecipients, avatarGradient, type RecipientStatus } from '@/app/gifter-dashboard/data';
+import { DigitalUnboxingPreview } from '@/app/gifter-dashboard/components/DigitalUnboxingPreview';
 
 const FILTERS: ('All' | RecipientStatus)[] = ['All', 'Claimed', 'Delivered', 'Pending', 'Bounced'];
 
@@ -59,6 +60,22 @@ export default function GlowOrderDetail({ params }: { params: Promise<{ id: stri
           <span>{order.budgetPerRecipient}/person</span>
           <span className="gdg-dot" aria-hidden>·</span>
           <span className={`gdg-status-text gdg-status-text-${order.status.toLowerCase()}`}>{order.status}</span>
+        </div>
+      </section>
+
+      {/* Digital unboxing showcase */}
+      <section className="gdg-unboxing">
+        <DigitalUnboxingPreview design={order.unboxing} aspectRatio="21 / 9" radius={0} showLabel={false} />
+        <div className="gdg-unboxing-caption">
+          <div className="gdg-unboxing-info">
+            <span className="gdg-unboxing-kicker">
+              <span className="gdg-unboxing-play" aria-hidden>▶</span>
+              Digital unboxing
+            </span>
+            <div className="gdg-unboxing-theme">{order.unboxing.theme}</div>
+            <div className="gdg-unboxing-occasion">{order.unboxing.occasion}</div>
+          </div>
+          <div className="gdg-unboxing-msg">&ldquo;{order.unboxing.message}&rdquo;</div>
         </div>
       </section>
 
@@ -180,6 +197,44 @@ export default function GlowOrderDetail({ params }: { params: Promise<{ id: stri
         .gdg-status-text-scheduled { color: #FCD34D; }
         .gdg-status-text-completed { color: #93C5FD; }
         .gdg-status-text-draft     { color: var(--gdg-text-soft); }
+
+        /* Digital unboxing showcase */
+        .gdg-unboxing {
+          background: var(--gdg-surface);
+          border: 1px solid var(--gdg-hairline);
+          border-radius: var(--gdg-radius);
+          overflow: hidden;
+        }
+        .gdg-unboxing-caption {
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 20px; padding: 16px 20px;
+        }
+        .gdg-unboxing-info { min-width: 0; }
+        .gdg-unboxing-kicker {
+          display: inline-flex; align-items: center; gap: 6px;
+          font-size: 10px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.1em;
+          color: var(--gdg-text-dim);
+        }
+        .gdg-unboxing-play { font-size: 7px; }
+        .gdg-unboxing-theme {
+          font-family: var(--gdg-display);
+          font-size: 19px; font-weight: 600;
+          letter-spacing: -0.015em; color: var(--gdg-text);
+          margin-top: 3px;
+        }
+        .gdg-unboxing-occasion {
+          font-size: 13px; color: var(--gdg-text-soft); margin-top: 1px;
+        }
+        .gdg-unboxing-msg {
+          font-size: 14px; color: var(--gdg-text-soft);
+          font-style: italic; text-align: right;
+          max-width: 280px; flex-shrink: 0;
+        }
+        @media (max-width: 620px) {
+          .gdg-unboxing-caption { flex-direction: column; align-items: flex-start; gap: 10px; }
+          .gdg-unboxing-msg { text-align: left; max-width: none; }
+        }
 
         /* Health */
         .gdg-health {

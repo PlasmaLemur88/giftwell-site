@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { GIFTER, STATS, ORDERS, getRecipients, avatarGradient } from './data';
+import { DigitalUnboxingPreview } from './components/DigitalUnboxingPreview';
 
 function useCountUp(target: number, duration = 1400): number {
   const [value, setValue] = useState(0);
@@ -99,6 +100,8 @@ export default function GifterHome() {
                   transform: `rotate(${ROTATIONS[idx % ROTATIONS.length]})`,
                 }}
               >
+                <DigitalUnboxingPreview design={o.unboxing} aspectRatio="16 / 9" radius={12} bordered />
+
                 <div className="gd-order-card-top">
                   <div>
                     <div className="gd-order-name">{o.name}</div>

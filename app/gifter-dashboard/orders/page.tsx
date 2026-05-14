@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ORDERS } from '../data';
+import { DigitalUnboxingPreview } from '../components/DigitalUnboxingPreview';
 
 const ROW_TINTS = ['var(--gd-paper)', 'var(--gd-peach)', 'var(--gd-sky)', 'var(--gd-pink-soft)'];
 
@@ -26,6 +27,9 @@ export default function GifterOrders() {
               className="gd-order-row"
               style={{ background: ROW_TINTS[idx % ROW_TINTS.length] }}
             >
+              <div className="gd-row-thumb">
+                <DigitalUnboxingPreview design={o.unboxing} aspectRatio="1 / 1" radius={10} bordered showLabel={false} />
+              </div>
               <div className="gd-row-main">
                 <div className="gd-row-name">{o.name}</div>
                 <div className="gd-row-sub">
@@ -87,10 +91,10 @@ export default function GifterOrders() {
         }
         :global(.gd-order-row) {
           display: grid;
-          grid-template-columns: 1fr 200px auto 20px;
+          grid-template-columns: 72px 1fr 200px auto 20px;
           align-items: center;
           gap: 18px;
-          padding: 18px 22px;
+          padding: 16px 22px;
           border: var(--gd-border);
           border-radius: var(--gd-radius-lg);
           box-shadow: var(--gd-sticker);
@@ -102,6 +106,7 @@ export default function GifterOrders() {
           transform: translate(-3px, -3px);
           box-shadow: 7px 7px 0 var(--gd-ink);
         }
+        .gd-row-thumb { width: 72px; }
         .gd-row-main { min-width: 0; }
         .gd-row-name {
           font-family: var(--gd-display);
@@ -147,15 +152,16 @@ export default function GifterOrders() {
 
         @media (max-width: 720px) {
           :global(.gd-order-row) {
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 56px 1fr auto;
             grid-template-areas:
-              "name status"
-              "progress progress";
-            gap: 12px 14px;
+              "thumb name status"
+              "progress progress progress";
+            gap: 10px 14px;
           }
+          .gd-row-thumb { grid-area: thumb; width: 56px; }
           .gd-row-main { grid-area: name; }
           .gd-row-progress { grid-area: progress; }
-          .gd-row-status { grid-area: status; }
+          .gd-row-status { grid-area: status; align-self: center; }
           .gd-row-arrow { display: none; }
         }
       `}</style>

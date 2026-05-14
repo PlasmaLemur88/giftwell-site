@@ -6,6 +6,7 @@ import {
   ORDERS, getRecipients, avatarGradient,
   type GifterOrderStatus,
 } from '@/app/gifter-dashboard/data';
+import { DigitalUnboxingPreview } from '@/app/gifter-dashboard/components/DigitalUnboxingPreview';
 
 const FILTERS: ('All' | GifterOrderStatus)[] = ['All', 'Sent', 'Scheduled', 'Completed'];
 
@@ -51,14 +52,13 @@ export default function GlowOrders() {
             : [];
           return (
             <Link key={o.id} href={`/gifter-dashboard-glow/orders/${o.id}`} className="gdg-card gdg-order-card">
-              <div className="gdg-order-poster">
+              <div className="gdg-order-poster-wrap">
+                <DigitalUnboxingPreview design={o.unboxing} aspectRatio="4 / 3" radius={0} />
                 <span className={`gdg-status gdg-status-${o.status.toLowerCase()}`}>{o.status}</span>
-                <span className="gdg-order-poster-amount">{o.budgetPerRecipient}</span>
-                <span className="gdg-order-poster-label">per person</span>
               </div>
               <div className="gdg-order-body">
                 <div className="gdg-order-name">{o.name}</div>
-                <div className="gdg-order-meta">{o.recipients} recipients</div>
+                <div className="gdg-order-meta">{o.recipients} recipients · {o.budgetPerRecipient}/person</div>
                 {previewRecipients.length > 0 ? (
                   <>
                     <div className="gdg-progress">
@@ -144,28 +144,11 @@ export default function GlowOrders() {
           border-color: rgba(124, 92, 255, 0.5);
           box-shadow: 0 18px 40px -16px rgba(124, 92, 255, 0.45);
         }
-        .gdg-order-poster {
+        .gdg-order-poster-wrap {
           position: relative;
-          aspect-ratio: 4 / 3;
-          background:
-            radial-gradient(circle at 30% 25%, rgba(167, 139, 250, 0.45), transparent 60%),
-            linear-gradient(135deg, #2A2150, #1A1530);
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          gap: 2px;
-        }
-        .gdg-order-poster-amount {
-          font-family: var(--gdg-display);
-          font-size: 40px; font-weight: 600;
-          letter-spacing: -0.03em; color: #fff;
-        }
-        .gdg-order-poster-label {
-          font-size: 11px; font-weight: 600;
-          text-transform: uppercase; letter-spacing: 0.1em;
-          color: rgba(255, 255, 255, 0.55);
         }
         .gdg-status {
-          position: absolute; top: 12px; left: 12px;
+          position: absolute; top: 12px; right: 12px;
           font-size: 10.5px; font-weight: 700;
           text-transform: uppercase; letter-spacing: 0.06em;
           padding: 4px 9px; border-radius: 999px; color: #fff;

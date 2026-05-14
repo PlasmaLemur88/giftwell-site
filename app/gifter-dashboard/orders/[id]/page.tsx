@@ -3,6 +3,7 @@
 import { use, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ORDERS, getRecipients, avatarGradient, type RecipientStatus } from '../../data';
+import { DigitalUnboxingPreview } from '../../components/DigitalUnboxingPreview';
 
 const FILTERS: ('All' | RecipientStatus)[] = ['All', 'Claimed', 'Delivered', 'Pending', 'Bounced'];
 
@@ -66,6 +67,19 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
           <span className="gd-meta-chip">{order.recipients} recipients</span>
           <span className="gd-meta-chip">{order.budgetPerRecipient}/person</span>
           <span className="gd-meta-chip gd-meta-chip-pink">{order.status}</span>
+        </div>
+      </section>
+
+      {/* Digital unboxing showcase */}
+      <section className="gd-unboxing">
+        <DigitalUnboxingPreview design={order.unboxing} aspectRatio="21 / 9" radius={0} showLabel={false} />
+        <div className="gd-unboxing-caption">
+          <div>
+            <span className="gd-unboxing-kicker"><span aria-hidden>▶</span> Digital unboxing</span>
+            <div className="gd-unboxing-theme">{order.unboxing.theme}</div>
+            <div className="gd-unboxing-occasion">{order.unboxing.occasion}</div>
+          </div>
+          <div className="gd-unboxing-msg">&ldquo;{order.unboxing.message}&rdquo;</div>
         </div>
       </section>
 
@@ -201,6 +215,47 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
           box-shadow: var(--gd-sticker-sm);
         }
         .gd-meta-chip-pink { background: var(--gd-pink); color: var(--gd-cream); }
+
+        /* Digital unboxing showcase */
+        .gd-unboxing {
+          background: var(--gd-paper);
+          border: var(--gd-border);
+          border-radius: var(--gd-radius-lg);
+          box-shadow: var(--gd-sticker);
+          overflow: hidden;
+        }
+        .gd-unboxing-caption {
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 20px; padding: 16px 20px;
+          border-top: var(--gd-border);
+        }
+        .gd-unboxing-kicker {
+          display: inline-flex; align-items: center; gap: 6px;
+          font-size: 10px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.1em;
+          color: var(--gd-ink-muted);
+        }
+        .gd-unboxing-kicker span { font-size: 7px; }
+        .gd-unboxing-theme {
+          font-family: var(--gd-display);
+          font-size: 22px; font-weight: 500; font-style: italic;
+          letter-spacing: -0.015em; color: var(--gd-ink);
+          margin-top: 3px;
+        }
+        .gd-unboxing-occasion {
+          font-size: 13px; color: var(--gd-ink-soft); margin-top: 1px;
+          font-weight: 500;
+        }
+        .gd-unboxing-msg {
+          font-family: var(--gd-display);
+          font-size: 15px; font-style: italic;
+          color: var(--gd-ink-soft);
+          text-align: right; max-width: 260px; flex-shrink: 0;
+        }
+        @media (max-width: 620px) {
+          .gd-unboxing-caption { flex-direction: column; align-items: flex-start; gap: 10px; }
+          .gd-unboxing-msg { text-align: left; max-width: none; }
+        }
 
         .gd-health {
           background: var(--gd-paper);
