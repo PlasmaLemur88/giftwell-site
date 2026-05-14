@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giftwell | Corporate Gifting Made Easy</title>
+<link rel="icon" type="image/png" href="g-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══ BRUTALIST DESIGN TOKENS ═══ */
+:root {
+  --cream:        #F1ECDE;
+  --cream-deep:   #E6DFCB;
+  --paper:        #FFF8EC;
+  --ink:          #0F0F12;
+  --ink-soft:     #2A2A30;
+  --ink-muted:    #5E5E68;
+  --peach:        #FFD6C2;
+  --peach-deep:   #FFB89D;
+  --lime:         #D4F542;
+  --lime-deep:    #B8E024;
+  --pink:         #FF4D8D;
+  --pink-soft:    #FFC2D6;
+  --sky:          #C8E6FF;
+
+  --border:       1.5px solid var(--ink);
+  --border-thick: 2.5px solid var(--ink);
+  --sticker:      4px 4px 0 var(--ink);
+  --sticker-lg:   7px 7px 0 var(--ink);
+  --sticker-sm:   3px 3px 0 var(--ink);
+  --radius:       14px;
+  --radius-lg:    20px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--cream);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grain on the whole page */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.06  0 0 0 0 0.06  0 0 0 0 0.07  0 0 0 0.18 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+main { position: relative; z-index: 1; }
+
+/* ═══ HEADINGS ═══ */
+h1, h2, h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+  color: var(--ink);
+}
+h1 em, h2 em, h3 em { font-style: italic; font-weight: 500; color: var(--pink); }
+
+/* ═══ STICKER COMPONENTS ═══ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700; font-size: 13px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 14px 26px; border-radius: 999px;
+  text-decoration: none; cursor: pointer; border: var(--border);
+  box-shadow: var(--sticker);
+  transition: transform 160ms cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 160ms ease;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+.btn-lime  { background: var(--lime); color: var(--ink); }
+.btn-ink   { background: var(--ink); color: var(--cream); }
+.btn-pink  { background: var(--pink); color: var(--cream); }
+.btn-cream { background: var(--cream); color: var(--ink); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 5px 12px; border-radius: 999px;
+  border: var(--border); background: var(--lime); color: var(--ink);
+  box-shadow: var(--sticker-sm);
+}
+.chip-peach { background: var(--peach); }
+.chip-pink  { background: var(--pink); color: var(--cream); }
+.chip-paper { background: var(--paper); }
+.chip-sky   { background: var(--sky); }
+.chip-ink   { background: var(--ink); color: var(--cream); }
+
+.sticker {
+  background: var(--paper);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sticker);
+}
+
+.g-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  background: var(--lime); border: var(--border);
+  border-radius: 10px; box-shadow: var(--sticker-sm);
+  transform: rotate(-4deg);
+  flex-shrink: 0;
+}
+.g-mark img { width: 22px; height: 22px; object-fit: contain; }
+
+/* ═══ REVEAL ═══ */
+.reveal {
+  opacity: 0; transform: translateY(40px);
+  transition: opacity .7s cubic-bezier(.25,.1,.25,1),
+              transform .7s cubic-bezier(.17,.67,.3,1.2);
+}
+.reveal.vis { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: .1s; }
+.reveal-d2 { transition-delay: .2s; }
+.reveal-d3 { transition-delay: .3s; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ═══ NAV ═══ */
+nav.top {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--cream);
+  border-bottom: var(--border);
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px;
+}
+.nav-logo {
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+.nav-logo span {
+  font-family: 'Fraunces', serif;
+  font-style: italic; font-weight: 600; font-size: 24px;
+  color: var(--ink); letter-spacing: -0.01em;
+}
+.nav-links { display: flex; gap: 28px; }
+.nav-links a {
+  font-size: 13.5px; font-weight: 600;
+  color: var(--ink); text-decoration: none;
+}
+.nav-links a:hover { color: var(--pink); }
+.nav-right { display: flex; align-items: center; gap: 14px; }
+.nav-right .login {
+  font-size: 13px; font-weight: 600; color: var(--ink); text-decoration: none;
+}
+
+/* ═══ HERO ═══ */
+.hero {
+  padding: 60px 32px 100px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute;
+  top: -120px; right: -80px;
+  width: 380px; height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--peach) 0%, transparent 65%);
+  opacity: 0.6; pointer-events: none;
+}
+.hero::after {
+  content: ''; position: absolute;
+  bottom: -160px; left: -120px;
+  width: 420px; height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--pink-soft) 0%, transparent 70%);
+  opacity: 0.5; pointer-events: none;
+}
+.hero-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 64px;
+  align-items: center; position: relative;
+}
+.hero-eyebrows { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+.hero h1 {
+  font-size: clamp(48px, 7vw, 86px);
+  margin-bottom: 24px;
+  line-height: 0.98;
+}
+.hero .pink-pull {
+  display: inline-block;
+  background: var(--lime);
+  border: var(--border);
+  box-shadow: var(--sticker);
+  padding: 2px 14px;
+  border-radius: 14px;
+  transform: rotate(-1.5deg) translateY(-2px);
+  font-style: italic; color: var(--pink);
+}
+.hero-sub {
+  font-size: 18px; line-height: 1.55;
+  color: var(--ink-soft); font-weight: 500;
+  margin-bottom: 32px; max-width: 520px;
+}
+.hero-meta {
+  margin-top: 28px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hero-meta-text {
+  font-size: 11.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--ink-muted);
+}
+
+/* Hero media — sticker box */
+.hero-media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--paper);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sticker-lg);
+  transform: rotate(1.5deg);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.hero-media-label {
+  position: absolute; top: 18px; left: 22px;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--ink-muted);
+}
+.hero-giftbox {
+  width: 78%; aspect-ratio: 1 / 1;
+  position: relative;
+}
+.hero-giftbox .box {
+  position: absolute; inset: 18% 0 0 0;
+  background: var(--peach);
+  border: var(--border); border-radius: 6px;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.hero-giftbox .lid {
+  position: absolute; left: -3%; right: -3%; top: 10%; height: 14%;
+  background: var(--pink);
+  border: var(--border); border-radius: 6px;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.hero-giftbox .ribbon-v {
+  position: absolute; left: 47%; top: 10%; bottom: 0; width: 6%;
+  background: var(--lime);
+  border-left: var(--border); border-right: var(--border);
+}
+.hero-giftbox .ribbon-h {
+  position: absolute; left: 0; right: 0; top: 38%; height: 7%;
+  background: var(--lime);
+  border-top: var(--border); border-bottom: var(--border);
+}
+.hero-giftbox .bow {
+  position: absolute; left: 38%; top: 0; width: 24%; height: 20%;
+  background: var(--pink);
+  border: var(--border); border-radius: 50%;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.hero-giftbox .star {
+  position: absolute;
+  font-family: 'Fraunces', serif; font-style: italic;
+  font-size: 24px; color: var(--ink);
+}
+.hero-giftbox .star-1 { top: -2%; right: 0; font-size: 28px; transform: rotate(12deg); }
+.hero-giftbox .star-2 { bottom: -2%; left: -8%; font-size: 22px; transform: rotate(-18deg); }
+
+/* ═══ MARQUEE ═══ */
+.marquee {
+  background: var(--ink); color: var(--cream);
+  padding: 20px 0;
+  border-top: var(--border); border-bottom: var(--border);
+  overflow: hidden;
+  position: relative;
+}
+.marquee-track {
+  display: flex; gap: 32px;
+  white-space: nowrap;
+  animation: marquee 50s linear infinite;
+}
+.marquee-track span {
+  font-family: 'Fraunces', serif;
+  font-style: italic; font-weight: 500;
+  font-size: 22px;
+  display: inline-flex; align-items: center; gap: 32px;
+}
+.marquee-track span::after {
+  content: '✦';
+  color: var(--lime);
+  margin-left: 12px;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ═══ SHOWCASE ═══ */
+.showcase {
+  padding: 100px 32px 80px;
+  max-width: 1200px; margin: 0 auto;
+  text-align: center;
+}
+.showcase h2 {
+  font-size: clamp(36px, 5vw, 56px);
+  max-width: 880px; margin: 0 auto 18px;
+}
+.showcase p {
+  font-size: 17px; color: var(--ink-soft);
+  font-weight: 500; max-width: 600px;
+  margin: 0 auto 36px;
+  line-height: 1.55;
+}
+.tabs {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  justify-content: center; margin-bottom: 40px;
+}
+.tab {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 9px 16px;
+  background: var(--paper); color: var(--ink);
+  border: var(--border); border-radius: 999px;
+  box-shadow: var(--sticker-sm);
+  cursor: pointer; user-select: none;
+  transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+.tab:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.tab.active { background: var(--ink); color: var(--cream); }
+.showcase-media {
+  aspect-ratio: 16 / 9;
+  background: var(--peach);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sticker-lg);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-style: italic; font-size: 18px;
+  color: var(--ink-muted);
+  position: relative;
+}
+.showcase-media::before {
+  content: '▶'; font-style: normal;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--lime); border: var(--border);
+  box-shadow: var(--sticker);
+  font-size: 18px; color: var(--ink);
+  margin-right: 14px;
+}
+
+/* ═══ FEATURE ROWS ═══ */
+.feature-row {
+  padding: 80px 32px;
+}
+.feature-row:nth-child(odd) { background: transparent; }
+.feature-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
+  align-items: center;
+}
+.feature-inner.reverse > div:first-child { order: 2; }
+.feature-text h2 {
+  font-size: clamp(32px, 4vw, 48px);
+  margin-bottom: 18px;
+}
+.feature-text p {
+  font-size: 16.5px; line-height: 1.6;
+  color: var(--ink-soft); font-weight: 500;
+  margin-bottom: 28px;
+  max-width: 480px;
+}
+.feature-media {
+  aspect-ratio: 4 / 3;
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sticker-lg);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-style: italic; color: var(--ink-muted);
+  font-size: 16px;
+  position: relative;
+}
+.feature-row:nth-of-type(1) .feature-media { background: var(--peach);    transform: rotate(-1.5deg); }
+.feature-row:nth-of-type(2) .feature-media { background: var(--sky);      transform: rotate(1.2deg); }
+.feature-row:nth-of-type(3) .feature-media { background: var(--lime);     transform: rotate(-0.8deg); }
+.feature-row:nth-of-type(4) .feature-media { background: var(--pink-soft);transform: rotate(1.4deg); }
+.feature-row:nth-of-type(5) .feature-media { background: var(--peach);    transform: rotate(-1.2deg); }
+.feature-row:nth-of-type(6) .feature-media { background: var(--sky);      transform: rotate(0.8deg); }
+.feature-media .play {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: var(--cream); border: var(--border);
+  box-shadow: var(--sticker);
+  font-size: 16px;
+  margin-right: 12px;
+}
+
+/* ═══ 3 CARDS ═══ */
+.cards-section {
+  padding: 100px 32px;
+  max-width: 1200px; margin: 0 auto;
+}
+.cards-head {
+  text-align: center; margin-bottom: 56px;
+}
+.cards-head h2 {
+  font-size: clamp(36px, 5vw, 56px);
+  max-width: 720px; margin: 0 auto;
+}
+.cards-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
+}
+.fcard {
+  background: var(--paper);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sticker);
+  padding: 22px;
+  display: flex; flex-direction: column; gap: 16px;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.fcard:hover { transform: translate(-3px, -3px); box-shadow: 7px 7px 0 var(--ink); }
+.fcard:nth-child(1) { transform: rotate(-1.2deg); }
+.fcard:nth-child(2) { transform: rotate(0.8deg); }
+.fcard:nth-child(3) { transform: rotate(-0.5deg); }
+.fcard:nth-child(1):hover { transform: rotate(0deg) translate(-3px, -3px); }
+.fcard:nth-child(2):hover { transform: rotate(0deg) translate(-3px, -3px); }
+.fcard:nth-child(3):hover { transform: rotate(0deg) translate(-3px, -3px); }
+.fcard-img {
+  aspect-ratio: 4 / 3;
+  border-radius: 12px; border: var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-style: italic;
+  color: var(--ink-muted);
+}
+.fcard:nth-child(1) .fcard-img { background: var(--peach); }
+.fcard:nth-child(2) .fcard-img { background: var(--lime); }
+.fcard:nth-child(3) .fcard-img { background: var(--pink-soft); }
+.fcard h3 {
+  font-size: 24px; margin-bottom: 8px;
+  font-style: italic;
+}
+.fcard p {
+  font-size: 14.5px; line-height: 1.55;
+  color: var(--ink-soft); font-weight: 500;
+  margin-bottom: 14px;
+}
+.fcard-link {
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--ink); text-decoration: none;
+  align-self: flex-start;
+  padding: 7px 14px; border-radius: 999px;
+  background: var(--cream); border: var(--border);
+  box-shadow: var(--sticker-sm);
+  transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+.fcard-link:hover {
+  transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink);
+  background: var(--lime);
+}
+
+/* ═══ ORIGIN STORY ═══ */
+.origin {
+  padding: 120px 32px;
+  background: var(--cream-deep);
+  border-top: var(--border); border-bottom: var(--border);
+  position: relative;
+}
+.origin::before {
+  content: '"';
+  position: absolute;
+  top: 40px; left: 50%; transform: translateX(-50%);
+  font-family: 'Fraunces', serif;
+  font-style: italic; font-weight: 700;
+  font-size: 200px; line-height: 1;
+  color: var(--pink); opacity: 0.4;
+}
+.origin-inner {
+  max-width: 800px; margin: 0 auto;
+  text-align: center; position: relative;
+}
+.origin h2 {
+  font-size: clamp(34px, 4.5vw, 50px);
+  margin-bottom: 28px; font-style: italic;
+}
+.origin p {
+  font-size: 18px; line-height: 1.55;
+  color: var(--ink-soft); font-weight: 500;
+  margin-bottom: 16px;
+}
+
+/* ═══ REVIEWS ═══ */
+.reviews {
+  padding: 100px 32px;
+  max-width: 1200px; margin: 0 auto;
+}
+.reviews-inner {
+  display: grid; grid-template-columns: 1fr 1.4fr; gap: 64px;
+  align-items: start;
+}
+.reviews-text { position: sticky; top: 100px; }
+.reviews-text h2 {
+  font-size: clamp(34px, 4.5vw, 52px);
+  margin: 18px 0 16px;
+}
+.reviews-text p {
+  font-size: 16.5px; color: var(--ink-soft);
+  font-weight: 500; line-height: 1.55;
+  margin-bottom: 28px; max-width: 360px;
+}
+.reviews-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 22px;
+}
+.review-card {
+  background: var(--paper);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sticker);
+  padding: 22px;
+}
+.review-card:nth-child(odd) { transform: rotate(-0.8deg); }
+.review-card:nth-child(even) { transform: rotate(0.6deg); }
+.review-card:nth-child(3n) { background: var(--peach); }
+.review-card:nth-child(3n+1) { background: var(--paper); }
+.review-card:nth-child(3n+2) { background: var(--sky); }
+.review-header {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+  margin-bottom: 10px;
+}
+.review-header h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 18px; font-weight: 500; font-style: italic;
+  line-height: 1.2; letter-spacing: -0.01em;
+}
+.review-date {
+  font-size: 11px; color: var(--ink-muted); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.review-stars {
+  color: var(--pink); font-size: 14px;
+  margin-bottom: 4px;
+}
+.review-author {
+  font-size: 12px; color: var(--ink-muted); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  display: block; margin-bottom: 14px;
+}
+.review-card p {
+  font-size: 14.5px; line-height: 1.55;
+  color: var(--ink-soft); font-weight: 500;
+}
+
+/* ═══ CTA BANNER ═══ */
+.cta {
+  padding: 120px 32px;
+  background: var(--lime);
+  border-top: var(--border); border-bottom: var(--border);
+  text-align: center; position: relative;
+  overflow: hidden;
+}
+.cta::before {
+  content: '';
+  position: absolute; left: -100px; top: -60px;
+  width: 280px; height: 280px;
+  background: var(--pink-soft); opacity: 0.5;
+  border-radius: 50%;
+}
+.cta::after {
+  content: '';
+  position: absolute; right: -120px; bottom: -80px;
+  width: 320px; height: 320px;
+  background: var(--peach); opacity: 0.6;
+  border-radius: 50%;
+}
+.cta-inner { position: relative; z-index: 2; max-width: 880px; margin: 0 auto; }
+.cta h2 {
+  font-size: clamp(40px, 6vw, 72px);
+  margin-bottom: 18px;
+}
+.cta p {
+  font-size: 17px; color: var(--ink-soft);
+  font-weight: 500; margin-bottom: 32px;
+}
+.cta .g-mark {
+  width: 64px; height: 64px;
+  margin: 0 auto 22px;
+  background: var(--ink);
+}
+.cta .g-mark img { width: 38px; height: 38px; filter: invert(1); }
+
+/* ═══ FOOTER ═══ */
+footer {
+  padding: 64px 32px 48px;
+  background: var(--cream-deep);
+  border-top: var(--border);
+}
+.footer-inner {
+  max-width: 1200px; margin: 0 auto;
+}
+.footer-top {
+  display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid rgba(15, 15, 18, 0.15);
+}
+.footer-logo-col { display: flex; flex-direction: column; gap: 14px; }
+.footer-logo-col .footer-mark {
+  width: 48px; height: 48px;
+  background: var(--lime); border: var(--border);
+  border-radius: 12px; box-shadow: var(--sticker-sm);
+  display: inline-flex; align-items: center; justify-content: center;
+  transform: rotate(-4deg);
+}
+.footer-logo-col .footer-mark img { width: 30px; height: 30px; }
+.footer-logo-col p {
+  font-size: 14px; color: var(--ink-soft);
+  font-weight: 500; line-height: 1.55; max-width: 260px;
+}
+.footer-col h5 {
+  font-family: 'Inter', sans-serif;
+  font-size: 11.5px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  margin-bottom: 14px;
+  color: var(--ink);
+}
+.footer-col a {
+  display: block;
+  font-size: 14px; color: var(--ink-soft);
+  text-decoration: none; margin-bottom: 8px;
+  font-weight: 500;
+}
+.footer-col a:hover { color: var(--pink); }
+.footer-bottom {
+  padding-top: 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; color: var(--ink-muted); font-weight: 500;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 900px) {
+  .hero-inner,
+  .feature-inner,
+  .reviews-inner { grid-template-columns: 1fr; gap: 36px; }
+  .feature-inner.reverse > div:first-child { order: 0; }
+  .reviews-text { position: static; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .reviews-grid { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: 1fr 1fr; }
+  .nav-links { display: none; }
+}
+@media (max-width: 640px) {
+  .footer-top { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; gap: 10px; }
+  .hero { padding: 40px 22px 70px; }
+  .showcase, .cards-section, .reviews { padding: 70px 22px; }
+  .origin, .cta { padding: 80px 22px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="nav-inner">
+    <a href="/site.html" class="nav-logo" aria-label="Giftwell">
+      <span class="g-mark"><img src="g-black-bold.png" alt=""></span>
+      <span>Giftwell</span>
+    </a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#proof">Proof</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="login">Log in</a>
+      <a href="#" class="btn btn-lime">Install free</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="reveal">
+      <div class="hero-eyebrows">
+        <span class="chip chip-lime">★★★★★ 100+ Shopify merchants</span>
+        <span class="chip chip-peach">Free to install</span>
+      </div>
+      <h1>
+        Your next
+        <span class="pink-pull">$1M</span>
+        channel is
+        <em>corporate&nbsp;gifting.</em>
+      </h1>
+      <p class="hero-sub">
+        Sales teams, HR, event planners, team leads. They&rsquo;re all buying gifts in your category right now. Giftwell makes your store the easiest place to order &mdash; and turns every recipient into a subscriber.
+      </p>
+      <a href="#" class="btn btn-ink">Unlock new revenue →</a>
+      <div class="hero-meta">
+        <span class="hero-meta-text">Built for</span>
+        <span class="chip chip-ink">Shopify</span>
+        <span class="hero-meta-text">merchants</span>
+      </div>
+    </div>
+    <div class="hero-media reveal reveal-d2">
+      <span class="hero-media-label">Hero product video</span>
+      <div class="hero-giftbox">
+        <span class="star star-1">✦</span>
+        <div class="box"></div>
+        <div class="ribbon-h"></div>
+        <div class="ribbon-v"></div>
+        <div class="lid"></div>
+        <div class="bow"></div>
+        <span class="star star-2">✦</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>The gifting app we&rsquo;ve been waiting for</span>
+    <span>Partiful for corporate gifts</span>
+    <span>DTC brands&rsquo; secret weapon</span>
+    <span>Corporate gifting, reimagined</span>
+    <span>Finally, B2B revenue that doesn&rsquo;t suck</span>
+    <span>Installed in October, $47K by November</span>
+    <span>The gifting app we&rsquo;ve been waiting for</span>
+    <span>Partiful for corporate gifts</span>
+    <span>DTC brands&rsquo; secret weapon</span>
+    <span>Corporate gifting, reimagined</span>
+    <span>Finally, B2B revenue that doesn&rsquo;t suck</span>
+    <span>Installed in October, $47K by November</span>
+  </div>
+</div>
+
+<!-- SHOWCASE -->
+<section class="showcase reveal" id="how">
+  <h2>The <em>easiest</em> corporate gifting checkout on the internet</h2>
+  <p>100% free to install. We only make money when you do. Customize the perfect gift experience.</p>
+  <div class="tabs">
+    <div class="tab active">Branded</div>
+    <div class="tab">AI parsing</div>
+    <div class="tab">Unwrapping</div>
+    <div class="tab">Tracking</div>
+  </div>
+  <div class="showcase-media reveal reveal-d2">Feature demo</div>
+</section>
+
+<!-- FEATURE: Paste any list -->
+<section class="feature-row">
+  <div class="feature-inner">
+    <div class="feature-text reveal">
+      <span class="chip chip-pink" style="margin-bottom: 18px">AI parsing</span>
+      <h2>Give us anything. We&rsquo;ll <em>figure it out.</em></h2>
+      <p>Emails. Addresses. Names. A mix of all three. Doesn&rsquo;t matter. Drop whatever you have. AI parses, auto-completes, and builds the order. No CSV. No spreadsheet. No lost sales.</p>
+      <a href="#" class="btn btn-ink">Unlock new revenue →</a>
+    </div>
+    <div class="feature-media reveal reveal-d2"><span class="play">▶</span>Media slot</div>
+  </div>
+</section>
+
+<!-- FEATURE: Branded unwrapping -->
+<section class="feature-row">
+  <div class="feature-inner reverse">
+    <div class="feature-text reveal">
+      <span class="chip chip-sky" style="margin-bottom: 18px">Branded unwrapping</span>
+      <h2>The gifter looks like a <em>hero.</em> Not like they bulk-ordered.</h2>
+      <p>Every recipient gets a branded, animated unwrapping experience with a personal message. Your logo, your colors, your vibe. The gifter gets credit for being thoughtful. The recipient remembers your brand. Other platforms send a tracking number.</p>
+      <a href="#" class="btn btn-ink">Unlock new revenue →</a>
+    </div>
+    <div class="feature-media reveal reveal-d2"><span class="play">▶</span>Media slot</div>
+  </div>
+</section>
+
+<!-- FEATURE: 4 clicks -->
+<section class="feature-row">
+  <div class="feature-inner">
+    <div class="feature-text reveal">
+      <span class="chip" style="margin-bottom: 18px">Bulk checkout</span>
+      <h2>One order. 200 gifts. <em>Done.</em></h2>
+      <p>Corporate buyers don&rsquo;t have time. Everything is pre-populated. Gift selected, message written, theme applied. They click through, customize if they want, and checkout in one shot. That&rsquo;s 200 gifts, not 200 separate orders.</p>
+      <a href="#" class="btn btn-ink">Unlock new revenue →</a>
+    </div>
+    <div class="feature-media reveal reveal-d2"><span class="play">▶</span>Media slot</div>
+  </div>
+</section>
+
+<!-- FEATURE: Tracking -->
+<section class="feature-row">
+  <div class="feature-inner reverse">
+    <div class="feature-text reveal">
+      <span class="chip chip-peach" style="margin-bottom: 18px">Tracking</span>
+      <h2>Every gift tracked. Every claim visible. <em>Zero guesswork.</em></h2>
+      <p>Did it arrive? Did they open it? Who hasn&rsquo;t claimed yet? The gifter sees everything in real time. No follow-up emails. No &ldquo;did you get it?&rdquo; texts. Full transparency. That&rsquo;s exactly what makes them order again.</p>
+      <a href="#" class="btn btn-ink">Unlock new revenue →</a>
+    </div>
+    <div class="feature-media reveal reveal-d2"><span class="play">▶</span>Media slot</div>
+  </div>
+</section>
+
+<!-- 3 CARDS -->
+<section class="cards-section" id="proof">
+  <div class="cards-head reveal">
+    <h2>This isn&rsquo;t a Shopify app. It&rsquo;s a <em>revenue channel.</em></h2>
+  </div>
+  <div class="cards-grid">
+    <div class="fcard reveal">
+      <div class="fcard-img">Bundle preview</div>
+      <h3>One order, 200 gifts</h3>
+      <p>Drop emails, addresses, names. Whatever you have. AI builds the order. No spreadsheet. No friction. No lost sales.</p>
+      <a href="#" class="fcard-link">See how →</a>
+    </div>
+    <div class="fcard reveal reveal-d1">
+      <div class="fcard-img">Unwrapping preview</div>
+      <h3>Make the gifter look cool</h3>
+      <p>Branded unwrapping. Personal message. Their logo, their colors. The gifter looks thoughtful. Not like they bulk-ordered from a catalog.</p>
+      <a href="#" class="fcard-link">See the experience →</a>
+    </div>
+    <div class="fcard reveal reveal-d2">
+      <div class="fcard-img">Funnel preview</div>
+      <h3>200 new subscribers per order</h3>
+      <p>Every recipient opts into your marketing from the gift experience. One corporate order fills your funnel with people who&rsquo;ve already held your product.</p>
+      <a href="#" class="fcard-link">See the flywheel →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE: Subscribers -->
+<section class="feature-row">
+  <div class="feature-inner">
+    <div class="feature-text reveal">
+      <span class="chip" style="margin-bottom: 18px">Acquisition</span>
+      <h2>One corporate order. <em>200 new subscribers.</em></h2>
+      <p>Every gift recipient can opt into your marketing right from the unwrapping experience. One order of 200 gifts = 200 people who&rsquo;ve already held your product and are now in your funnel. This isn&rsquo;t a one-off sale. It&rsquo;s an acquisition channel.</p>
+      <a href="#" class="btn btn-ink">Unlock new revenue →</a>
+    </div>
+    <div class="feature-media reveal reveal-d2"><span class="play">▶</span>Media slot</div>
+  </div>
+</section>
+
+<!-- FEATURE: 10% fee -->
+<section class="feature-row" id="pricing">
+  <div class="feature-inner reverse">
+    <div class="feature-text reveal">
+      <span class="chip chip-pink" style="margin-bottom: 18px">Pricing</span>
+      <h2>You keep every dollar. We charge the buyer <em>10%.</em></h2>
+      <p>Other platforms take 20-40% of your revenue. We don&rsquo;t touch your margins. The buyer pays a 10% experience fee because they&rsquo;re getting branded unwrapping, AI-powered ordering, and full tracking. They&rsquo;re happy to pay it. You keep 100% of your product revenue.</p>
+      <a href="#" class="btn btn-ink">Unlock new revenue →</a>
+    </div>
+    <div class="feature-media reveal reveal-d2"><span class="play">▶</span>Media slot</div>
+  </div>
+</section>
+
+<!-- ORIGIN -->
+<section class="origin">
+  <div class="origin-inner reveal">
+    <h2>We didn&rsquo;t build this in a garage. <em>We built it in our own store.</em></h2>
+    <p>We were Shopify merchants who hit $3M in corporate gifting in a single year using our own custom tools. We know every small detail that makes order flows convert. Every friction point that kills a sale. Every follow-up that turns a one-time buyer into a quarterly reorder.</p>
+    <p>We built Giftwell because we wanted to give every merchant the same unfair advantage.</p>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews" id="reviews">
+  <div class="reviews-inner">
+    <div class="reviews-text reveal">
+      <span class="chip chip-pink">★★★★★ 5.0 · Shopify App Store</span>
+      <h2>Real reviews, from <em>real merchants.</em></h2>
+      <p>Don&rsquo;t just take our word for it. See what our merchants say.</p>
+      <a href="#" class="btn btn-ink">Unlock new revenue →</a>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card reveal">
+        <div class="review-header"><h4>$47K in our first month</h4><span class="review-date">Dec 2025</span></div>
+        <div class="review-stars">★★★★★</div>
+        <span class="review-author">Wellness brand · Shopify Plus</span>
+        <p>We installed in October and did $47K in corporate orders by November. One buyer ordered 300 candle sets in a single checkout. That never would&rsquo;ve happened without Giftwell.</p>
+      </div>
+      <div class="review-card reveal reveal-d1">
+        <div class="review-header"><h4>Clients screenshot the unwrapping</h4><span class="review-date">Nov 2025</span></div>
+        <div class="review-stars">★★★★★</div>
+        <span class="review-author">DTC skincare · NYC</span>
+        <p>The gifting experience is what sets us apart. Our corporate buyers say their recipients love the unwrapping. It makes them look thoughtful, not like they did a bulk order.</p>
+      </div>
+      <div class="review-card reveal reveal-d2">
+        <div class="review-header"><h4>Corporate is now bigger than DTC</h4><span class="review-date">Jan 2026</span></div>
+        <div class="review-stars">★★★★★</div>
+        <span class="review-author">Specialty food · LA</span>
+        <p>We did $3M in corporate gifting last year. It&rsquo;s now our biggest channel. The convenience for buyers is what drives repeat orders. They just paste a list and it&rsquo;s done.</p>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-header"><h4>Zero margin hit was the dealbreaker</h4><span class="review-date">Oct 2025</span></div>
+        <div class="review-stars">★★★★★</div>
+        <span class="review-author">Home goods · Shopify</span>
+        <p>Every other platform wanted 20-30% of our revenue. Giftwell charges the buyer, not us. That alone made the decision easy.</p>
+      </div>
+      <div class="review-card reveal reveal-d1">
+        <div class="review-header"><h4>200 new subscribers from one order</h4><span class="review-date">Dec 2025</span></div>
+        <div class="review-stars">★★★★★</div>
+        <span class="review-author">Coffee · Shopify Plus</span>
+        <p>A corporate buyer sent 200 gifts. 180 of those recipients opted into our marketing. Three months later, 40 of them have reordered. That&rsquo;s not gifting. That&rsquo;s acquisition.</p>
+      </div>
+      <div class="review-card reveal reveal-d2">
+        <div class="review-header"><h4>Our buyers keep coming back</h4><span class="review-date">Jan 2026</span></div>
+        <div class="review-stars">★★★★★</div>
+        <span class="review-author">Premium snacks · Austin</span>
+        <p>The tracking dashboard is what does it. Buyers can see exactly who claimed, who hasn&rsquo;t. They feel in control. That&rsquo;s why they reorder every quarter.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-inner reveal">
+    <span class="g-mark"><img src="g-black-bold.png" alt=""></span>
+    <h2>Your next <em>$1M channel</em> starts here.</h2>
+    <p>Free to install. Zero margin hit. Corporate gifting revenue from day one.</p>
+    <a href="#" class="btn btn-ink">Unlock new revenue →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo-col">
+        <span class="footer-mark"><img src="g-black-bold.png" alt=""></span>
+        <p>Corporate gifting for Shopify. Free to install. Charged to the buyer.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <a href="#">How it works</a>
+        <a href="#">Pricing</a>
+        <a href="#">Playbook</a>
+        <a href="#">Changelog</a>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Careers</a>
+        <a href="#">Terms</a>
+        <a href="#">Privacy</a>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <a href="#">Contact</a>
+        <a href="#">Help center</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Giftwell. All rights reserved.</span>
+      <span>Made for Shopify merchants.</span>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+setTimeout(() => {
+  document.querySelectorAll('.reveal').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight) el.classList.add('vis');
+    else observer.observe(el);
+  });
+}, 50);
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>
