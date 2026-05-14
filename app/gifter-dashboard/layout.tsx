@@ -37,11 +37,6 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
               <SidebarLink key={item.href} {...item} />
             ))}
           </nav>
-          <div className="gd-sidebar-sticker" aria-hidden>
-            <span className="gd-sticker-line">made</span>
-            <span className="gd-sticker-line gd-sticker-line-italic">with care</span>
-            <span className="gd-sticker-star">✦</span>
-          </div>
         </aside>
 
         {/* Top-right profile pill */}
@@ -72,7 +67,10 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
             {children}
 
             <footer className="gd-footer-sig">
-              Made with <em>✦</em> by Giftwell
+              <span>Made with</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/g-black-bold.png" alt="Giftwell" className="gd-footer-mark" />
+              <span>by Giftwell</span>
             </footer>
           </div>
         </main>
@@ -214,36 +212,6 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
         }
         .gd-nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
 
-        /* Sidebar bottom sticker */
-        .gd-sidebar-sticker {
-          margin-top: auto;
-          background: var(--gd-peach);
-          border: var(--gd-border);
-          border-radius: 14px;
-          padding: 14px 16px 16px;
-          box-shadow: var(--gd-sticker-sm);
-          transform: rotate(-1.5deg);
-          position: relative;
-          display: flex; flex-direction: column;
-        }
-        .gd-sticker-line {
-          font-family: var(--gd-display);
-          font-size: 17px; line-height: 1.05;
-          color: var(--gd-ink); font-weight: 600;
-        }
-        .gd-sticker-line-italic { font-style: italic; font-weight: 500; }
-        .gd-sticker-star {
-          position: absolute;
-          top: -10px; right: -10px;
-          width: 28px; height: 28px;
-          border-radius: 50%;
-          background: var(--gd-lime);
-          border: var(--gd-border);
-          display: inline-flex; align-items: center; justify-content: center;
-          font-size: 14px;
-          transform: rotate(8deg);
-        }
-
         /* Avatar */
         .gd-avatar {
           width: 34px; height: 34px;
@@ -353,7 +321,10 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
 
         /* Footer signature */
         .gd-footer-sig {
-          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
           font-size: 12px;
           color: var(--gd-ink-muted);
           padding: 44px 16px 16px;
@@ -361,12 +332,10 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
           text-transform: uppercase;
           font-weight: 600;
         }
-        .gd-footer-sig em {
-          font-family: var(--gd-display);
-          font-style: italic;
-          color: var(--gd-pink);
-          margin: 0 4px;
-          font-size: 14px;
+        .gd-footer-mark {
+          width: 16px; height: 16px;
+          object-fit: contain;
+          display: inline-block;
         }
       `}</style>
     </div>
