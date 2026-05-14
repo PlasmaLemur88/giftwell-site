@@ -51,16 +51,16 @@ export default function AccountPage() {
 
       <style jsx>{`
         .gd-account { display: flex; flex-direction: column; gap: 18px; }
-        .gd-page-header { padding: 4px 8px 8px; color: #fff; }
+        .gd-page-header { padding: 4px 8px 8px; color: var(--gd-text); }
         .gd-page-header h1 {
           font-family: 'Georgia', 'Times New Roman', serif;
           font-size: 38px; font-weight: 400; font-style: italic;
           letter-spacing: -0.02em; margin: 0 0 6px;
-          color: #fff;
+          color: var(--gd-text);
         }
         .gd-page-header p {
-          font-size: 14.5px; color: #fff; font-weight: 500;
-          margin: 0; text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
+          font-size: 14.5px; color: var(--gd-text); font-weight: 500;
+          margin: 0; text-shadow: var(--gd-text-shadow);
         }
 
         .gd-card {

@@ -160,28 +160,28 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
 
         /* Hero — sits on the body atmosphere, no card */
         .gd-order-hero {
-          color: #fff;
+          color: var(--gd-text);
           padding: 4px 8px 12px;
         }
         .gd-order-back {
           display: inline-flex; align-items: center;
-          color: #fff; text-decoration: none;
+          color: var(--gd-text); text-decoration: none;
           font-size: 13.5px; margin-bottom: 14px;
           font-weight: 500;
           opacity: 0.9;
-          text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
+          text-shadow: var(--gd-text-shadow);
         }
         .gd-order-back:hover { opacity: 1; }
         .gd-order-title {
           font-family: 'Georgia', 'Times New Roman', serif;
           font-size: 38px; font-weight: 400; font-style: italic;
           letter-spacing: -0.02em; margin: 0 0 6px;
-          color: #fff;
+          color: var(--gd-text);
         }
         .gd-order-meta {
-          font-size: 14px; color: #fff;
+          font-size: 14px; color: var(--gd-text);
           font-weight: 500;
-          text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
+          text-shadow: var(--gd-text-shadow);
         }
 
         /* Health */

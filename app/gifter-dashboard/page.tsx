@@ -173,7 +173,7 @@ export default function GifterHome() {
         /* ─── Hero — no card, just content on the body atmosphere ─── */
         .gd-hero {
           position: relative;
-          color: #fff;
+          color: var(--gd-text);
           padding: 8px 8px 24px;
         }
         .gd-hero-content { position: relative; z-index: 2; }
@@ -183,7 +183,7 @@ export default function GifterHome() {
           letter-spacing: -0.02em;
           line-height: 1;
           margin: 0 0 8px;
-          color: #fff;
+          color: var(--gd-text);
         }
         .gd-hero-name-italic {
           font-family: 'Georgia', 'Times New Roman', serif;
@@ -192,16 +192,16 @@ export default function GifterHome() {
           letter-spacing: -0.015em;
         }
         .gd-hero-name-stop {
-          color: rgba(255, 255, 255, 0.5);
+          opacity: 0.5;
         }
         .gd-hero-tagline {
           font-size: 15px;
-          color: #fff;
+          color: var(--gd-text);
           margin: 0 0 28px;
           font-weight: 500;
-          text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
+          text-shadow: var(--gd-text-shadow);
         }
-        .gd-hero-tagline strong { font-weight: 700; color: #fff; }
+        .gd-hero-tagline strong { font-weight: 700; color: var(--gd-text); }
         .gd-sparkle {
           display: inline-block;
           margin-left: 4px;

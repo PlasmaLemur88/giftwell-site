@@ -1,9 +1,10 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BRAND, BRAND_DARK, GIFTER } from './data';
+import { RandomBackground, type BackgroundMode } from './components/RandomBackground';
 
 const NAV = [
   { href: '/gifter-dashboard',                label: 'Home',         icon: HomeIcon },
@@ -13,8 +14,13 @@ const NAV = [
 ];
 
 export default function GifterDashboardLayout({ children }: { children: ReactNode }) {
+  const [mode, setMode] = useState<BackgroundMode>('dark');
+  const isLight = mode === 'light';
+
   return (
-    <div className="gd-shell">
+    <div className="gd-shell" data-mode={mode}>
+      <RandomBackground onModeChange={setMode} />
+
       {/* Top notice */}
       <div className="gd-notice">
         Preview of the Giftwell gifter dashboard . hosted on <strong>account.giftwell.io</strong> in production
@@ -25,7 +31,7 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
         <aside className="gd-sidebar">
           <div className="gd-sidebar-logo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/g-white-bold.png" alt="" className="gd-mark" />
+            <img src={isLight ? "/g-black-bold.png" : "/g-white-bold.png"} alt="" className="gd-mark" />
             <span className="gd-wordmark">Giftwell</span>
           </div>
           <nav className="gd-sidebar-nav">
@@ -52,7 +58,7 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
             <header className="gd-mobile-header">
               <div className="gd-sidebar-logo" style={{ padding: 0 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/g-white-bold.png" alt="" className="gd-mark" />
+                <img src={isLight ? "/g-black-bold.png" : "/g-white-bold.png"} alt="" className="gd-mark" />
                 <span className="gd-wordmark">Giftwell</span>
               </div>
               <Link href="/gifter-dashboard/account" className="gd-avatar gd-avatar-sm" aria-label="Account">
@@ -85,24 +91,29 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
       <style jsx global>{`
         body { background: #F6F2FA; margin: 0; }
 
+        /* Adaptive text tokens — flip based on the active background mode.
+           Pages reference these via var(--gd-text), var(--gd-text-shadow),
+           var(--gd-text-muted) and re-resolve when the background swaps. */
         .gd-shell {
+          position: relative;
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
           color: #1a1a1f;
           min-height: 100vh;
-          background:
-            radial-gradient(ellipse 75% 240px at 50% 0%, rgba(255, 214, 194, 0.32) 0%, transparent 75%) no-repeat,
-            linear-gradient(180deg,
-              ${BRAND_DARK} 0px,
-              ${BRAND} 60px,
-              #9B7FEC 170px,
-              #BFA6F0 290px,
-              #DCC8F0 420px,
-              #ECDFF3 540px,
-              #F2E9F6 640px,
-              #F6F2FA 760px,
-              #F6F2FA 100%
-            ) no-repeat;
           background-color: #F6F2FA;
+          /* Dark-bg defaults: text-on-purple */
+          --gd-text: #ffffff;
+          --gd-text-muted: rgba(255, 255, 255, 0.92);
+          --gd-text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
+          --gd-nav-pill-bg: rgba(255, 255, 255, 0.96);
+          --gd-nav-pill-text: ${BRAND_DARK};
+        }
+        /* Light-bg override: text-on-white-or-grid */
+        .gd-shell[data-mode="light"] {
+          --gd-text: #1a1a1f;
+          --gd-text-muted: rgba(26, 26, 31, 0.7);
+          --gd-text-shadow: none;
+          --gd-nav-pill-bg: #1a1a1f;
+          --gd-nav-pill-text: #ffffff;
         }
         .gd-notice {
           background: #1a1a1f; color: #fff;
@@ -132,7 +143,10 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
           display: inline-block;
           object-fit: contain;
         }
-        .gd-wordmark { font-size: 16px; font-weight: 700; letter-spacing: -0.005em; color: #fff; }
+        .gd-wordmark {
+          font-size: 16px; font-weight: 700; letter-spacing: -0.005em;
+          color: var(--gd-text);
+        }
 
         .gd-sidebar-nav {
           display: flex; flex-direction: column; gap: 2px;
@@ -142,18 +156,19 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
           display: flex; align-items: center; gap: 10px;
           padding: 10px 12px; border-radius: 10px;
           font-size: 14px; font-weight: 500;
-          color: #fff; text-decoration: none;
-          text-shadow: 0 1px 2px rgba(20, 14, 50, 0.25);
+          color: var(--gd-text); text-decoration: none;
+          text-shadow: var(--gd-text-shadow);
           transition: background 160ms ease, color 160ms ease;
         }
-        .gd-nav-item:hover { background: rgba(255, 255, 255, 0.18); }
+        .gd-shell[data-mode="dark"]  .gd-nav-item:hover { background: rgba(255, 255, 255, 0.18); }
+        .gd-shell[data-mode="light"] .gd-nav-item:hover { background: rgba(15, 15, 25, 0.06); }
         .gd-nav-item-active {
-          background: rgba(255, 255, 255, 0.96);
-          color: ${BRAND_DARK};
+          background: var(--gd-nav-pill-bg);
+          color: var(--gd-nav-pill-text);
           text-shadow: none;
           box-shadow: 0 4px 14px -6px rgba(20, 14, 50, 0.25);
         }
-        .gd-nav-item-active:hover { background: #fff; color: ${BRAND_DARK}; }
+        .gd-nav-item-active:hover { background: var(--gd-nav-pill-bg); color: var(--gd-nav-pill-text); }
         .gd-nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
 
         .gd-sidebar-foot {
