@@ -65,13 +65,6 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
             </header>
 
             {children}
-
-            <footer className="gd-footer-sig">
-              <span>Made with</span>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/g-black-bold.png" alt="Giftwell" className="gd-footer-mark" />
-              <span>by Giftwell</span>
-            </footer>
           </div>
         </main>
       </div>
@@ -319,24 +312,6 @@ export default function GifterDashboardLayout({ children }: { children: ReactNod
           .gd-chat-fab { bottom: 80px; right: 18px; width: 52px; height: 52px; }
         }
 
-        /* Footer signature */
-        .gd-footer-sig {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          font-size: 12px;
-          color: var(--gd-ink-muted);
-          padding: 44px 16px 16px;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-          font-weight: 600;
-        }
-        .gd-footer-mark {
-          width: 16px; height: 16px;
-          object-fit: contain;
-          display: inline-block;
-        }
       `}</style>
     </div>
   );
