@@ -24,13 +24,14 @@ type Metric = {
   positive: boolean;
   Icon: IconComp;
   spark: number[];
+  href: string;
 };
 
 const METRICS: Metric[] = [
-  { label: 'Gifts ordered',       value: '1,284',   delta: '+18.2%', positive: true, Icon: GiftCardIcon,    spark: [62, 68, 70, 78, 84, 92, 96, 104, 110, 118, 124, 132] },
-  { label: 'Active gifters',      value: '92',      delta: '+12.5%', positive: true, Icon: PersonIcon,      spark: [70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92] },
-  { label: 'Recipients claimed',  value: '812',     delta: '+14.8%', positive: true, Icon: CheckCircleIcon, spark: [38, 44, 48, 52, 58, 62, 66, 72, 76, 82, 88, 94] },
-  { label: 'Gift revenue',        value: '$24,180', delta: '+18.0%', positive: true, Icon: CashDollarIcon,  spark: [1100, 1240, 1280, 1420, 1540, 1680, 1820, 1980, 2120, 2280, 2380, 2510] },
+  { label: 'Gifts ordered',       value: '1,284',   delta: '+18.2%', positive: true, Icon: GiftCardIcon,    spark: [62, 68, 70, 78, 84, 92, 96, 104, 110, 118, 124, 132],         href: '/admin-preview/orders' },
+  { label: 'Active gifters',      value: '92',      delta: '+12.5%', positive: true, Icon: PersonIcon,      spark: [70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92],              href: '/admin-preview/reports' },
+  { label: 'Recipients claimed',  value: '812',     delta: '+14.8%', positive: true, Icon: CheckCircleIcon, spark: [38, 44, 48, 52, 58, 62, 66, 72, 76, 82, 88, 94],              href: '/admin-preview/reports' },
+  { label: 'Gift revenue',        value: '$24,180', delta: '+18.0%', positive: true, Icon: CashDollarIcon,  spark: [1100, 1240, 1280, 1420, 1540, 1680, 1820, 1980, 2120, 2280, 2380, 2510], href: '/admin-preview/reports' },
 ];
 
 type OrderStatus = 'Delivered' | 'Shipped' | 'Claimed' | 'Pending';
@@ -43,15 +44,15 @@ const RECENT_ORDERS: Order[] = [
   { id: 'GW-1281', name: 'Jordan Park', count:  5, status: 'Pending'   },
 ];
 
-type Activity = { Icon: IconComp; text: string; time: string };
+type Activity = { Icon: IconComp; text: string; time: string; href: string };
 
 const RECENT_ACTIVITY: Activity[] = [
-  { Icon: GiftCardFilledIcon,   text: 'Sarah Chen claimed her gift',  time: '2m ago' },
-  { Icon: EmailNewsletterIcon,  text: 'Marcus Liu opted in',          time: '14m ago' },
-  { Icon: DeliveryIcon,         text: 'Order #GW-1284 shipped',       time: '1h ago' },
-  { Icon: GiftCardFilledIcon,   text: 'Priya Patel claimed her gift', time: '2h ago' },
-  { Icon: PackageFulfilledIcon, text: 'Order #GW-1281 delivered',     time: '3h ago' },
-  { Icon: EmailNewsletterIcon,  text: 'Alex Kim opted in',            time: '4h ago' },
+  { Icon: GiftCardFilledIcon,   text: 'Sarah Chen claimed her gift',  time: '2m ago',  href: '/admin-preview/orders/GW-1284' },
+  { Icon: EmailNewsletterIcon,  text: 'Marcus Liu opted in',          time: '14m ago', href: '/admin-preview/orders/GW-1283' },
+  { Icon: DeliveryIcon,         text: 'Order #GW-1284 shipped',       time: '1h ago',  href: '/admin-preview/orders/GW-1284' },
+  { Icon: GiftCardFilledIcon,   text: 'Priya Patel claimed her gift', time: '2h ago',  href: '/admin-preview/orders/GW-1282' },
+  { Icon: PackageFulfilledIcon, text: 'Order #GW-1281 delivered',     time: '3h ago',  href: '/admin-preview/orders/GW-1281' },
+  { Icon: EmailNewsletterIcon,  text: 'Alex Kim opted in',            time: '4h ago',  href: '/admin-preview/orders' },
 ];
 
 function Sparkline({ data }: { data: number[] }) {
@@ -135,7 +136,7 @@ export default function DashboardPage() {
             {METRICS.map((m) => {
               const Icon = m.Icon;
               return (
-                <div className="metric-card" key={m.label}>
+                <Link className="metric-card" key={m.label} href={m.href}>
                   <div className="metric-card-top">
                     <span className="metric-icon" aria-hidden><Icon /></span>
                     <span className={`metric-delta-pill ${m.positive ? 'pos' : 'neg'}`}>
@@ -145,7 +146,7 @@ export default function DashboardPage() {
                   <div className="metric-value">{m.value}</div>
                   <div className="metric-label">{m.label}</div>
                   <Sparkline data={m.spark} />
-                </div>
+                </Link>
               );
             })}
           </div>
@@ -157,19 +158,21 @@ export default function DashboardPage() {
           <section className="panel">
             <div className="panel-header">
               <h3 className="panel-title">Recent orders</h3>
-              <Link className="panel-link" href="/admin-preview/reports">View all →</Link>
+              <Link className="panel-link" href="/admin-preview/orders">View all →</Link>
             </div>
             <ul className="order-list">
               {RECENT_ORDERS.map((o) => (
-                <li className="order-row" key={o.id}>
-                  <span className="order-avatar" aria-hidden>
-                    {o.name.charAt(0)}
-                  </span>
-                  <div className="order-meta">
-                    <div className="order-name">{o.name}</div>
-                    <div className="order-sub">#{o.id} · {o.count} gifts</div>
-                  </div>
-                  <span className={`status-pill status-${o.status.toLowerCase()}`}>{o.status}</span>
+                <li key={o.id}>
+                  <Link href={`/admin-preview/orders/${o.id}`} className="order-row">
+                    <span className="order-avatar" aria-hidden>
+                      {o.name.charAt(0)}
+                    </span>
+                    <div className="order-meta">
+                      <div className="order-name">{o.name}</div>
+                      <div className="order-sub">#{o.id} · {o.count} {o.count === 1 ? 'gift' : 'gifts'}</div>
+                    </div>
+                    <span className={`status-pill status-${o.status.toLowerCase()}`}>{o.status}</span>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -178,16 +181,18 @@ export default function DashboardPage() {
           <section className="panel">
             <div className="panel-header">
               <h3 className="panel-title">Recent activity</h3>
-              <Link className="panel-link" href="/admin-preview/reports">View all →</Link>
+              <Link className="panel-link" href="/admin-preview/orders">View all →</Link>
             </div>
             <ul className="activity-list">
               {RECENT_ACTIVITY.map((a, i) => {
                 const Icon = a.Icon;
                 return (
-                  <li className="activity-row" key={i}>
-                    <span className="activity-icon" aria-hidden><Icon /></span>
-                    <span className="activity-text">{a.text}</span>
-                    <span className="activity-time">{a.time}</span>
+                  <li key={i}>
+                    <Link href={a.href} className="activity-row">
+                      <span className="activity-icon" aria-hidden><Icon /></span>
+                      <span className="activity-text">{a.text}</span>
+                      <span className="activity-time">{a.time}</span>
+                    </Link>
                   </li>
                 );
               })}
@@ -261,16 +266,28 @@ export default function DashboardPage() {
         @media (max-width: 1080px) { .metric-strip { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 540px) { .metric-strip { grid-template-columns: 1fr; } }
 
-        .metric-card {
+        /* Card chrome — use :global so flex/text styles apply to the <a>
+           rendered by next/link (styled-jsx hash scoping doesn't always
+           reach inside Link). */
+        :global(.metric-card) {
           background: #fff;
-          border: 1px solid #dcdcde;
+          border: 1px solid #d4d4d8;
           border-radius: 14px;
           padding: 18px 18px 14px;
-          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
+          box-shadow: 0 1px 3px rgba(15, 15, 25, 0.04), 0 4px 12px -6px rgba(15, 15, 25, 0.06);
           display: flex;
           flex-direction: column;
           gap: 4px;
           min-width: 0;
+          text-decoration: none;
+          color: inherit;
+          cursor: pointer;
+          transition: border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+        }
+        :global(.metric-card:hover) {
+          border-color: #a8a8b0;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba(15, 15, 25, 0.06), 0 10px 24px -10px rgba(15, 15, 25, 0.14);
         }
         .metric-card-top {
           display: flex;
@@ -331,10 +348,10 @@ export default function DashboardPage() {
 
         .panel {
           background: #fff;
-          border: 1px solid #dcdcde;
+          border: 1px solid #d4d4d8;
           border-radius: 14px;
           padding: 18px 20px;
-          box-shadow: 0 1px 2px rgba(15, 15, 25, 0.03);
+          box-shadow: 0 1px 3px rgba(15, 15, 25, 0.04), 0 4px 12px -6px rgba(15, 15, 25, 0.06);
         }
         .panel-header {
           display: flex;
@@ -364,14 +381,22 @@ export default function DashboardPage() {
           display: flex;
           flex-direction: column;
         }
-        .order-row {
+        /* :global so flex/spacing applies to the <a> rendered by next/link. */
+        :global(.order-row) {
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 10px 0;
+          padding: 10px 4px;
+          margin: 0 -4px;
           border-top: 1px solid #f0f0f2;
+          border-radius: 8px;
+          text-decoration: none;
+          color: inherit;
+          cursor: pointer;
+          transition: background 120ms ease;
         }
-        .order-row:first-child { border-top: none; }
+        :global(.order-row:hover) { background: #f7f7f9; }
+        .order-list :global(li):first-child :global(.order-row) { border-top: none; }
         .order-avatar {
           width: 32px;
           height: 32px;
@@ -403,14 +428,21 @@ export default function DashboardPage() {
         .status-claimed   { background: #F3E8FF; color: #6D28D9; }
         .status-pending   { background: #FEF3C7; color: #92400E; }
 
-        .activity-row {
+        :global(.activity-row) {
           display: flex;
           align-items: center;
           gap: 10px;
-          padding: 9px 0;
+          padding: 9px 4px;
+          margin: 0 -4px;
           border-top: 1px solid #f0f0f2;
+          border-radius: 8px;
+          text-decoration: none;
+          color: inherit;
+          cursor: pointer;
+          transition: background 120ms ease;
         }
-        .activity-row:first-child { border-top: none; }
+        :global(.activity-row:hover) { background: #f7f7f9; }
+        .activity-list :global(li):first-child :global(.activity-row) { border-top: none; }
         .activity-icon {
           width: 26px;
           height: 26px;
