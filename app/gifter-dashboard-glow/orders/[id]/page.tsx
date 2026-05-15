@@ -19,6 +19,18 @@ export default function GlowOrderDetail({ params }: { params: Promise<{ id: stri
   const order = ORDERS.find((o) => o.id === id);
   const [filter, setFilter] = useState<typeof FILTERS[number]>('All');
   const [search, setSearch] = useState('');
+  const [actioned, setActioned] = useState<{ id: string; kind: 'copied' | 'resent' } | null>(null);
+
+  function copyLink(rid: string, link: string) {
+    navigator.clipboard?.writeText(link);
+    setActioned({ id: rid, kind: 'copied' });
+    setTimeout(() => setActioned((a) => (a?.id === rid ? null : a)), 1600);
+  }
+  function resend(rid: string, link: string) {
+    navigator.clipboard?.writeText(link);
+    setActioned({ id: rid, kind: 'resent' });
+    setTimeout(() => setActioned((a) => (a?.id === rid ? null : a)), 1600);
+  }
 
   if (!order) {
     return (
@@ -78,6 +90,17 @@ export default function GlowOrderDetail({ params }: { params: Promise<{ id: stri
           <div className="gdg-unboxing-msg">&ldquo;{order.unboxing.message}&rdquo;</div>
         </div>
       </section>
+
+      {/* Developer note — explains the prototype vs. production architecture */}
+      <aside className="gdg-devnote" aria-label="Developer note">
+        <span className="gdg-devnote-tag">Dev note</span>
+        <span className="gdg-devnote-body">
+          In production this preview re-renders from the same design record as the unboxing experience — it&rsquo;s
+          not scraped from the URL. The fields (<code>theme</code>, <code>scene</code>, <code>message</code>, etc.) live on{' '}
+          <code>UnboxingDesign</code> in <code>app/gifter-dashboard/data.ts</code>; real captures drop in via{' '}
+          <code>previewImage</code>. See <code>docs/digital-unboxing.md</code> for the full architecture.
+        </span>
+      </aside>
 
       {/* Health */}
       <section className="gdg-health">
@@ -139,7 +162,8 @@ export default function GlowOrderDetail({ params }: { params: Promise<{ id: stri
           <div className="gdg-empty">No recipients match.</div>
         ) : (
           filtered.map((r) => {
-            const isStuck = r.status === 'Pending';
+            const isCopied = actioned?.id === r.id && actioned.kind === 'copied';
+            const isResent = actioned?.id === r.id && actioned.kind === 'resent';
             return (
               <div key={r.id} className="gdg-recipient">
                 <span className="gdg-recipient-avatar" style={{ background: avatarGradient(r.initials) }}>
@@ -154,7 +178,23 @@ export default function GlowOrderDetail({ params }: { params: Promise<{ id: stri
                 </div>
                 <div className="gdg-recipient-right">
                   <span className={`gdg-rec-status gdg-rec-status-${r.status.toLowerCase()}`}>{r.status}</span>
-                  {isStuck && <button className="gdg-resend">Resend</button>}
+                  <div className="gdg-rec-actions">
+                    <button
+                      type="button"
+                      className={`gdg-rec-action ${isCopied ? 'gdg-rec-action-ok' : ''}`}
+                      onClick={() => copyLink(r.id, r.link)}
+                      title={r.link}
+                    >
+                      {isCopied ? '✓ Copied' : 'Copy link'}
+                    </button>
+                    <button
+                      type="button"
+                      className={`gdg-rec-action gdg-rec-action-primary ${isResent ? 'gdg-rec-action-ok' : ''}`}
+                      onClick={() => resend(r.id, r.link)}
+                    >
+                      {isResent ? '✓ Resent' : 'Resend'}
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -234,6 +274,33 @@ export default function GlowOrderDetail({ params }: { params: Promise<{ id: stri
         @media (max-width: 620px) {
           .gdg-unboxing-caption { flex-direction: column; align-items: flex-start; gap: 10px; }
           .gdg-unboxing-msg { text-align: left; max-width: none; }
+        }
+
+        /* Dev note callout */
+        .gdg-devnote {
+          display: flex; align-items: flex-start; gap: 12px;
+          padding: 12px 16px;
+          background: rgba(124, 92, 255, 0.06);
+          border: 1px dashed rgba(124, 92, 255, 0.35);
+          border-radius: var(--gdg-radius);
+          font-size: 12.5px; line-height: 1.55;
+          color: var(--gdg-text-soft);
+        }
+        .gdg-devnote-tag {
+          flex-shrink: 0;
+          font-size: 10px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.1em;
+          padding: 3px 8px; border-radius: 4px;
+          background: rgba(124, 92, 255, 0.22);
+          color: #C4B5FD;
+          margin-top: 1px;
+        }
+        .gdg-devnote-body code {
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 11.5px;
+          background: rgba(255, 255, 255, 0.06);
+          padding: 1px 5px; border-radius: 3px;
+          color: var(--gdg-text);
         }
 
         /* Health */
@@ -342,16 +409,34 @@ export default function GlowOrderDetail({ params }: { params: Promise<{ id: stri
         .gdg-rec-status-delivered { background: rgba(96, 165, 250, 0.16); color: #93C5FD; }
         .gdg-rec-status-pending   { background: rgba(251, 191, 36, 0.16); color: #FCD34D; }
         .gdg-rec-status-bounced   { background: rgba(248, 113, 113, 0.16); color: #FCA5A5; }
-        .gdg-resend {
+        .gdg-rec-actions {
+          display: inline-flex; align-items: center; gap: 6px;
+        }
+        .gdg-rec-action {
           all: unset; cursor: pointer;
           font-size: 12px; font-weight: 600;
-          color: var(--gdg-text); padding: 6px 13px;
-          border-radius: 999px;
+          color: var(--gdg-text-soft);
+          padding: 6px 12px; border-radius: 999px;
           background: var(--gdg-pill);
           border: 1px solid var(--gdg-hairline);
-          transition: background 140ms ease;
+          transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+          white-space: nowrap;
         }
-        .gdg-resend:hover { background: var(--gdg-pill-hover); }
+        .gdg-rec-action:hover { background: var(--gdg-pill-hover); color: var(--gdg-text); }
+        .gdg-rec-action-primary {
+          color: var(--gdg-text);
+          background: rgba(124, 92, 255, 0.18);
+          border-color: rgba(124, 92, 255, 0.45);
+        }
+        .gdg-rec-action-primary:hover {
+          background: rgba(124, 92, 255, 0.28);
+          border-color: rgba(124, 92, 255, 0.7);
+        }
+        .gdg-rec-action-ok {
+          background: rgba(52, 211, 153, 0.22) !important;
+          border-color: rgba(52, 211, 153, 0.55) !important;
+          color: #6EE7B7 !important;
+        }
 
         .gdg-empty {
           padding: 36px; text-align: center;

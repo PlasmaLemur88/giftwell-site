@@ -37,17 +37,25 @@ export function getAllPeople(): Recipient[] {
 export type GifterOrderStatus = 'Sent' | 'Scheduled' | 'Draft' | 'Completed';
 
 /* The branded digital unboxing each recipient sees when they open the gift.
-   Card posters render a live preview of this design. */
+   Card posters render a live preview of this design.
+
+   In production this record is the *source of truth* — the unboxing experience
+   page and the dashboard preview both render from it. The dashboard does NOT
+   scrape the unboxing URL; it re-renders the same design data at card size.
+   (See docs/digital-unboxing.md for the architecture.) */
 export type UnboxingDesign = {
   theme: string;       // display name of the unboxing design
   occasion: string;    // what the campaign is for
-  scene: string;       // CSS background for the unwrap scene
-  box: string;         // gift box body color
-  lid: string;         // gift box lid color
-  ribbon: string;      // ribbon + bow color
-  accent: string;      // sparkle / accent color
-  motif: string;       // emoji motif
+  scene: string;       // CSS background for the unwrap scene (fallback render)
+  box: string;         // gift box body color (fallback render)
+  lid: string;         // gift box lid color (fallback render)
+  ribbon: string;      // ribbon + bow color (fallback render)
+  accent: string;      // sparkle / accent color (fallback render)
+  motif: string;       // emoji motif (fallback render)
   message: string;     // the note shown inside the unwrap
+  /* Real-asset capture of the unboxing experience. When present, the preview
+     renders this image; otherwise the CSS scene above is used as a fallback. */
+  previewImage?: string;
 };
 
 export type GifterOrder = {
@@ -147,15 +155,16 @@ export const ORDERS: GifterOrder[] = [
     bounced: 0,
     budgetPerRecipient: '$120',
     unboxing: {
-      theme: 'Autumn Thanks',
-      occasion: 'Year-end partner gifts',
-      scene: 'linear-gradient(160deg, #6B3A1E, #A8551F)',
-      box: '#F4E4C8',
-      lid: '#FBF0D8',
-      ribbon: '#C4622A',
-      accent: '#E8A23E',
-      motif: '🍂',
-      message: 'Grateful for a great year together.',
+      theme: 'Feno · Elite Oral Health',
+      occasion: 'Year-end partner thank-you',
+      scene: 'linear-gradient(160deg, #0A1A3A, #1B2C5C)',
+      box: '#F4F6FB',
+      lid: '#FFFFFF',
+      ribbon: '#3A6BE0',
+      accent: '#8FB3FF',
+      motif: '✦',
+      message: 'We wanted to say thanks with an Elite Oral Health!',
+      previewImage: '/unboxings/feno-elite-oral-health.jpg',
     },
   },
   {
@@ -217,6 +226,10 @@ export type Recipient = {
   status: RecipientStatus;
   picked?: string;
   tracking?: string;
+  /* Per-recipient unboxing link. In production this is a tokenised URL the
+     recipient receives in their gift email — the gifter can copy or resend it
+     from the dashboard. Mocked here. */
+  link: string;
 };
 
 const NAMES: { name: string; email: string }[] = [
@@ -278,6 +291,7 @@ export function getRecipients(order: GifterOrder): Recipient[] {
     else if (bouncedRemaining > 0) { status = 'Bounced'; bouncedRemaining--; }
     else { status = 'Pending'; }
 
+    const token = ((seed + i * 991) >>> 0).toString(36).padStart(7, '0').slice(0, 7);
     out.push({
       id: `${order.id}-${i + 1}`,
       name: pick.name,
@@ -286,6 +300,7 @@ export function getRecipients(order: GifterOrder): Recipient[] {
       status,
       picked: (status === 'Delivered' || status === 'Claimed') ? PRODUCTS[productIdx] : undefined,
       tracking: status === 'Delivered' ? `1Z${((seed + i) >>> 0).toString(36).slice(0, 6).toUpperCase()}45` : undefined,
+      link: `https://giftwell.link/g/${token}`,
     });
   }
   return out;

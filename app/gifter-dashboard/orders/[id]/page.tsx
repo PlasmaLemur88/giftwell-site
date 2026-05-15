@@ -26,6 +26,18 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
   const order = ORDERS.find((o) => o.id === id);
   const [filter, setFilter] = useState<typeof FILTERS[number]>('All');
   const [search, setSearch] = useState('');
+  const [actioned, setActioned] = useState<{ id: string; kind: 'copied' | 'resent' } | null>(null);
+
+  function copyLink(rid: string, link: string) {
+    navigator.clipboard?.writeText(link);
+    setActioned({ id: rid, kind: 'copied' });
+    setTimeout(() => setActioned((a) => (a?.id === rid ? null : a)), 1600);
+  }
+  function resend(rid: string, link: string) {
+    navigator.clipboard?.writeText(link);
+    setActioned({ id: rid, kind: 'resent' });
+    setTimeout(() => setActioned((a) => (a?.id === rid ? null : a)), 1600);
+  }
 
   if (!order) {
     return (
@@ -82,6 +94,18 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
           <div className="gd-unboxing-msg">&ldquo;{order.unboxing.message}&rdquo;</div>
         </div>
       </section>
+
+      {/* Developer note — explains the prototype vs. production architecture */}
+      <aside className="gd-devnote" aria-label="Developer note">
+        <span className="gd-devnote-tag">Dev note</span>
+        <span className="gd-devnote-body">
+          In production this preview re-renders from the same design record as the unboxing experience —
+          it&rsquo;s not scraped from the URL. The fields (<code>theme</code>, <code>scene</code>,{' '}
+          <code>message</code>, etc.) live on <code>UnboxingDesign</code> in{' '}
+          <code>app/gifter-dashboard/data.ts</code>; real captures drop in via <code>previewImage</code>.
+          See <code>docs/digital-unboxing.md</code> for the full architecture.
+        </span>
+      </aside>
 
       <section className="gd-health">
         <div className="gd-health-bar">
@@ -146,7 +170,8 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
           <div className="gd-empty">No recipients match.</div>
         ) : (
           filtered.map((r) => {
-            const isStuck = r.status === 'Pending';
+            const isCopied = actioned?.id === r.id && actioned.kind === 'copied';
+            const isResent = actioned?.id === r.id && actioned.kind === 'resent';
             return (
               <div key={r.id} className="gd-recipient-row">
                 <span className="gd-recipient-avatar" style={{
@@ -163,9 +188,23 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
                   <span className="gd-recipient-status" style={{ background: STATUS_PILL_BG[r.status] }}>
                     {r.status}
                   </span>
-                  {isStuck && (
-                    <button className="gd-recipient-resend">Resend</button>
-                  )}
+                  <div className="gd-rec-actions">
+                    <button
+                      type="button"
+                      className={`gd-rec-action ${isCopied ? 'gd-rec-action-ok' : ''}`}
+                      onClick={() => copyLink(r.id, r.link)}
+                      title={r.link}
+                    >
+                      {isCopied ? '✓ Copied' : 'Copy link'}
+                    </button>
+                    <button
+                      type="button"
+                      className={`gd-rec-action gd-rec-action-primary ${isResent ? 'gd-rec-action-ok' : ''}`}
+                      onClick={() => resend(r.id, r.link)}
+                    >
+                      {isResent ? '✓ Resent' : 'Resend'}
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -255,6 +294,32 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
         @media (max-width: 620px) {
           .gd-unboxing-caption { flex-direction: column; align-items: flex-start; gap: 10px; }
           .gd-unboxing-msg { text-align: left; max-width: none; }
+        }
+
+        /* Dev note callout */
+        .gd-devnote {
+          display: flex; align-items: flex-start; gap: 12px;
+          padding: 12px 16px;
+          background: var(--gd-paper);
+          border: 1.5px dashed var(--gd-ink);
+          border-radius: var(--gd-radius);
+          font-size: 12.5px; line-height: 1.55;
+          color: var(--gd-ink-soft);
+        }
+        .gd-devnote-tag {
+          flex-shrink: 0;
+          font-size: 10px; font-weight: 800;
+          text-transform: uppercase; letter-spacing: 0.12em;
+          padding: 3px 8px; border-radius: 4px;
+          background: var(--gd-ink); color: var(--gd-cream);
+          margin-top: 1px;
+        }
+        .gd-devnote-body code {
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 11.5px;
+          background: rgba(15, 15, 18, 0.08);
+          padding: 1px 5px; border-radius: 3px;
+          color: var(--gd-ink);
         }
 
         .gd-health {
@@ -389,20 +454,31 @@ export default function GifterOrderDetail({ params }: { params: Promise<{ id: st
           color: var(--gd-ink);
           border: 1.5px solid var(--gd-ink);
         }
-        .gd-recipient-resend {
-          all: unset; cursor: pointer;
-          font-size: 12px; font-weight: 700;
-          color: var(--gd-ink); padding: 6px 12px;
-          border-radius: 999px;
-          background: var(--gd-lime);
-          border: 1.5px solid var(--gd-ink);
-          box-shadow: 3px 3px 0 var(--gd-ink);
-          text-transform: uppercase; letter-spacing: 0.05em;
-          transition: transform 140ms ease, box-shadow 140ms ease;
+        .gd-rec-actions {
+          display: inline-flex; align-items: center; gap: 6px;
         }
-        .gd-recipient-resend:hover {
+        .gd-rec-action {
+          all: unset; cursor: pointer;
+          font-size: 11px; font-weight: 700;
+          color: var(--gd-ink); padding: 5px 11px;
+          border-radius: 999px;
+          background: var(--gd-paper);
+          border: 1.5px solid var(--gd-ink);
+          box-shadow: 2px 2px 0 var(--gd-ink);
+          text-transform: uppercase; letter-spacing: 0.05em;
+          white-space: nowrap;
+          transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+        }
+        .gd-rec-action:hover {
           transform: translate(-1px, -1px);
-          box-shadow: 4px 4px 0 var(--gd-ink);
+          box-shadow: 3px 3px 0 var(--gd-ink);
+        }
+        .gd-rec-action-primary {
+          background: var(--gd-lime);
+        }
+        .gd-rec-action-ok {
+          background: var(--gd-sky) !important;
+          color: var(--gd-ink) !important;
         }
 
         .gd-empty {

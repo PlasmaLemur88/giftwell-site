@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { UnboxingDesign } from '../data';
 
 /**
@@ -7,6 +8,14 @@ import type { UnboxingDesign } from '../data';
  * open their gift. Rendered on order cards + order detail so the dashboard
  * reads as a gallery of the gift designs the gifter set up — the way
  * Partiful event cards show the host's own flyer art.
+ *
+ * RENDER PRIORITY:
+ *   1. If `design.previewImage` is set AND loads successfully → render it.
+ *   2. Otherwise → render the CSS scene (gift box, motifs, sparkles).
+ *
+ * In production both modes should be replaced by a single shared renderer
+ * that draws from the same design record as the unboxing experience itself —
+ * see docs/digital-unboxing.md for the architecture.
  */
 export function DigitalUnboxingPreview({
   design,
@@ -21,6 +30,9 @@ export function DigitalUnboxingPreview({
   bordered?: boolean;
   showLabel?: boolean;
 }) {
+  const [imageOk, setImageOk] = useState(true);
+  const useImage = !!design.previewImage && imageOk;
+
   return (
     <div
       className="dup"
@@ -31,23 +43,35 @@ export function DigitalUnboxingPreview({
         border: bordered ? '1.5px solid #0F0F12' : undefined,
       }}
     >
-      {/* Floating motif + sparkles */}
-      <span className="dup-motif dup-motif-1" aria-hidden>{design.motif}</span>
-      <span className="dup-motif dup-motif-2" aria-hidden>{design.motif}</span>
-      <span className="dup-spark dup-spark-1" style={{ color: design.accent }} aria-hidden>✦</span>
-      <span className="dup-spark dup-spark-2" style={{ color: design.accent }} aria-hidden>✦</span>
-      <span className="dup-spark dup-spark-3" style={{ color: design.accent }} aria-hidden>✦</span>
+      {useImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          className="dup-image"
+          src={design.previewImage}
+          alt={`${design.theme} unboxing preview`}
+          onError={() => setImageOk(false)}
+        />
+      ) : (
+        <>
+          {/* Floating motif + sparkles */}
+          <span className="dup-motif dup-motif-1" aria-hidden>{design.motif}</span>
+          <span className="dup-motif dup-motif-2" aria-hidden>{design.motif}</span>
+          <span className="dup-spark dup-spark-1" style={{ color: design.accent }} aria-hidden>✦</span>
+          <span className="dup-spark dup-spark-2" style={{ color: design.accent }} aria-hidden>✦</span>
+          <span className="dup-spark dup-spark-3" style={{ color: design.accent }} aria-hidden>✦</span>
 
-      {/* Gift box */}
-      <div className="dup-box-wrap">
-        <div className="dup-box" style={{ background: design.box }}>
-          <span className="dup-ribbon-v" style={{ background: design.ribbon }} />
-          <span className="dup-ribbon-h" style={{ background: design.ribbon }} />
-        </div>
-        <span className="dup-lid" style={{ background: design.lid }} />
-        <span className="dup-bow" style={{ background: design.ribbon }} />
-        <span className="dup-bow-knot" style={{ background: design.ribbon }} />
-      </div>
+          {/* Gift box */}
+          <div className="dup-box-wrap">
+            <div className="dup-box" style={{ background: design.box }}>
+              <span className="dup-ribbon-v" style={{ background: design.ribbon }} />
+              <span className="dup-ribbon-h" style={{ background: design.ribbon }} />
+            </div>
+            <span className="dup-lid" style={{ background: design.lid }} />
+            <span className="dup-bow" style={{ background: design.ribbon }} />
+            <span className="dup-bow-knot" style={{ background: design.ribbon }} />
+          </div>
+        </>
+      )}
 
       {/* "Previewing the digital unboxing" label */}
       {showLabel && (
@@ -66,6 +90,13 @@ export function DigitalUnboxingPreview({
           width: 100%;
           overflow: hidden;
           box-sizing: border-box;
+        }
+        .dup-image {
+          position: absolute;
+          inset: 0;
+          width: 100%; height: 100%;
+          object-fit: cover;
+          display: block;
         }
 
         /* Gift box — proportional so it scales at any card size */
