@@ -3,6 +3,14 @@
 This is the state of work in flight at the end of the 2026-05-15 session.
 Read this first if you (or a fresh Claude session) want to resume.
 
+> **Also read [`catchup-2026-05-15.md`](./catchup-2026-05-15.md)** — the
+> full strategic catchup the user dumped at end of session. 15-section
+> product spec covering the Gifter Design Page, the email/unwrap
+> "honor the gifter" framing, the brand landing page, the gifter
+> dashboard, all of merchant admin, the marketing site, the demo store,
+> plus cross-cutting terminology + open meta-decisions. **That doc is
+> the spec; this file is the session state.**
+
 ---
 
 ## TL;DR
@@ -66,10 +74,15 @@ question was dismissed without a pick. See "Strategic note" below.
    the Feno preview appears everywhere the order card renders + in the
    embed in `docs/digital-unboxing.md`.
 2. **Pick a direction for the gifter dashboard.** See "Strategic note"
-   below. Without a pick, the dashboard stays a dashboard.
+   below. The catchup doc (§Open meta-decisions) confirms Brandon leans
+   Partyful-style — but the formal lock hasn't happened.
 3. **Decide merge order for #13 and #14.** They don't conflict. Merging
    #14 first then syncing into the #13 branch (or vice versa) decides
    which preview gets the unified state first.
+4. **Lock the meta-decisions in `catchup-2026-05-15.md`** — 7 items at
+   the bottom of that doc need a pick before the next sync. Most depend
+   on a conversation with Gustavo, Greg, or external research (e.g.
+   Shopify Components inventory).
 
 ---
 
@@ -231,9 +244,14 @@ truth for the architecture.
 
 ## Quick-start prompt for the next session
 
-> Resume work on the Giftwell gifter dashboard. Read
-> `docs/NEXT-SESSION.md` first for current state — PRs #13 and #14 are
-> open with green CI and live Vercel previews. Pending user action: the
-> Feno screenshot upload, the Partiful direction decision, and the merge
-> order for the two PRs. Don't push to `main` directly. Don't try
-> outbound `vercel.com` or direct `github.com` — use the GitHub MCP tools.
+> Resume work on Giftwell. Read `docs/NEXT-SESSION.md` for current state,
+> then `docs/catchup-2026-05-15.md` for the full product spec (15
+> sections covering Gifter Design Page, gifter/merchant dashboards,
+> email center, landing page, onboarding, marketing site, demo store,
+> plus terminology + cross-cutting). PRs #13 (gifter dashboard) and #14
+> (admin polish) are open with green CI and live Vercel previews.
+> Pending user action: the Feno screenshot upload, the Partyful
+> direction decision, the merge order for the two PRs, and the 7
+> open meta-decisions at the bottom of the catchup doc. Don't push to
+> `main` directly. Don't try outbound `vercel.com` or direct
+> `github.com` — use the GitHub MCP tools.
