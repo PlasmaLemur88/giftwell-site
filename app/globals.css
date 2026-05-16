@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
 @import "tailwindcss";
 
 /* ── Giftwell Design System — Partiful-inspired ── */
@@ -312,4 +314,120 @@ body {
   background: var(--gw-gray-100);
   color: var(--gw-gray-900);
   border-bottom-left-radius: 4px;
+}
+
+/* ── Aurora background (gifter dashboard) ── */
+
+:root {
+  --white: #ffffff;
+  --black: #000000;
+  --transparent: transparent;
+  /* Brand-tinted aurora palette (purple-violet-peach) */
+  --aurora-1: #5C3FE0;
+  --aurora-2: #7C5CFF;
+  --aurora-3: #A78BFA;
+  --aurora-4: #C5ADF5;
+  --aurora-5: #FFD6C2;
+  /* shadcn-style foreground/background tokens used by GlassButton */
+  --foreground: oklch(0.145 0 0);
+  --background: oklch(1 0 0);
+}
+
+@keyframes aurora {
+  from { background-position: 50% 50%, 50% 50%; }
+  to   { background-position: 350% 50%, 350% 50%; }
+}
+
+@theme {
+  --animate-aurora: aurora 60s linear infinite;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Gifter Dashboard — Partiful-style tokens
+   Cream paper base · ink black borders · sticker shadows ·
+   peach + lime + hot pink accents · Fraunces display italic
+   ─────────────────────────────────────────────────────────── */
+
+.gd-shell {
+  /* Surfaces */
+  --gd-cream:        #F1ECDE;
+  --gd-cream-deep:   #E6DFCB;
+  --gd-paper:        #FFF8EC;
+  --gd-ink:          #0F0F12;
+  --gd-ink-soft:     #2A2A30;
+  --gd-ink-muted:    #5E5E68;
+
+  /* Accent palette */
+  --gd-peach:        #FFD6C2;
+  --gd-peach-deep:   #FFB89D;
+  --gd-lime:         #D4F542;
+  --gd-lime-deep:    #B8E024;
+  --gd-pink:         #FF4D8D;
+  --gd-pink-soft:    #FFC2D6;
+  --gd-sky:          #C8E6FF;
+
+  /* Status (kept calmer than accents so data stays scannable) */
+  --gd-success:      #1F8A4C;
+  --gd-info:         #3A6EE0;
+  --gd-warn:         #E0A23E;
+  --gd-danger:       #E04F4F;
+
+  /* Sticker tokens */
+  --gd-border:       1.5px solid var(--gd-ink);
+  --gd-sticker:      4px 4px 0 var(--gd-ink);
+  --gd-sticker-lg:   6px 6px 0 var(--gd-ink);
+  --gd-sticker-sm:   3px 3px 0 var(--gd-ink);
+  --gd-radius:       14px;
+  --gd-radius-lg:    18px;
+
+  /* Typography */
+  --gd-display: 'Fraunces', 'Georgia', 'Times New Roman', serif;
+  --gd-body:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Sticker animation: lift on hover */
+@keyframes gd-sticker-pop {
+  from { transform: translate(0, 0);   box-shadow: 4px 4px 0 var(--gd-ink); }
+  to   { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--gd-ink); }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Gifter Dashboard — "Glow" variant (Partiful-style)
+   Committed dark base · purple ambient bloom · charcoal pills ·
+   heavy Clash Display headings · soft rounded cards, no borders
+   ─────────────────────────────────────────────────────────── */
+
+.gdg-shell {
+  /* Surfaces */
+  --gdg-bg:          #0A0A0C;
+  --gdg-surface:     #161619;
+  --gdg-surface-2:   #1E1E23;
+  --gdg-pill:        #222227;
+  --gdg-pill-hover:  #2C2C33;
+  --gdg-hairline:    rgba(255, 255, 255, 0.08);
+
+  /* Text */
+  --gdg-text:        #FFFFFF;
+  --gdg-text-soft:   rgba(255, 255, 255, 0.62);
+  --gdg-text-dim:    rgba(255, 255, 255, 0.40);
+
+  /* Brand + accents */
+  --gdg-purple:      #7C5CFF;
+  --gdg-purple-deep: #5C3FE0;
+  --gdg-purple-soft: #A78BFA;
+  --gdg-blue:        #4A9EFF;
+
+  /* Status — tuned for dark */
+  --gdg-success:     #34D399;
+  --gdg-info:        #60A5FA;
+  --gdg-warn:        #FBBF24;
+  --gdg-danger:      #F87171;
+
+  /* Shape */
+  --gdg-radius:      18px;
+  --gdg-radius-lg:   22px;
+
+  /* Type */
+  --gdg-display:     'Clash Display', 'Inter', -apple-system, sans-serif;
+  --gdg-body:        'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
